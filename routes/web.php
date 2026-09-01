@@ -1,6 +1,6 @@
 <?php
 use App\Http\Controllers\LoanController;
-use App\Http\Controllers\reportController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\ItemController;
@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
             Route::put('/{item}', [ItemController::class, 'update'])->name('update');
         });
-        
+
         // MODUL MASTER INSTANSI
         Route::prefix('borrowers')->name('borrowers.')->group(function () {
             Route::get('/', [BorrowerController::class, 'index'])->name('index');
@@ -51,28 +51,19 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{borrower}/edit', [BorrowerController::class, 'edit'])->name('edit');
             Route::put('/{borrower}', [BorrowerController::class, 'update'])->name('update');
         });
-    });
 
-    Route::middleware(['role:Super Admin'])->group(function () {
-        
-        // Route Mutasi Stok...
+        // MODUL MUTASI STOK / LEDGER
         Route::prefix('stocks')->name('stocks.')->group(function () {
-            // ... (kode stocks sebelumnya)
+            Route::get('/', [StockMovementController::class, 'index'])->name('index');
+            Route::get('/create', [StockMovementController::class, 'create'])->name('create');
+            Route::post('/', [StockMovementController::class, 'store'])->name('store');
         });
 
-        // Route Laporan Bulanan
+        // MODUL LAPORAN
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export-pdf', [ReportController::class, 'exportPdf'])->name('export-pdf');
         });
-
-    });
-
-    // MODUL MUTASI STOK / LEDGER
-    Route::middleware(['role:Super Admin'])->prefix('stocks')->name('stocks.')->group(function () {
-        Route::get('/', [StockMovementController::class, 'index'])->name('index');
-        Route::get('/create', [StockMovementController::class, 'create'])->name('create');
-        Route::post('/', [StockMovementController::class, 'store'])->name('store'); 
     });
 
 });

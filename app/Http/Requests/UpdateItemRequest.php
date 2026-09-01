@@ -19,6 +19,7 @@ class UpdateItemRequest extends FormRequest
                 'max:50', 
                 Rule::unique('items')->ignore($this->item) // Abaikan SKU ini sendiri
             ],
+            'total_qty' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

@@ -13,6 +13,7 @@ class StoreItemRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'sku'  => ['required', 'string', 'max:50', 'unique:items,sku'],
+            'total_qty' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }
