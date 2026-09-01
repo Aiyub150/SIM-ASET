@@ -88,5 +88,12 @@
     
     <!-- Tempat injeksi JavaScript tambahan (jika halaman butuh JS khusus) -->
     @stack('scripts')
+
+    <!-- Footer copyright -->
+    <footer class="bg-light text-center py-3 mt-4">
+        <div class="container">
+            <small class="text-muted">© 2026 Aiyub Heriyanto. All rights reserved.</small>
+        </div>
+    </footer>
 </body>
 </html>
