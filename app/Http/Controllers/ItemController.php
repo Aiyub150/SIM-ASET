@@ -23,12 +23,14 @@ class ItemController extends Controller
 
     public function store(StoreItemRequest $request): RedirectResponse
     {
-        // Paksa stok awal menjadi 0
+        // Jika total_qty diberikan oleh Super Admin, gunakan sebagai stok awal.
+        $totalQty = $request->input('total_qty');
+
         $item = Item::create([
             'name'          => $request->name,
             'sku'           => $request->sku,
-            'total_qty'     => 0,
-            'available_qty' => 0,
+            'total_qty'     => $totalQty !== null ? (int)$totalQty : 0,
+            'available_qty' => $totalQty !== null ? (int)$totalQty : 0,
         ]);
 
         return redirect()
@@ -43,11 +45,32 @@ class ItemController extends Controller
 
     public function update(UpdateItemRequest $request, Item $item): RedirectResponse
     {
-        // Hanya update identitas, JANGAN PERNAH menyentuh qty di sini
+        // Update identitas
         $item->update([
             'name' => $request->name,
             'sku'  => $request->sku,
         ]);
+
+        // Jika Super Admin mengubah total_qty, sesuaikan available_qty proporsional
+        if ($request->filled('total_qty')) {
+            $newTotal = (int)$request->input('total_qty');
+            $oldTotal = (int)$item->getOriginal('total_qty');
+            $oldAvailable = (int)$item->getOriginal('available_qty');
+
+            if ($oldTotal === 0) {
+                // Jika sebelumnya nol, treat available = newTotal
+                $newAvailable = $newTotal;
+            } else {
+                // Menyesuaikan available secara proporsional berdasarkan perubahan total
+                $ratio = $oldAvailable / max(1, $oldTotal);
+                $newAvailable = (int) round($ratio * $newTotal);
+            }
+
+            $item->update([
+                'total_qty' => $newTotal,
+                'available_qty' => max(0, $newAvailable),
+            ]);
+        }
 
         return redirect()
             ->route('items.index')
