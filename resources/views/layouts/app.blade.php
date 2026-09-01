@@ -29,9 +29,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('loans.index') }}">Peminjaman</a>
                     </li>
-                    
-                    <!-- Sembunyikan menu ini dari Staff Biasa -->
+                   <!-- Sembunyikan menu ini dari Staff Biasa -->
                     @role('Super Admin')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('borrowers.index') }}">Data Instansi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('items.index') }}">Master Barang</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('stocks.index') }}">Kartu Stok</a>
                     </li>

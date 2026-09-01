@@ -2,6 +2,8 @@
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\reportController;
 use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\BorrowerController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
 // Halaman utama langsung diarahkan ke login
@@ -31,6 +33,26 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{loan}/return', [LoanController::class, 'returnItems'])->name('return');
     });
     // Lapisan Pertahanan 2: Wajib memiliki Role 'Super Admin'
+    Route::middleware(['role:Super Admin'])->group(function () {
+        // MODUL MASTER BARANG
+        Route::prefix('items')->name('items.')->group(function () {
+            Route::get('/', [ItemController::class, 'index'])->name('index');
+            Route::get('/create', [ItemController::class, 'create'])->name('create');
+            Route::post('/', [ItemController::class, 'store'])->name('store');
+            Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
+            Route::put('/{item}', [ItemController::class, 'update'])->name('update');
+        });
+        
+        // MODUL MASTER INSTANSI
+        Route::prefix('borrowers')->name('borrowers.')->group(function () {
+            Route::get('/', [BorrowerController::class, 'index'])->name('index');
+            Route::get('/create', [BorrowerController::class, 'create'])->name('create');
+            Route::post('/', [BorrowerController::class, 'store'])->name('store');
+            Route::get('/{borrower}/edit', [BorrowerController::class, 'edit'])->name('edit');
+            Route::put('/{borrower}', [BorrowerController::class, 'update'])->name('update');
+        });
+    });
+
     Route::middleware(['role:Super Admin'])->group(function () {
         
         // Route Mutasi Stok...
