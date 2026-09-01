@@ -36,17 +36,7 @@
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $item->name ?? '') }}" placeholder="Contoh: Tenda Pramuka Kapasitas 10 Orang" required>
                         @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-
-                    @role('Super Admin')
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Jumlah (Qty)</label>
-                            <input type="number" name="total_qty" class="form-control @error('total_qty') is-invalid @enderror" value="{{ old('total_qty', $item->total_qty ?? '') }}" min="0" step="1">
-                            <div class="form-text">
-                                Jika diisi untuk barang baru, stok awal akan langsung diset sesuai nilai ini. Untuk edit, perubahan akan menyesuaikan stok tersedia secara proporsional.
-                            </div>
-                            @error('total_qty') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                    @endrole
+                    
 
                     <button type="submit" class="btn btn-{{ isset($item) ? 'warning' : 'primary' }} w-100 fw-bold py-2">
                         {{ isset($item) ? 'Simpan Perubahan' : 'Simpan Barang Baru' }}
