@@ -171,6 +171,30 @@ Model / Database
 
 ---
 
+## Preview Fitur Utama
+
+Berikut beberapa preview halaman utama dari aplikasi yang tersedia di folder docs/images dengan versi final yang dimaksudkan untuk dokumentasi.
+
+### Master Barang
+![Preview Master Barang](docs/images/itemsv2.png)
+
+### Daftar Peminjam
+![Preview Daftar Peminjam](docs/images/borrowersv2.png)
+
+### Daftar Peminjaman
+![Preview Daftar Peminjaman](docs/images/loansv2.png)
+
+### Form Peminjaman
+![Preview Form Peminjaman](docs/images/loan-createv2.png)
+
+### Kartu Stok / Mutasi
+![Preview Kartu Stok](docs/images/stock-movementsv2.png)
+
+### Laporan
+![Preview Laporan](docs/images/reportsv2.png)
+
+---
+
 ## Proses Kerja yang Benar di Aplikasi Saat Ini
 
 ### A. Persiapan data awal
