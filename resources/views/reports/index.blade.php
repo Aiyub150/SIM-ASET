@@ -24,31 +24,35 @@
 {{-- Filter Panel --}}
 <div class="card mb-4">
     <div class="card-body p-3">
-        <form action="{{ route('reports.index') }}" method="GET" class="d-flex align-items-center gap-3 flex-wrap">
-            <span class="fw-500 text-muted" style="font-weight:500; font-size:.85rem;">Filter Periode:</span>
+        <form action="{{ route('reports.index') }}" method="GET" id="report-filter-form"
+              class="d-flex align-items-center gap-3 flex-wrap">
+            <span class="text-muted" style="font-weight:500; font-size:.85rem;">Filter Periode:</span>
 
+            {{--
+                Gunakan <input type="month"> untuk picker kalender bawaan browser.
+                Format value yang dikirim: YYYY-MM (kita urai di controller).
+                Fallback: jika browser tidak support, tampilkan dua select terpisah.
+            --}}
             <div class="d-flex align-items-center gap-2">
-                <label class="form-label mb-0" style="font-size:.85rem; font-weight:500;">Bulan</label>
-                <select name="month" class="form-select form-select-sm" style="width:auto; min-width:110px;">
-                    @for($i = 1; $i <= 12; $i++)
-                        @php $val = str_pad($i, 2, '0', STR_PAD_LEFT); @endphp
-                        <option value="{{ $val }}" {{ $month == $val ? 'selected' : '' }}>
-                            {{ date('F', mktime(0, 0, 0, $i, 10)) }}
-                        </option>
-                    @endfor
-                </select>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <label class="form-label mb-0" style="font-size:.85rem; font-weight:500;">Tahun</label>
-                <select name="year" class="form-select form-select-sm" style="width:auto; min-width:85px;">
-                    @for($y = date('Y') - 2; $y <= date('Y'); $y++)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
-                </select>
+                <label for="period_month" class="form-label mb-0" style="font-size:.85rem; font-weight:500;">
+                    Bulan & Tahun
+                </label>
+                <input type="month"
+                       id="period_month"
+                       name="period"
+                       class="form-control form-control-sm"
+                       style="width:auto; min-width:155px;"
+                       value="{{ $year }}-{{ $month }}"
+                       min="{{ (date('Y') - 5) }}-01"
+                       max="{{ (date('Y') + 3) }}-12">
             </div>
 
             <button type="submit" class="btn btn-sm btn-primary px-3">Tampilkan</button>
+
+            {{-- Tombol reset ke bulan ini --}}
+            <button type="button" id="btn-reset-period" class="btn btn-sm btn-outline-secondary">
+                Bulan Ini
+            </button>
         </form>
     </div>
 </div>
@@ -162,3 +166,21 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const btn   = document.getElementById('btn-reset-period');
+    const input = document.getElementById('period_month');
+    if (btn && input) {
+        btn.addEventListener('click', function () {
+            const now = new Date();
+            const y   = now.getFullYear();
+            const m   = String(now.getMonth() + 1).padStart(2, '0');
+            input.value = y + '-' + m;
+            document.getElementById('report-filter-form').submit();
+        });
+    }
+})();
+</script>
+@endpush

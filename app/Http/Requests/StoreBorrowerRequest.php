@@ -1,31 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Requests;
 
-use App\Models\Borrower;
-use App\Http\Requests\StoreBorrowerRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Foundation\Http\FormRequest;
 
-class BorrowerController extends Controller
+class StoreBorrowerRequest extends FormRequest
 {
-    public function index(): View
+    public function authorize(): bool
     {
-        $borrowers = Borrower::orderBy('institution_name', 'asc')->paginate(15);
-        return view('borrowers.index', compact('borrowers'));
+        return true;
     }
 
-    public function create(): View
+    public function rules(): array
     {
-        return view('borrowers.create');
+        return [
+            'institution_name' => ['required', 'string', 'max:255'],
+            'pic_name'         => ['required', 'string', 'max:255'],
+            'contact_number'   => ['required', 'string', 'max:50'],
+            'address'          => ['nullable', 'string', 'max:500'],
+        ];
     }
 
-    public function store(StoreBorrowerRequest $request): RedirectResponse
+    public function messages(): array
     {
-        $borrower = Borrower::create($request->validated());
-
-        return redirect()
-            ->route('borrowers.index')
-            ->with('success', "Instansi {$borrower->institution_name} berhasil ditambahkan ke dalam Master Data.");
+        return [
+            'institution_name.required' => 'Nama instansi wajib diisi.',
+            'pic_name.required'         => 'Nama penanggung jawab wajib diisi.',
+            'contact_number.required'   => 'Nomor kontak wajib diisi.',
+        ];
     }
 }

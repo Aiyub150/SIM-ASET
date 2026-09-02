@@ -58,7 +58,7 @@ Administrator dapat menambahkan serta memperbarui data barang yang telah tersedi
 
 Halaman ini menampilkan daftar inventaris beserta informasi utama seperti kode, nama, kategori, lokasi, dan stok barang.
 
-![Manajemen Barang](docs/images/items.png)
+![Manajemen Barang](docs/images/itemsv2.png)
 
 ---
 
@@ -104,7 +104,7 @@ Data peminjam dapat mencakup:
 
 Halaman ini digunakan untuk melihat, menambahkan, dan memperbarui data pihak atau instansi yang dapat melakukan peminjaman inventaris.
 
-![Manajemen Peminjam](docs/images/borrowers.png)
+![Manajemen Peminjam](docs/images/borrowersv2.png)
 
 ---
 
@@ -142,13 +142,13 @@ PJM-20260901-A7K2
 
 Halaman ini menampilkan transaksi peminjaman yang telah dibuat beserta informasi status dan data peminjam.
 
-![Daftar Peminjaman](docs/images/loans.png)
+![Daftar Peminjaman](docs/images/loansv2.png)
 
 ### 🖼️ Form Peminjaman
 
 Form peminjaman digunakan untuk membuat transaksi baru, memilih peminjam, menentukan tanggal, dan menambahkan barang yang akan dipinjam.
 
-![Form Peminjaman](docs/images/loan-create.png)
+![Form Peminjaman](docs/images/loan-createv2.png)
 
 ---
 
@@ -206,7 +206,7 @@ Dokumen ini dapat digunakan sebagai arsip atau bukti transaksi.
 
 ### 🖼️ Contoh Dokumen Peminjaman
 
-![Peminjaman PDF](docs/images/loan-pdf.png)
+![Peminjaman PDF](docs/images/loan-pdfv2.png)
 
 ---
 
@@ -225,7 +225,7 @@ Pergerakan dapat digunakan untuk mencatat aktivitas seperti:
 
 Halaman ini digunakan untuk melihat riwayat perubahan stok dan melakukan penyesuaian inventaris sesuai kebutuhan operasional.
 
-![Stock Movement](docs/images/stock-movements.png)
+![Stock Movement](docs/images/stock-movementsv2.png)
 
 ---
 
@@ -247,7 +247,7 @@ Laporan dapat diekspor ke dalam format PDF.
 
 ### 🖼️ Tampilan Laporan
 
-![Laporan Inventaris](docs/images/reports.png)
+![Laporan Inventaris](docs/images/reportsv2.png)
 
 ---
 

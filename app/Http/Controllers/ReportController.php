@@ -15,11 +15,10 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil filter dari URL, jika kosong gunakan bulan dan tahun saat ini
-        $month = $request->input('month', now()->format('m'));
-        $year = $request->input('year', now()->format('Y'));
+        // Terima format baru: ?period=YYYY-MM (dari <input type="month">)
+        // Juga tetap kompatibel dengan format lama: ?month=MM&year=YYYY
+        [$month, $year] = $this->parsePeriod($request);
 
-        // Tarik data dengan Eager Loading dan Filter Waktu
         $loans = Loan::with(['borrower'])
             ->whereMonth('borrow_date', $month)
             ->whereYear('borrow_date', $year)
@@ -40,17 +39,31 @@ class ReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        $month = $request->input('month', now()->format('m'));
-        $year = $request->input('year', now()->format('Y'));
+        [$month, $year] = $this->parsePeriod($request);
 
-        $loans = Loan::with(['borrower'])->whereMonth('borrow_date', $month)->whereYear('borrow_date', $year)->get();
+        $loans     = Loan::with(['borrower'])->whereMonth('borrow_date', $month)->whereYear('borrow_date', $year)->get();
         $movements = StockMovement::with(['item'])->whereMonth('created_at', $month)->whereYear('created_at', $year)->get();
 
         $monthName = Carbon::createFromFormat('m', $month)->translatedFormat('F');
 
         $pdf = Pdf::loadView('reports.pdf', compact('loans', 'movements', 'monthName', 'year'));
-        $pdf->setPaper('A4', 'landscape'); // Gunakan Landscape karena kolom tabel laporan biasanya banyak
+        $pdf->setPaper('A4', 'landscape');
 
         return $pdf->stream("Laporan_Inventaris_{$monthName}_{$year}.pdf");
+    }
+
+    // ── Helper: urai periode dari request ─────────────────────────────────
+    private function parsePeriod(Request $request): array
+    {
+        // Format baru dari <input type="month">: period=YYYY-MM
+        if ($request->filled('period') && str_contains($request->input('period'), '-')) {
+            [$y, $m] = explode('-', $request->input('period'), 2);
+            return [str_pad($m, 2, '0', STR_PAD_LEFT), $y];
+        }
+
+        // Format lama: ?month=MM&year=YYYY (untuk kompatibilitas link ekspor PDF)
+        $month = $request->input('month', now()->format('m'));
+        $year  = $request->input('year',  now()->format('Y'));
+        return [str_pad($month, 2, '0', STR_PAD_LEFT), $year];
     }
 }

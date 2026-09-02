@@ -44,7 +44,7 @@ class ItemController extends Controller
 
         return redirect()
             ->route('items.index')
-            ->with('success', "Barang <strong>{$item->name}</strong> berhasil ditambahkan dengan SKU <code>{$item->sku}</code>.");
+            ->with('success', "Barang \"{$item->name}\" berhasil ditambahkan dengan SKU: {$item->sku}");
     }
 
     public function edit(Item $item): View
@@ -59,20 +59,26 @@ class ItemController extends Controller
         $item->update(['name' => $request->name]);
 
         if ($request->filled('total_qty')) {
-            $newTotal     = (int) $request->total_qty;
-            $oldTotal     = (int) $item->getOriginal('total_qty');
-            $onLoan       = $oldTotal - (int) $item->getOriginal('available_qty');
-            $newAvailable = max(0, $newTotal - $onLoan);
+            $newTotal = (int) $request->total_qty;
+            $onLoan   = $item->total_qty - $item->available_qty; // qty yang masih dipinjam
+
+            // Tolak jika total baru lebih kecil dari yang sedang dipinjam —
+            // ini akan membuat available_qty negatif yang tidak masuk akal secara fisik.
+            if ($newTotal < $onLoan) {
+                return back()
+                    ->withInput()
+                    ->with('error', "Tidak dapat mengubah total menjadi {$newTotal}. Saat ini masih ada {$onLoan} unit yang sedang dipinjam. Total minimal yang diizinkan adalah {$onLoan}.");
+            }
 
             $item->update([
                 'total_qty'     => $newTotal,
-                'available_qty' => $newAvailable,
+                'available_qty' => $newTotal - $onLoan,
             ]);
         }
 
         return redirect()
             ->route('items.index')
-            ->with('success', "Data Barang <strong>{$item->name}</strong> berhasil diperbarui.");
+            ->with('success', "Data Barang \"{$item->name}\" berhasil diperbarui.");
     }
 
     // ── Helper: daftar kategori beserta prefix & nomor SKU berikutnya ──
