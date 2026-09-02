@@ -11,7 +11,7 @@
 
 ## 📌 Tentang Proyek
 
-**Web Inventaris Pemerintah Daerah** adalah aplikasi berbasis web yang dikembangkan menggunakan **Laravel 12** untuk membantu pengelolaan inventaris serta proses peminjaman barang pada lingkungan Pemerintah Daerah.
+**Web Inventaris Pemerintah Daerah (SIM-ASET)** adalah aplikasi berbasis web yang dikembangkan menggunakan **Laravel 12** untuk membantu pengelolaan inventaris serta proses peminjaman barang pada lingkungan Pemerintah Daerah.
 
 Aplikasi ini menyediakan sistem terpusat untuk mengelola data barang, kategori, lokasi penyimpanan, peminjam, transaksi peminjaman, pengembalian, pergerakan stok, hingga pembuatan laporan.
 

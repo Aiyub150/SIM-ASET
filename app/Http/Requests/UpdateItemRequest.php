@@ -12,14 +12,11 @@ class UpdateItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'sku'  => [
-                'required', 
-                'string', 
-                'max:50', 
-                Rule::unique('items')->ignore($this->item) // Abaikan SKU ini sendiri
-            ],
-            'total_qty' => ['nullable', 'integer', 'min:0'],
+            // category_id tidak boleh diubah, tapi tetap dikirim via hidden input untuk audit
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'name'        => ['required', 'string', 'max:255'],
+            // SKU tidak berubah saat edit — tidak perlu di-validate dari input
+            'total_qty'   => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

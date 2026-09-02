@@ -25,10 +25,10 @@ class MasterDataSeeder extends Seeder
         $gudangUtama = Location::create(['name' => 'Gudang Utama Pemkab', 'address' => 'Jl. Pemuda No. 1']);
         $aula = Location::create(['name' => 'Gudang Aula Serbaguna', 'address' => 'Lantai 1 Gedung A']);
 
-        // 3. Buat Master Kategori
-        $furnitur = Category::create(['name' => 'Furnitur', 'description' => 'Meja, Kursi, Lemari']);
-        $elektronik = Category::create(['name' => 'Elektronik', 'description' => 'Proyektor, Sound System, Mic']);
-        $perlengkapan = Category::create(['name' => 'Perlengkapan Acara', 'description' => 'Tenda, Panggung, Karpet']);
+        // 3. Buat Master Kategori (sku_prefix wajib diisi untuk auto-generate SKU)
+        $furnitur     = Category::create(['name' => 'Furnitur',           'description' => 'Meja, Kursi, Lemari',          'sku_prefix' => 'FURN']);
+        $elektronik   = Category::create(['name' => 'Elektronik',         'description' => 'Proyektor, Sound System, Mic', 'sku_prefix' => 'ELEC']);
+        $perlengkapan = Category::create(['name' => 'Perlengkapan Acara', 'description' => 'Tenda, Panggung, Karpet',      'sku_prefix' => 'TENT']);
 
         // 4. Buat Master Barang
         // Kritis: Karena ini data awal, total_qty dan available_qty WAJIB sama.

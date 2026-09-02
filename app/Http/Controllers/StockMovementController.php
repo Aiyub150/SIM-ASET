@@ -20,7 +20,6 @@ class StockMovementController extends Controller
      */
     public function index(): View
     {
-        // Eager load untuk mencegah N+1 Query
         $movements = StockMovement::with(['item', 'user'])
                                   ->orderBy('created_at', 'desc')
                                   ->paginate(20);
@@ -33,9 +32,9 @@ class StockMovementController extends Controller
      */
     public function create(): View
     {
-        // Ambil semua barang untuk dropdown
-        $items = Item::orderBy('name', 'asc')->get();
-        return view('stocks.create', compact('items'));
+        $items         = Item::orderBy('name', 'asc')->get();
+        $suggestedCode = $this->generateReferenceCode();
+        return view('stocks.create', compact('items', 'suggestedCode'));
     }
 
     /**
@@ -44,22 +43,33 @@ class StockMovementController extends Controller
     public function store(StoreStockMovementRequest $request): RedirectResponse
     {
         try {
-            // Hardcode ID Admin sementara (utang teknis yang harus segera kita bayar nanti)
-            $userId = 1; 
+            $userId = auth()->id();
 
-            // Lempar ke Service
             $movement = $this->stockService->adjustStock($request->validated(), $userId);
 
             $action = $movement->type === 'in' ? 'Penambahan' : 'Pengurangan';
 
             return redirect()
                 ->route('stocks.index')
-                ->with('success', "Mutasi Stok ($action) berhasil dicatat dengan Nomor Referensi: {$movement->reference_code}");
+                ->with('success', "Mutasi Stok ({$action}) berhasil dicatat. Ref: <strong>{$movement->reference_code}</strong>");
 
         } catch (Exception $e) {
             return back()
                 ->withInput()
                 ->with('error', $e->getMessage());
         }
+    }
+
+    // ── Helper: generate reference code BAST/YYYY/MM/XXX ──────────────
+    private function generateReferenceCode(): string
+    {
+        $year  = now()->format('Y');
+        $month = now()->format('m');
+
+        $countThisMonth = StockMovement::whereYear('created_at', $year)
+                                       ->whereMonth('created_at', $month)
+                                       ->count();
+
+        return 'BAST/' . $year . '/' . $month . '/' . str_pad($countThisMonth + 1, 3, '0', STR_PAD_LEFT);
     }
 }

@@ -11,9 +11,18 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'sku'  => ['required', 'string', 'max:50', 'unique:items,sku'],
-            'total_qty' => ['nullable', 'integer', 'min:0'],
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'name'        => ['required', 'string', 'max:255'],
+            // SKU tidak divalidasi dari input — di-generate server-side di controller
+            'total_qty'   => ['nullable', 'integer', 'min:0'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'category_id.required' => 'Kategori barang wajib dipilih.',
+            'category_id.exists'   => 'Kategori yang dipilih tidak valid.',
         ];
     }
 }
