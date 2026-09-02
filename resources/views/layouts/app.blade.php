@@ -345,11 +345,9 @@
 
         <div class="sidebar-brand">
             <a href="{{ route('loans.index') }}" class="brand-logo">
-                <div class="brand-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 16 16">
-                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-                    </svg>
-                </div>
+                <img src="{{ asset('images/sim-aset_logo.svg') }}"
+                     alt="SIM-ASET Logo"
+                     style="width:36px; height:36px; flex-shrink:0; border-radius:9px;">
                 <div>
                     <div class="brand-name">SIM-ASET</div>
                     <div class="brand-subtitle">Inventaris Aset Daerah</div>

@@ -2,8 +2,7 @@
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.x-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Spatie Permission](https://img.shields.io/badge/Spatie-Permission-orange?style=for-the-badge)
 
@@ -348,15 +347,12 @@ Aplikasi menggunakan pendekatan MVC Laravel dengan service layer untuk menangani
 | **Laravel 12** | Framework utama aplikasi |
 | **PHP 8.2+** | Bahasa pemrograman backend |
 | **Blade** | Template engine antarmuka |
-| **Tailwind CSS** | Styling antarmuka |
-| **Vite** | Build tool frontend |
+| **Bootstrap 5** | Styling antarmuka (via CDN) |
 | **Laravel Breeze** | Autentikasi |
 | **Spatie Permission** | Role & permission |
 | **SQLite** | Database default pada environment contoh |
 | **MySQL** | Dapat digunakan melalui konfigurasi database |
 | **Dompdf** | Pembuatan dokumen PDF |
-| **Alpine.js** | Interaksi frontend |
-| **Axios** | HTTP client |
 
 ---
 
@@ -547,23 +543,7 @@ Data awal dapat mencakup:
 
 ---
 
-# 🎨 6. Build Frontend
-
-Untuk development:
-
-```bash
-npm run dev
-```
-
-Untuk build production:
-
-```bash
-npm run build
-```
-
----
-
-# ▶️ 7. Menjalankan Aplikasi
+# ▶️ 6. Menjalankan Aplikasi
 
 Jalankan server Laravel:
 
@@ -576,20 +556,6 @@ Kemudian buka:
 ```text
 http://127.0.0.1:8000
 ```
-
----
-
-# ⚡ Menjalankan Development Environment
-
-Repository menyediakan script Composer untuk menjalankan beberapa proses development secara bersamaan.
-
-Gunakan:
-
-```bash
-composer run dev
-```
-
-Script ini digunakan untuk menjalankan development server Laravel, queue listener, Laravel Pail, dan Vite sesuai konfigurasi proyek.
 
 ---
 
@@ -745,8 +711,10 @@ Beberapa karakteristik implementasi saat ini:
 - Sistem mendukung pengembalian sebagian barang.
 - PDF dibuat menggunakan Dompdf.
 - Role dan permission menggunakan Spatie Laravel Permission.
-- Frontend menggunakan Vite.
-- Development workflow tersedia melalui `composer run dev`.
+- **Frontend menggunakan Bootstrap 5 via CDN** — tidak memerlukan `npm run build` untuk menjalankan antarmuka.
+- **SKU barang di-generate otomatis** oleh server berdasarkan prefix kategori + autonumber (format: `PREFIX-NNN`). SKU tidak dapat diinput manual.
+- **Stok awal barang** dapat diisi saat pendaftaran barang baru. Jika diisi, sistem otomatis mencatat entri di `stock_movements` dengan tipe `in` dan kode referensi `INIT/{SKU}` sebagai jejak audit pembuka.
+- `location_id` saat ini hardcode ke lokasi pertama. Pemilihan lokasi saat input barang belum tersedia (utang teknis).
 
 ---
 

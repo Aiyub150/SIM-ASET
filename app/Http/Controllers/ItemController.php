@@ -6,12 +6,16 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ItemController extends Controller
 {
+    public function __construct(private StockService $stockService) {}
+
     public function index(): View
     {
         $items = Item::with('category')->orderBy('name', 'asc')->paginate(15);
@@ -27,20 +31,35 @@ class ItemController extends Controller
     public function store(StoreItemRequest $request): RedirectResponse
     {
         $category = Category::findOrFail($request->category_id);
-
-        // Generate SKU server-side: PREFIX-NNN (autonumber per kategori)
-        $sku = $this->generateSku($category);
-
         $totalQty = $request->filled('total_qty') ? (int) $request->total_qty : 0;
 
-        $item = Item::create([
-            'category_id'   => $category->id,
-            'location_id'   => 1, // default; bisa ditambah field lokasi nanti
-            'name'          => $request->name,
-            'sku'           => $sku,
-            'total_qty'     => $totalQty,
-            'available_qty' => $totalQty,
-        ]);
+        $item = DB::transaction(function () use ($category, $totalQty, $request) {
+            // Generate SKU di dalam transaksi agar autonumber aman
+            $sku = $this->generateSkuInsideTransaction($category);
+
+            // Buat item dengan stok 0 terlebih dahulu
+            $item = Item::create([
+                'category_id'   => $category->id,
+                'location_id'   => 1, // default; bisa ditambah field lokasi nanti
+                'name'          => $request->name,
+                'sku'           => $sku,
+                'total_qty'     => 0,
+                'available_qty' => 0,
+            ]);
+
+            // Jika ada stok awal, catat sebagai stock movement tipe 'in'
+            if ($totalQty > 0) {
+                $this->stockService->adjustStock([
+                    'item_id'        => $item->id,
+                    'type'           => 'in',
+                    'qty'            => $totalQty,
+                    'reference_code' => 'INIT/' . $sku,
+                    'notes'          => 'Stok awal saat data barang dibuat.',
+                ], Auth::id());
+            }
+
+            return $item;
+        });
 
         return redirect()
             ->route('items.index')
@@ -104,25 +123,23 @@ class ItemController extends Controller
         });
     }
 
-    // ── Helper: generate SKU unik ───────────────────────────────────────
-    private function generateSku(Category $category): string
+    // ── Helper: generate SKU unik — HARUS dipanggil dari dalam DB::transaction() ──
+    private function generateSkuInsideTransaction(Category $category): string
     {
         $prefix = $category->sku_prefix ?: strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $category->name), 0, 4));
 
-        return DB::transaction(function () use ($prefix, $category) {
-            $last = Item::where('category_id', $category->id)
-                        ->where('sku', 'like', $prefix . '-%')
-                        ->lockForUpdate()
-                        ->orderByDesc('sku')
-                        ->value('sku');
+        $last = Item::where('category_id', $category->id)
+                    ->where('sku', 'like', $prefix . '-%')
+                    ->lockForUpdate()
+                    ->orderByDesc('sku')
+                    ->value('sku');
 
-            $nextNum = 1;
-            if ($last) {
-                $parts   = explode('-', $last);
-                $nextNum = (int) end($parts) + 1;
-            }
+        $nextNum = 1;
+        if ($last) {
+            $parts   = explode('-', $last);
+            $nextNum = (int) end($parts) + 1;
+        }
 
-            return $prefix . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
-        });
+        return $prefix . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
     }
 }

@@ -16,9 +16,9 @@ SIM ASET dirancang sebagai *Enterprise Resource Planning* (ERP) berskala mikro y
 Sistem ini dibangun menggunakan **Laravel 12** dan antarmuka **Bootstrap 5**.
 
 ### A. Core Modules & Data Flow
-*   **Master Data (`items`, `borrowers`):** 
+*   **Master Data (`items`, `borrowers`):**
     *   Dikelola melalui operasi CRUD standar (tanpa fitur hapus permanen untuk mencegah *orphan data*).
-    *   **Aturan Kritis:** Saat entitas `items` baru dibuat, stok fisik (`total_qty` & `available_qty`) **WAJIB bernilai 0**. Tidak boleh ada *input* kuantitas pada saat inisialisasi master data.
+    *   **Stok Awal:** Saat entitas `items` baru dibuat, administrator dapat mengisi `total_qty` awal. Jika diisi (> 0), sistem otomatis membuat entri di `stock_movements` dengan tipe `in` dan kode referensi `INIT/{SKU}` sebagai jejak audit pembuka. Barang selalu dimulai dari stok 0 di level database; stok awal diterapkan melalui `StockService::adjustStock()` dalam transaksi yang sama — bukan via `UPDATE` langsung.
 *   **Stock Ledger / Buku Besar (`stock_movements`):**
     *   Satu-satunya pintu masuk untuk mengubah kuantitas barang.
     *   Tipe mutasi: `in` (pengadaan), `out` (hibah/keluar), `broken` (rusak), `lost` (hilang).

@@ -24,19 +24,11 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.25);
         }
         .auth-logo-area {
-            background: var(--primary);
+            background: #fff;
             border-radius: 16px 16px 0 0;
-            padding: 2rem;
+            padding: 1.75rem 2rem 1.5rem;
             text-align: center;
-        }
-        .auth-logo-area .logo-icon {
-            width: 56px; height: 56px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
         }
         .form-control, .form-select {
             border-radius: 8px;
@@ -68,13 +60,9 @@
     <div style="width: 100%; max-width: 420px; padding: 1rem;">
         <div class="auth-card card">
             <div class="auth-logo-area">
-                <div class="logo-icon mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" viewBox="0 0 16 16">
-                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                    </svg>
-                </div>
-                <h5 class="text-white fw-700 mb-1" style="font-weight:700;">SIM-ASET</h5>
-                <p class="text-white mb-0" style="opacity:.8; font-size:.85rem;">Sistem Inventaris Aset Daerah</p>
+                <img src="{{ asset('images/sim-aset_banner.png') }}"
+                     alt="SIM-ASET — Sistem Inventaris Aset Daerah"
+                     style="max-width: 320px; width: 100%; height: auto;">
             </div>
             <div class="card-body p-4">
                 {{ $slot }}
