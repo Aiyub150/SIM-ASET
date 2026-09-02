@@ -1,557 +1,349 @@
-# Web Inventaris Pemerintah Daerah
+# SIM-ASET
+
+Sistem Inventaris Aset Daerah berbasis Laravel untuk mengelola data barang, stok, peminjaman, pengembalian, serta laporan operasional inventaris di lingkungan pemerintah daerah.
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.x-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Spatie Permission](https://img.shields.io/badge/Spatie-Permission-orange?style=for-the-badge)
 
 ---
 
-## 📌 Tentang Proyek
+## Tentang Proyek
 
-**Web Inventaris Pemerintah Daerah (SIM-ASET)** adalah aplikasi berbasis web yang dikembangkan menggunakan **Laravel 12** untuk membantu pengelolaan inventaris serta proses peminjaman barang pada lingkungan Pemerintah Daerah.
+Project ini adalah versi yang sedang dikembangkan untuk kebutuhan pengelolaan aset pemerintahan secara terstruktur dan audit-friendly.
 
-Aplikasi ini menyediakan sistem terpusat untuk mengelola data barang, kategori, lokasi penyimpanan, peminjam, transaksi peminjaman, pengembalian, pergerakan stok, hingga pembuatan laporan.
+Tujuan utama dari aplikasi ini adalah:
 
-Sistem menerapkan **Role-Based Access Control (RBAC)** sehingga hak akses pengguna dapat dibedakan berdasarkan peran, seperti **Super Admin** dan **Staff Logistik**.
+- mengelola master data barang dan instansi peminjam,
+- menjaga integritas stok melalui ledger mutasi,
+- membatasi akses berdasarkan role pengguna,
+- mencatat seluruh proses peminjaman dan pengembalian secara terdokumentasi,
+- menghasilkan laporan dan dokumen PDF yang dapat dipakai sebagai bukti operasional.
 
-Repository:
-> https://github.com/Aiyub150/SIM-ASET
-
----
-
-# ✨ Fitur Utama
-
-## 1. 🔐 Autentikasi & Hak Akses Pengguna
-
-Aplikasi menyediakan autentikasi pengguna serta pembatasan akses berdasarkan role.
-
-Sistem menggunakan **Laravel Breeze** untuk autentikasi dan **Spatie Laravel Permission** untuk pengelolaan role dan permission.
-
-Role yang tersedia pada data awal:
-
-- **Super Admin**
-- **Staff Logistik**
-
-Hak akses pengguna dibatasi sesuai role yang diberikan sehingga fitur administrasi dan operasional dapat dikelola secara terkontrol.
+Aplikasi ini dibangun dengan Laravel 12, Bootstrap 5, serta Spatie Laravel Permission untuk kontrol akses.
 
 ---
 
-## 2. 📦 Manajemen Barang
+## Status Versi Saat Ini
 
-Fitur manajemen barang digunakan untuk mengelola seluruh data inventaris yang tersedia.
+Versi project yang ada saat ini sudah mencakup fitur inti berikut:
 
-Informasi barang dapat mencakup:
+- autentikasi pengguna dengan Laravel Breeze,
+- role management dengan 3 level utama: Super Admin, Admin, dan Staff Logistik,
+- manajemen barang dan instansi peminjam,
+- pencatatan mutasi stok dan Kartu Stok,
+- transaksi peminjaman dan pengembalian barang,
+- validasi keamanan input dan format data,
+- laporan bulanan dan PDF,
+- akses fitur berdasarkan peran akun.
 
-- SKU / kode barang
-- Nama barang
-- Kategori
-- Lokasi
-- Jumlah stok
-- Jumlah stok tersedia
-
-Administrator dapat menambahkan serta memperbarui data barang yang telah tersedia.
-
-### 🖼️ Tampilan Manajemen Barang
-
-Halaman ini menampilkan daftar inventaris beserta informasi utama seperti kode, nama, kategori, lokasi, dan stok barang.
-
-![Manajemen Barang](docs/images/itemsv2.png)
+Dokumen lanjutan mengenai roadmap dan konteks proyek tersedia di folder docs.
 
 ---
 
-## 3. 🗂️ Manajemen Kategori
+## Struktur Role Saat Ini
 
-Kategori digunakan untuk mengelompokkan barang agar data inventaris lebih terstruktur.
+### Super Admin
+- mengakses semua modul operasional,
+- dapat mengelola pengguna dan role,
+- mengatur konfigurasi akses sistem.
 
-Kategori dapat digunakan sebagai referensi saat membuat maupun memperbarui data barang.
+### Admin
+- dapat mengakses modul master data, stok, peminjaman, report,
+- tidak dapat mengelola role atau menambah user baru.
 
-Contoh kategori pada data awal antara lain:
-
-- Furnitur
-- Elektronik
-- Perlengkapan Acara
-
----
-
-## 4. 🏢 Manajemen Lokasi
-
-Fitur lokasi digunakan untuk mencatat tempat penyimpanan barang.
-
-Pencatatan lokasi membantu petugas mengetahui posisi penyimpanan inventaris secara lebih terstruktur.
-
-Contoh lokasi pada data awal:
-
-- Gudang Utama Pemkab
-- Gudang Aula Serbaguna
+### Staff Logistik
+- dapat membuat dan melihat transaksi peminjaman yang dibuat dirinya,
+- tidak dapat mengelola user maupun role,
+- tidak dapat melihat seluruh transaksi milik user lain.
 
 ---
 
-## 5. 👥 Manajemen Peminjam
+## Alur Kerja Aplikasi
 
-Fitur **Borrowers / Peminjam** digunakan untuk menyimpan informasi instansi atau pihak yang melakukan peminjaman barang.
-
-Data peminjam dapat mencakup:
-
-- Nama instansi
-- PIC / penanggung jawab
-- Nomor kontak
-- Alamat
-
-### 🖼️ Tampilan Data Peminjam
-
-Halaman ini digunakan untuk melihat, menambahkan, dan memperbarui data pihak atau instansi yang dapat melakukan peminjaman inventaris.
-
-![Manajemen Peminjam](docs/images/borrowersv2.png)
-
----
-
-## 6. 📋 Peminjaman Barang
-
-Fitur peminjaman digunakan untuk membuat dan mengelola transaksi peminjaman inventaris.
-
-Informasi transaksi mencakup:
-
-- Kode transaksi
-- Peminjam
-- Petugas
-- Tanggal peminjaman
-- Tanggal jatuh tempo
-- Barang yang dipinjam
-- Jumlah barang
-- Catatan
-- Status transaksi
-
-Sistem mendukung satu transaksi yang berisi beberapa jenis barang.
-
-Kode transaksi dibuat dengan format:
+Alur kerja aplikasi yang benar sesuai versi sekarang adalah sebagai berikut:
 
 ```text
-PJM-YYYYMMDD-XXXX
-```
-
-Contoh:
-
-```text
-PJM-20260901-A7K2
-```
-
-### 🖼️ Tampilan Daftar Peminjaman
-
-Halaman ini menampilkan transaksi peminjaman yang telah dibuat beserta informasi status dan data peminjam.
-
-![Daftar Peminjaman](docs/images/loansv2.png)
-
-### 🖼️ Form Peminjaman
-
-Form peminjaman digunakan untuk membuat transaksi baru, memilih peminjam, menentukan tanggal, dan menambahkan barang yang akan dipinjam.
-
-![Form Peminjaman](docs/images/loan-createv2.png)
-
----
-
-## 7. 🔄 Validasi Ketersediaan Stok
-
-Sebelum transaksi disimpan, sistem melakukan validasi terhadap stok barang yang tersedia.
-
-Jika jumlah yang diminta melebihi stok tersedia, transaksi akan ditolak.
-
-Setelah peminjaman berhasil:
-
-```text
-Stok Tersedia
-      ↓
-Jumlah Dipinjam
-      ↓
-Stok Tersedia Berkurang
-```
-
-Sistem membedakan:
-
-- **Total Stock** — jumlah keseluruhan barang.
-- **Available Stock** — jumlah barang yang sedang tersedia untuk dipinjam.
-
----
-
-## 8. ↩️ Pengembalian Barang
-
-Sistem menyediakan proses pengembalian barang berdasarkan transaksi peminjaman.
-
-Pengembalian mendukung **partial return**, sehingga barang dalam satu transaksi tidak harus dikembalikan sekaligus.
-
-Contoh:
-
-```text
-Peminjaman:
-10 Kursi
-
-Pengembalian pertama:
-4 Kursi
-
-Sisa belum dikembalikan:
-6 Kursi
-```
-
-Stok akan diperbarui berdasarkan jumlah barang yang dikembalikan.
-
----
-
-## 9. 🧾 Bukti Peminjaman PDF
-
-Setiap transaksi peminjaman dapat dibuat menjadi dokumen PDF menggunakan **barryvdh/laravel-dompdf**.
-
-Dokumen ini dapat digunakan sebagai arsip atau bukti transaksi.
-
-### 🖼️ Contoh Dokumen Peminjaman
-
-![Peminjaman PDF](docs/images/loan-pdfv2.png)
-
----
-
-## 10. 📦 Pergerakan Stok
-
-Fitur **Stock Movement** digunakan untuk mencatat perubahan stok sebagai histori pergerakan inventaris.
-
-Pergerakan dapat digunakan untuk mencatat aktivitas seperti:
-
-- Barang masuk
-- Barang keluar
-- Barang rusak
-- Barang hilang
-
-### 🖼️ Tampilan Pergerakan Stok
-
-Halaman ini digunakan untuk melihat riwayat perubahan stok dan melakukan penyesuaian inventaris sesuai kebutuhan operasional.
-
-![Stock Movement](docs/images/stock-movementsv2.png)
-
----
-
-## 11. 📊 Laporan Inventaris
-
-Fitur laporan digunakan untuk membantu administrator memantau aktivitas inventaris dan transaksi.
-
-Laporan dapat difilter berdasarkan:
-
-- Bulan
-- Tahun
-
-Informasi laporan berkaitan dengan:
-
-- Transaksi peminjaman
-- Pergerakan stok
-
-Laporan dapat diekspor ke dalam format PDF.
-
-### 🖼️ Tampilan Laporan
-
-![Laporan Inventaris](docs/images/reportsv2.png)
-
----
-
-# 🧩 Modul Sistem
-
-```text
-Authentication
-│
-├── Login
-├── Logout
-└── Profile
-
-Master Data
-│
-├── Items
-├── Categories
-├── Locations
-└── Borrowers
-
-Transaction
-│
-├── Loans
-├── Loan Items
-└── Returns
-
-Stock
-│
-└── Stock Movements
-
-Reporting
-│
-├── Loan Reports
-└── Stock Reports
+Login
+  ↓
+Siapkan Master Data
+  ├─ Kategori
+  ├─ Barang
+  ├─ Instansi / Peminjam
+  └─ Lokasi (jika dibutuhkan)
+  ↓
+Input Stok Awal / Mutasi Stok
+  ↓
+Buat Transaksi Peminjaman
+  ├─ pilih peminjam
+  ├─ pilih barang
+  ├─ pilih qty
+  └─ simpan transaksi
+  ↓
+Validasi stok tersedia
+  ↓
+Transaksi aktif / status dipinjam
+  ↓
+Proses pengembalian barang
+  ├─ pengembalian sebagian
+  └─ pengembalian penuh
+  ↓
+Update ketersediaan stok
+  ↓
+Laporan & PDF
 ```
 
 ---
 
-# 🏗️ Arsitektur Aplikasi
+## Arsitektur Proses Bisnis
 
-Aplikasi menggunakan pendekatan MVC Laravel dengan service layer untuk menangani proses bisnis tertentu.
-
-```text
-┌───────────────────────────┐
-│       Web Browser         │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│      Laravel Routes       │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│        Controllers        │
-│                           │
-│ Auth                      │
-│ Item                      │
-│ Borrower                  │
-│ Loan                      │
-│ Stock Movement            │
-│ Report                    │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│         Services          │
-│                           │
-│ LoanService               │
-│ StockService              │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│          Models           │
-│                           │
-│ User                      │
-│ Item                      │
-│ Category                  │
-│ Location                  │
-│ Borrower                  │
-│ Loan                      │
-│ LoanItem                  │
-│ StockMovement             │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│         Database          │
-└───────────────────────────┘
-```
-
----
-
-# 🛠️ Teknologi yang Digunakan
-
-| Teknologi | Fungsi |
-|---|---|
-| **Laravel 12** | Framework utama aplikasi |
-| **PHP 8.2+** | Bahasa pemrograman backend |
-| **Blade** | Template engine antarmuka |
-| **Bootstrap 5** | Styling antarmuka (via CDN) |
-| **Laravel Breeze** | Autentikasi |
-| **Spatie Permission** | Role & permission |
-| **SQLite** | Database default pada environment contoh |
-| **MySQL** | Dapat digunakan melalui konfigurasi database |
-| **Dompdf** | Pembuatan dokumen PDF |
-
----
-
-# 📁 Struktur Direktori
+Project ini memisahkan logika bisnis dari controller agar lebih aman dan terstruktur.
 
 ```text
-web-inventaris-pemda/
-│
-├── app/
-│   ├── Http/
-│   │   └── Controllers/
-│   │
-│   ├── Models/
-│   │
-│   └── Services/
-│
-├── database/
-│   ├── migrations/
-│   └── seeders/
-│
-├── resources/
-│   └── views/
-│       ├── auth/
-│       ├── borrowers/
-│       ├── items/
-│       ├── loans/
-│       ├── profile/
-│       ├── reports/
-│       ├── stocks/
-│       └── dashboard.blade.php
-│
-├── routes/
-│   ├── web.php
-│   └── auth.php
-│
-├── public/
-├── storage/
-├── tests/
-├── composer.json
-├── package.json
-└── README.md
+Browser
+  ↓
+Routes
+  ↓
+Controller
+  ↓
+Service Layer
+  ├─ LoanService
+  └─ StockService
+  ↓
+Model / Database
 ```
 
----
+### Penjelasan singkat
 
-# ⚙️ Persyaratan Sistem
-
-Sebelum menjalankan aplikasi, pastikan telah tersedia:
-
-- **Git**
-- **PHP >= 8.2**
-- **Composer**
-- **Node.js**
-- **NPM**
-
-Untuk database, environment contoh menggunakan **SQLite**. Aplikasi juga dapat dikonfigurasi untuk menggunakan database lain yang didukung Laravel, seperti MySQL.
+- `LoanService` menangani pembuatan transaksi peminjaman dan proses pengembalian.
+- `StockService` menangani mutasi stok dan perubahan saldo barang.
+- `lockForUpdate()` dipakai untuk mencegah race condition saat transaksi terjadi bersamaan.
+- perubahan stok tidak dilakukan dengan update langsung yang sembarangan; semuanya dicatat melalui mutasi ledger.
 
 ---
 
-# 🚀 Instalasi
+## Fitur Utama yang Sudah Ada
 
-## 1. Clone Repository
+### 1. Autentikasi & Role Access
+- login/logout menggunakan Laravel Breeze,
+- redirect langsung ke login untuk route yang tidak boleh diakses publik,
+- route register dan forgot-password diarahkan ke halaman login,
+- akses fitur dibatasi berdasarkan role.
+
+### 2. Master Data Barang
+- input barang baru,
+- otomatis generate SKU berdasarkan kategori,
+- validasi input nama barang untuk mencegah karakter berbahaya,
+- perubahan total stok wajib tetap konsisten dengan barang yang masih dipinjam.
+
+### 3. Master Data Instansi / Peminjam
+- data instansi, PIC, kontak, dan alamat,
+- validasi nama instansi agar aman dari karakter berbahaya,
+- tidak ada akses publik untuk menambah data tanpa login.
+
+### 4. Kartu Stok / Stock Movement
+- mencatat semua mutasi barang masuk, keluar, rusak, dan hilang,
+- format referensi wajib mengikuti pola: `BAST/YYYY/MM/NNN`,
+- setiap mutasi terdokumentasi dengan keterangan dan user yang membuatnya.
+
+### 5. Peminjaman Barang
+- satu transaksi dapat berisi beberapa item,
+- validasi stok yang tersedia sebelum transaksi disimpan,
+- catatan peminjaman bisa diisi pada form,
+- status transaksi aktif sampai seluruh item dikembalikan.
+
+### 6. Pengembalian Barang
+- mendukung pengembalian sebagian maupun penuh,
+- update available_qty dilakukan setelah pengembalian,
+- status otomatis berubah menjadi completed ketika semua item sudah kembali.
+
+### 7. Laporan dan PDF
+- laporan rekapitulasi bulanan,
+- laporan stok / mutasi,
+- export PDF untuk transaksi dan laporan.
+
+### 8. Keamanan Input
+- sanitasi XSS awal pada middleware,
+- validasi FormRequest untuk pencegahan payload berbahaya,
+- validasi format nomor referensi dan nama entitas,
+- filter terhadap karakter HTML/script yang tidak aman.
+
+---
+
+## Proses Kerja yang Benar di Aplikasi Saat Ini
+
+### A. Persiapan data awal
+1. Login sebagai Super Admin atau Admin.
+2. Siapkan kategori barang.
+3. Tambahkan barang baru.
+4. Jika diperlukan, isi stok awal.
+5. Tambahkan data instansi peminjam.
+
+### B. Membuat peminjaman
+1. Buka menu peminjaman.
+2. Pilih instansi peminjam.
+3. Pilih item yang dipinjam.
+4. Masukkan jumlah.
+5. Isi catatan jika ada.
+6. Sistem akan memvalidasi ketersediaan stok.
+7. Simpan transaksi.
+
+### C. Pengembalian barang
+1. Buka detail transaksi peminjaman.
+2. Masukkan jumlah barang yang dikembalikan.
+3. Sistem akan mengecek sisa hutang item.
+4. Simpan pengembalian.
+5. Stok tersedia akan bertambah kembali.
+
+### D. Monitoring data
+1. Periksa Kartu Stok untuk riwayat mutasi.
+2. Gunakan laporan untuk melihat rekap bulanan.
+3. Pastikan semua perubahan stok berkaitan dengan riwayat audit yang jelas.
+
+---
+
+## Rute Akses Saat Ini
+
+Beberapa rute utama yang ada dalam aplikasi:
+
+```text
+/login
+/logout
+/dashboard
+/items
+/borrowers
+/stocks
+/reports
+/users
+```
+
+Akses route dikelola berdasarkan role:
+
+- `items`, `borrowers`, `stocks`, `reports` -> Admin dan Super Admin
+- `users` -> Super Admin saja
+- `loans` -> semua user login, namun Staff Logistik hanya melihat transaksi yang dibuat dirinya
+
+---
+
+## Data Awal (Seeder)
+
+Saat menjalankan seeder, aplikasi akan mengisi role dan akun default seperti berikut:
+
+```text
+Email: superadmin@pemda.go.id
+Password: password123
+Role: Super Admin
+```
+
+```text
+Email: admin@pemda.go.id
+Password: password123
+Role: Admin
+```
+
+```text
+Email: staff@pemda.go.id
+Password: password123
+Role: Staff Logistik
+```
+
+> Kredensial ini hanya untuk kebutuhan development dan testing. Jangan dipakai di lingkungan produksi.
+
+---
+
+## Persyaratan Sistem
+
+- PHP 8.2+
+- Composer
+- Node.js + NPM
+- Database Laravel yang didukung (SQLite atau MySQL)
+
+---
+
+## Instalasi Cepat
+
+### 1. Clone project
 
 ```bash
 git clone https://github.com/Aiyub150/SIM-ASET.git
-cd web-inventaris-pemda
+cd web_inventaris
 ```
 
----
-
-## 2. Install Dependency
-
-Install dependency PHP:
+### 2. Install dependency PHP
 
 ```bash
 composer install
 ```
 
-Install dependency frontend:
+### 3. Install dependency frontend
 
 ```bash
 npm install
 ```
 
----
-
-## 3. Konfigurasi Environment
-
-### Linux / macOS
+### 4. Konfigurasi environment
 
 ```bash
-cp .env.example .env
+copy .env.example .env
 ```
 
-### Windows PowerShell
+atau di PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Generate application key:
+### 5. Generate key
 
 ```bash
 php artisan key:generate
 ```
 
----
+### 6. Konfigurasi database
 
-# 🗄️ 4. Konfigurasi Database
-
-## Opsi A — SQLite
-
-Buat file database:
-
-### Linux / macOS
+Untuk SQLite:
 
 ```bash
 touch database/database.sqlite
 ```
 
-### Windows PowerShell
-
-```powershell
-New-Item database/database.sqlite -ItemType File
-```
-
-Pastikan konfigurasi `.env` menggunakan:
+Pastikan `.env` berisi:
 
 ```env
 DB_CONNECTION=sqlite
 ```
 
-Jalankan migration:
-
-```bash
-php artisan migrate
-```
-
----
-
-## Opsi B — MySQL
-
-Contoh konfigurasi `.env`:
+Atau untuk MySQL:
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=web_inventaris_pemda
+DB_DATABASE=web_inventaris
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Kemudian jalankan:
+### 7. Jalankan migrasi
 
 ```bash
 php artisan migrate
 ```
 
----
-
-# 🌱 5. Jalankan Seeder
-
-Repository menyediakan data awal melalui seeder.
-
-Untuk mengisi data awal:
+### 8. Jalankan seeder
 
 ```bash
 php artisan db:seed
 ```
 
-Jika ingin menjalankan seeder role dan akun secara eksplisit:
-
-```bash
-php artisan db:seed --class=RoleAndAdminSeeder
-```
-
-Data awal dapat mencakup:
-
-- Role pengguna
-- Akun administrator
-- Lokasi
-- Kategori
-- Barang
-- Peminjam
-
-> **Catatan keamanan:** kredensial yang tersedia pada seeder ditujukan untuk development/testing. Jangan menggunakan password contoh pada lingkungan produksi.
-
----
-
-# ▶️ 6. Menjalankan Aplikasi
-
-Jalankan server Laravel:
+### 9. Jalankan aplikasi
 
 ```bash
 php artisan serve
 ```
 
-Kemudian buka:
+Lalu buka:
 
 ```text
 http://127.0.0.1:8000
@@ -559,191 +351,37 @@ http://127.0.0.1:8000
 
 ---
 
-# 👤 Akun Development
+## Dokumentasi Pendukung
 
-Akun development dibuat oleh seeder role dan administrator.
+Dokumen referensi proyek saat ini berada di folder docs:
 
-Contoh akun yang tersedia dari data awal:
+- docs/Projectcontext.md
+- docs/Ecosystem.md
+- docs/Futureroadmap.md
+- docs/Refactorndebug.md
 
-### Super Admin
-
-```text
-Email    : superadmin@pemda.go.id
-Password : password123
-Role     : Super Admin
-```
-
-### Staff Logistik
-
-```text
-Email    : staff@pemda.go.id
-Password : password123
-Role     : Staff Logistik
-```
-
-> **Peringatan keamanan:** akun dan password di atas hanya untuk development/testing. Ganti atau hapus akun tersebut sebelum aplikasi digunakan pada lingkungan produksi.
+Dokumen-dokumen ini menjelaskan konteks bisnis, arsitektur, roadmap, dan catatan refactor yang sudah diproses pada project.
 
 ---
 
-# 🧭 Cara Menggunakan Aplikasi
+## Catatan Teknis
 
-## 1. Login
-
-Buka:
-
-```text
-http://127.0.0.1:8000/login
-```
-
-Masuk menggunakan akun yang telah dibuat melalui seeder.
+- frontend menggunakan Bootstrap 5 dan Blade,
+- transaksi dibuat melalui service layer agar lebih aman dan dapat dipantau,
+- validasi input dan sanitasi XSS diterapkan agar data tidak masuk dengan karakter mencurigakan,
+- mutasi stok merupakan satu-satunya mekanisme yang digunakan untuk perubahan saldo barang,
+- struktur project fokus pada audit trail, keamanan data, dan kontrol akses berbasis role.
 
 ---
 
-## 2. Siapkan Master Data
+## Lisensi
 
-Sebelum membuat transaksi peminjaman, siapkan data:
-
-```text
-Lokasi
-   ↓
-Kategori
-   ↓
-Barang
-   ↓
-Peminjam
-```
+Project ini dibuat untuk kebutuhan internal sistem inventaris aset daerah dan dapat disesuaikan dengan kebijakan organisasi atau instansi yang menggunakannya.
 
 ---
 
-## 3. Buat Transaksi Peminjaman
+## Pengembang
 
-Masuk ke menu **Loans**, kemudian:
+Aiyub Heriyanto
 
-1. Pilih peminjam.
-2. Tentukan tanggal peminjaman.
-3. Tentukan tanggal jatuh tempo.
-4. Pilih barang.
-5. Masukkan jumlah barang.
-6. Tambahkan catatan jika diperlukan.
-7. Simpan transaksi.
-
-Sistem akan memeriksa stok sebelum transaksi dibuat.
-
----
-
-## 4. Proses Pengembalian
-
-Buka detail transaksi peminjaman kemudian lakukan pengembalian barang.
-
-Pengembalian dapat dilakukan sebagian maupun seluruhnya sesuai kondisi transaksi.
-
----
-
-## 5. Pantau Stok
-
-Gunakan menu **Stock Movements** untuk memeriksa histori perubahan stok.
-
----
-
-## 6. Buat Laporan
-
-Gunakan menu **Reports** untuk memilih periode bulan dan tahun.
-
-Setelah laporan ditampilkan, data dapat digunakan untuk dokumentasi dan dapat diekspor ke PDF.
-
----
-
-# 🔄 Alur Proses Peminjaman
-
-```text
-Login
-  ↓
-Pilih Peminjam
-  ↓
-Pilih Barang
-  ↓
-Masukkan Jumlah
-  ↓
-Validasi Stok
-  ↓
-Buat Transaksi
-  ↓
-Stok Tersedia Berkurang
-  ↓
-Transaksi Aktif
-  ↓
-Pengembalian
-  ↓
-Stok Diperbarui
-  ↓
-Transaksi Selesai
-```
-
----
-
-# 🔒 Kontrol Akses
-
-Sistem menggunakan role untuk membatasi akses terhadap fitur tertentu.
-
-### Super Admin
-
-Memiliki akses administratif terhadap modul seperti:
-
-- Barang
-- Peminjam
-- Stok
-- Laporan
-- Pengelolaan pengguna/role sesuai konfigurasi aplikasi
-
-### Staff Logistik
-
-Digunakan untuk kebutuhan operasional inventaris dan peminjaman sesuai permission yang diberikan.
-
----
-
-# 📌 Catatan Implementasi
-
-Beberapa karakteristik implementasi saat ini:
-
-- Database pada `.env.example` menggunakan SQLite.
-- Session, cache, dan queue pada konfigurasi contoh menggunakan database.
-- Proses transaksi peminjaman menggunakan service layer dan database transaction.
-- Sistem mendukung pengembalian sebagian barang.
-- PDF dibuat menggunakan Dompdf.
-- Role dan permission menggunakan Spatie Laravel Permission.
-- **Frontend menggunakan Bootstrap 5 via CDN** — tidak memerlukan `npm run build` untuk menjalankan antarmuka.
-- **SKU barang di-generate otomatis** oleh server berdasarkan prefix kategori + autonumber (format: `PREFIX-NNN`). SKU tidak dapat diinput manual.
-- **Stok awal barang** dapat diisi saat pendaftaran barang baru. Jika diisi, sistem otomatis mencatat entri di `stock_movements` dengan tipe `in` dan kode referensi `INIT/{SKU}` sebagai jejak audit pembuka.
-- `location_id` saat ini hardcode ke lokasi pertama. Pemilihan lokasi saat input barang belum tersedia (utang teknis).
-
----
-
-# 🔮 Pengembangan Selanjutnya
-
-Beberapa fitur yang dapat dikembangkan lebih lanjut:
-
-- Dashboard statistik inventaris.
-- Notifikasi jatuh tempo peminjaman.
-- QR Code untuk identifikasi barang.
-- Export Excel.
-- Audit log aktivitas pengguna.
-- Upload foto barang.
-- Multi-unit / multi-gudang.
-- REST API untuk integrasi sistem eksternal.
-
----
-
-# 📄 Lisensi
-
-Proyek ini dikembangkan untuk kebutuhan pengelolaan inventaris dan peminjaman barang pada lingkungan Pemerintah Daerah.
-
-Lisensi dapat disesuaikan dengan kebijakan instansi atau organisasi yang menggunakan aplikasi.
-
----
-
-# 👨‍💻 Pengembang
-
-**Aiyub Heriyanto**
-
-GitHub:
-https://github.com/Aiyub150
+GitHub: https://github.com/Aiyub150

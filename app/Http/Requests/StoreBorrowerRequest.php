@@ -14,8 +14,18 @@ class StoreBorrowerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'institution_name' => ['required', 'string', 'max:255'],
-            'pic_name'         => ['required', 'string', 'max:255'],
+            'institution_name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(?!.*(?:<|>|%3[CcEe]|on[a-z]+\s*=|javascript:|script|alert\(|SELECT\s|INSERT\s+INTO|UPDATE\s+.*SET|DELETE\s+FROM|DROP\s+TABLE)).+$/u',
+            ],
+            'pic_name'         => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(?!.*(?:<|>|%3[CcEe]|on[a-z]+\s*=|javascript:|script|alert\(|SELECT\s|INSERT\s+INTO|UPDATE\s+.*SET|DELETE\s+FROM|DROP\s+TABLE)).+$/u',
+            ],
             'contact_number'   => ['required', 'string', 'max:50'],
             'address'          => ['nullable', 'string', 'max:500'],
         ];

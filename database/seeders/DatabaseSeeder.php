@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,7 +9,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            MasterDataSeeder::class,
+            RoleAndAdminSeeder::class, // roles + users dulu
+            MasterDataSeeder::class,   // data master (lokasi, kategori, barang, borrower)
         ]);
     }
 }

@@ -73,6 +73,10 @@
                             @endif
                         </td>
                     </tr>
+                    <tr>
+                        <td class="text-muted ps-4 py-2 pb-3 border-top">Catatan</td>
+                        <td class="py-2 pb-3 border-top">{{ $loan->notes ?? '-' }}</td>
+                    </tr>
                 </table>
             </div>
         </div>

@@ -32,11 +32,6 @@
                 <input id="remember_me" type="checkbox" name="remember" class="form-check-input">
                 <label for="remember_me" class="form-check-label" style="font-size:.83rem;">Ingat saya</label>
             </div>
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" style="font-size:.83rem; color:#2563eb; text-decoration:none;">
-                    Lupa password?
-                </a>
-            @endif
         </div>
 
         <button type="submit" class="btn btn-primary-custom btn-primary text-white w-100">

@@ -3,25 +3,18 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Location;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Borrower;
-use Illuminate\Support\Facades\Hash;
 
 class MasterDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat Akun Admin
-        $admin = User::create([
-            'name' => 'Admin Pemda',
-            'email' => 'admin@pemda.go.id',
-            'password' => Hash::make('password123'),
-        ]);
+        // Catatan: user dan role dibuat oleh RoleAndAdminSeeder, bukan di sini.
 
-        // 2. Buat Master Lokasi
+        // 1. Buat Master Lokasi
         $gudangUtama = Location::create(['name' => 'Gudang Utama Pemkab', 'address' => 'Jl. Pemuda No. 1']);
         $aula = Location::create(['name' => 'Gudang Aula Serbaguna', 'address' => 'Lantai 1 Gedung A']);
 

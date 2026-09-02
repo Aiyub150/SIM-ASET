@@ -5,10 +5,18 @@
 
 @section('content')
 
+@php $isAdmin = auth()->user()->hasAnyRole(['Super Admin', 'Admin']); @endphp
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h5 class="fw-bold mb-0">Transaksi Peminjaman</h5>
-        <p class="text-muted mb-0" style="font-size:.82rem;">Daftar seluruh transaksi peminjaman aset daerah</p>
+        <p class="text-muted mb-0" style="font-size:.82rem;">
+            @if($isAdmin)
+                Daftar seluruh transaksi peminjaman aset daerah
+            @else
+                Daftar transaksi peminjaman yang Anda catat
+            @endif
+        </p>
     </div>
     <a href="{{ route('loans.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -25,7 +33,9 @@
                 <tr>
                     <th class="ps-4">Kode Transaksi</th>
                     <th>Instansi Peminjam</th>
-                    <th>Admin Pencatat</th>
+                    @if($isAdmin)
+                    <th>Pencatat</th>
+                    @endif
                     <th>Tgl Pinjam</th>
                     <th>Jatuh Tempo</th>
                     <th class="text-center">Status</th>
@@ -44,7 +54,9 @@
                         <td>
                             <span class="fw-500" style="font-weight:500;">{{ $loan->borrower->institution_name }}</span>
                         </td>
+                        @if($isAdmin)
                         <td class="text-muted">{{ $loan->user->name }}</td>
+                        @endif
                         <td>{{ $loan->borrow_date->format('d/m/Y') }}</td>
                         <td class="{{ $isOverdue ? 'text-danger fw-bold' : '' }}">
                             {{ $loan->due_date->format('d/m/Y') }}
@@ -69,7 +81,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="{{ $isAdmin ? 7 : 6 }}" class="text-center py-5 text-muted">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#cbd5e1" viewBox="0 0 16 16" class="d-block mx-auto mb-2">
                                 <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0-2a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
                             </svg>

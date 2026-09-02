@@ -12,7 +12,12 @@ class StoreItemRequest extends FormRequest
     {
         return [
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'name'        => ['required', 'string', 'max:255'],
+            'name'        => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(?!.*(?:<|>|%3[CcEe]|on[a-z]+\s*=|javascript:|script|alert\(|SELECT\s|INSERT\s+INTO|UPDATE\s+.*SET|DELETE\s+FROM|DROP\s+TABLE)).+$/u',
+            ],
             // SKU tidak divalidasi dari input — di-generate server-side di controller
             'total_qty'   => ['nullable', 'integer', 'min:0'],
         ];
