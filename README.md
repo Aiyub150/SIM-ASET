@@ -18,7 +18,7 @@ Aplikasi ini menyediakan sistem terpusat untuk mengelola data barang, kategori, 
 Sistem menerapkan **Role-Based Access Control (RBAC)** sehingga hak akses pengguna dapat dibedakan berdasarkan peran, seperti **Super Admin** dan **Staff Logistik**.
 
 Repository:
-> https://github.com/Aiyub150/web-inventaris-pemda
+> https://github.com/Aiyub150/SIM-ASET
 
 ---
 
@@ -421,7 +421,7 @@ Untuk database, environment contoh menggunakan **SQLite**. Aplikasi juga dapat d
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/Aiyub150/web-inventaris-pemda.git
+git clone https://github.com/Aiyub150/SIM-ASET.git
 cd web-inventaris-pemda
 ```
 
@@ -732,33 +732,6 @@ Memiliki akses administratif terhadap modul seperti:
 ### Staff Logistik
 
 Digunakan untuk kebutuhan operasional inventaris dan peminjaman sesuai permission yang diberikan.
-
----
-
-# 🖼️ Dokumentasi Antarmuka
-
-Untuk menampilkan screenshot pada README, simpan gambar pada:
-
-```text
-docs/
-└── images/
-    ├── dashboard.png
-    ├── items.png
-    ├── borrowers.png
-    ├── loans.png
-    ├── loan-create.png
-    ├── loan-pdf.png
-    ├── stock-movements.png
-    └── reports.png
-```
-
-Contoh penggunaan:
-
-```markdown
-![Dashboard](docs/images/dashboard.png)
-```
-
-Anda dapat menambahkan screenshot baru tanpa mengubah struktur source code aplikasi.
 
 ---
 
