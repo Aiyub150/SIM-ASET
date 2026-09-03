@@ -13,23 +13,23 @@ class StoreBorrowerRequest extends FormRequest
 
     public function rules(): array
     {
-        $blockedPattern = '/(?:<|>|%3[CcEe]|on[a-z]+\s*=|javascript:|vbscript:|data:text\/html|script\s*[:=]|SELECT\s+|INSERT\s+INTO|UPDATE\s+.*SET|DELETE\s+FROM|DROP\s+TABLE|UNION\s+SELECT|ALTER\s+TABLE|CREATE\s+TABLE)/i';
+        $safeTextPattern = '/^(?=.*\pL)[\pL\pN\s\.\-\/&(),\'+]+$/u';
 
         return [
             'institution_name' => [
                 'required',
                 'string',
                 'max:255',
-                'not_regex:' . $blockedPattern,
+                'regex:' . $safeTextPattern,
             ],
             'pic_name'         => [
                 'required',
                 'string',
                 'max:255',
-                'not_regex:' . $blockedPattern,
+                'regex:' . $safeTextPattern,
             ],
             'contact_number'   => ['required', 'string', 'max:50', 'regex:/^[0-9+\-()\s]{4,50}$/'],
-            'address'          => ['nullable', 'string', 'max:500', 'not_regex:' . $blockedPattern],
+            'address'          => ['nullable', 'string', 'max:500', 'regex:/^[\pL\pN\s\.\-\/&(),\':;#+]+$/u'],
         ];
     }
 
