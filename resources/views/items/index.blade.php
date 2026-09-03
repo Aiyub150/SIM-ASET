@@ -19,11 +19,25 @@
 </div>
 
 <div class="card">
+    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom gap-3 flex-wrap">
+        <label class="form-check mb-0 d-flex align-items-center gap-2">
+            <input type="checkbox" id="select-all-items" class="form-check-input">
+            <span>Pilih semua</span>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+            <select id="label-print-type" class="form-select form-select-sm" style="width: 180px;">
+                <option value="both">Barcode 1D + QR 2D</option>
+                <option value="1d">Barcode 1D saja</option>
+                <option value="2d">QR 2D saja</option>
+            </select>
+            <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary">Cetak Label Terpilih</button>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th class="ps-4" style="width:5%;">#</th>
+                    <th class="ps-4" style="width:5%;"><input type="checkbox" id="select-all-header" class="form-check-input" aria-label="Pilih semua barang"></th>
                     <th style="width:14%;">Kode (SKU)</th>
                     <th>Nama Barang</th>
                     <th style="width:14%;">Kategori</th>
@@ -36,7 +50,10 @@
                 @forelse($items as $index => $item)
                     @php $utilization = $item->total_qty > 0 ? round((($item->total_qty - $item->available_qty) / $item->total_qty) * 100) : 0; @endphp
                     <tr>
-                        <td class="ps-4 text-muted">{{ $items->firstItem() + $index }}</td>
+                        <td class="ps-4">
+                            <input type="checkbox" class="form-check-input item-checkbox" value="{{ $item->id }}" aria-label="Pilih {{ $item->name }}">
+                        </td>
+                        <td class="text-muted">{{ $items->firstItem() + $index }}</td>
                         <td>
                             <span style="font-family:monospace; font-size:.82rem; font-weight:600; color:#2563eb;">
                                 {{ $item->sku }}
@@ -63,7 +80,10 @@
                             @endif
                         </td>
                         <td class="text-center pe-4">
-                            <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a href="{{ route('items.label', $item->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">Cetak Label</a>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -85,5 +105,46 @@
     </div>
     @endif
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAllHeader = document.getElementById('select-all-header');
+        const selectAllLabel = document.getElementById('select-all-items');
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const bulkButton = document.getElementById('bulk-label-button');
+
+        const syncSelectAll = () => {
+            const allChecked = Array.from(checkboxes).length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+            selectAllHeader.checked = allChecked;
+            selectAllLabel.checked = allChecked;
+        };
+
+        const toggleAll = (checked) => {
+            checkboxes.forEach(cb => cb.checked = checked);
+            syncSelectAll();
+        };
+
+        selectAllHeader?.addEventListener('change', (e) => toggleAll(e.target.checked));
+        selectAllLabel?.addEventListener('change', (e) => toggleAll(e.target.checked));
+        checkboxes.forEach(cb => cb.addEventListener('change', syncSelectAll));
+
+        bulkButton?.addEventListener('click', function () {
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (!selected.length) {
+                alert('Pilih minimal satu barang terlebih dahulu.');
+                return;
+            }
+
+            const type = document.getElementById('label-print-type')?.value || 'both';
+            const url = new URL('{{ route('items.labels') }}', window.location.origin);
+            url.searchParams.set('type', type);
+            selected.forEach(id => url.searchParams.append('items[]', id));
+            window.open(url.toString(), '_blank');
+        });
+    });
+</script>
 
 @endsection

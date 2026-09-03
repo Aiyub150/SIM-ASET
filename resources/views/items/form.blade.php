@@ -38,6 +38,10 @@
                     {{-- KATEGORI — wajib, menentukan prefix SKU --}}
                     <div class="mb-3">
                         <label class="form-label">Kategori Barang</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.02 1.02 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
+                            <input type="text" class="form-control form-control-sm" id="category-search" placeholder="Cari kategori..." autocomplete="off">
+                        </div>
                         <select name="category_id" id="category_id"
                                 class="form-select @error('category_id') is-invalid @enderror"
                                 {{ isset($item) ? 'disabled' : 'required' }}>
@@ -136,7 +140,20 @@
 <script>
 (function () {
     const sel     = document.getElementById('category_id');
+    const search  = document.getElementById('category-search');
     const preview = document.getElementById('sku_preview');
+
+    function filterOptions() {
+        if (!search || !sel) return;
+        const q = search.value.trim().toLowerCase();
+        Array.from(sel.options).forEach((option) => {
+            if (!option.value) {
+                option.hidden = false;
+                return;
+            }
+            option.hidden = q !== '' && !option.text.toLowerCase().includes(q);
+        });
+    }
 
     function updatePreview() {
         const opt = sel.options[sel.selectedIndex];
@@ -150,6 +167,7 @@
         preview.value = prefix + '-' + String(num).padStart(3, '0');
     }
 
+    search?.addEventListener('input', filterOptions);
     sel.addEventListener('change', updatePreview);
 
     // Restore saat ada old() setelah validation error

@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{loan}/return', [LoanController::class, 'returnItems'])->name('return');
     });
 
+    Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->name('items.lookup');
+    Route::get('/items/{item}/label', [ItemController::class, 'printLabel'])->name('items.label');
+
     // ── MODUL OPERASIONAL (Admin & Super Admin) ───────────────────────
     Route::middleware(['role:Super Admin|Admin'])->group(function () {
 
@@ -39,7 +42,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/',            [ItemController::class, 'index'])->name('index');
             Route::get('/create',      [ItemController::class, 'create'])->name('create');
             Route::post('/',           [ItemController::class, 'store'])->name('store');
+            Route::get('/labels',      [ItemController::class, 'printLabels'])->name('labels');
             Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
+            Route::get('/{item}/label', [ItemController::class, 'printLabel'])->name('label');
             Route::put('/{item}',      [ItemController::class, 'update'])->name('update');
         });
 

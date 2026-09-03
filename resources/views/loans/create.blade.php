@@ -145,6 +145,40 @@
 
     <div class="row g-4">
 
+        <div class="col-12 mb-3">
+            <div class="card border-primary">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                        <div>
+                            <div class="fw-bold text-primary">Scan Barcode / Ketik SKU di Sini</div>
+                            <small class="text-muted">Gunakan scanner USB atau kamera web untuk menambah barang secara cepat</small>
+                        </div>
+                        <div class="text-muted small">Fallback manual tetap tersedia</div>
+                    </div>
+                    <div class="mt-3 position-relative">
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Pilih Input Device</label>
+                                <select id="scan-device-select" class="form-select form-select-sm">
+                                    <option value="keyboard">Keyboard / Scanner USB</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Status</label>
+                                <div class="form-control form-control-sm bg-light text-muted" id="scan-device-status">Menunggu input keyboard/scanner…</div>
+                            </div>
+                        </div>
+                        <input type="text" id="sku-scan-input" class="form-control form-control-lg" placeholder="Contoh: ELEC-001" autocomplete="off" spellcheck="false" autofocus>
+                        <div id="sku-scan-feedback" class="small mt-2 text-muted">Siap menerima input scanner…</div>
+                    </div>
+                    <div id="camera-preview-wrapper" class="mt-3 d-none">
+                        <div class="small text-muted mb-2">Preview kamera aktif</div>
+                        <video id="camera-preview" class="w-100 rounded border" autoplay playsinline muted style="max-height: 220px; background: #111827;"></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Kolom Kiri: Info Peminjam --}}
         <div class="col-lg-4">
             <div class="card h-100">
@@ -153,7 +187,11 @@
 
                     <div class="mb-3">
                         <label class="form-label">Peminjam (Instansi)</label>
-                        <select name="borrower_id" class="form-select @error('borrower_id') is-invalid @enderror" required>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.02 1.02 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
+                            <input type="text" class="form-control form-control-sm" id="borrower-search" placeholder="Cari instansi..." autocomplete="off">
+                        </div>
+                        <select name="borrower_id" id="borrower_id" class="form-select @error('borrower_id') is-invalid @enderror" required>
                             <option value="">— Pilih Instansi —</option>
                             @foreach($borrowers as $borrower)
                                 <option value="{{ $borrower->id }}" {{ old('borrower_id') == $borrower->id ? 'selected' : '' }}>
@@ -224,6 +262,21 @@
 @push('scripts')
 <script>
 (function () {
+    const borrowerSelect = document.getElementById('borrower_id');
+    const borrowerSearch = document.getElementById('borrower-search');
+    if (borrowerSelect && borrowerSearch) {
+        borrowerSearch.addEventListener('input', function () {
+            const value = this.value.trim().toLowerCase();
+            Array.from(borrowerSelect.options).forEach((option) => {
+                if (!option.value) {
+                    option.hidden = false;
+                    return;
+                }
+                option.hidden = value !== '' && !option.text.toLowerCase().includes(value);
+            });
+        });
+    }
+
     // ── Data Sumber ──────────────────────────────────────
     const ITEMS = JSON.parse(document.getElementById('items-data').textContent);
 
@@ -443,13 +496,153 @@
 
     document.getElementById('btn-add-item').addEventListener('click', () => {
         if (ITEMS.length === 0) return;
-        // Cek apakah semua item sudah dipilih
         const usedCount = pickers.filter(p => p.selectedId !== null).length;
         if (usedCount >= ITEMS.length) {
             alert('Semua barang yang tersedia sudah ditambahkan ke daftar.');
             return;
         }
         container.appendChild(createRow(false));
+    });
+
+    const skuInput = document.getElementById('sku-scan-input');
+    const skuFeedback = document.getElementById('sku-scan-feedback');
+    const scanDeviceSelect = document.getElementById('scan-device-select');
+    const scanDeviceStatus = document.getElementById('scan-device-status');
+    const cameraPreviewWrapper = document.getElementById('camera-preview-wrapper');
+    const cameraPreview = document.getElementById('camera-preview');
+    let cameraStream = null;
+
+    async function populateCameraDevices() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(device => device.kind === 'videoinput');
+
+        if (!videoInputs.length) return;
+
+        videoInputs.forEach((device, index) => {
+            const option = document.createElement('option');
+            option.value = `camera:${device.deviceId || index}`;
+            option.textContent = device.label || `Kamera ${index + 1}`;
+            scanDeviceSelect.appendChild(option);
+        });
+    }
+
+    async function startCameraPreview(deviceId) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+
+        try {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { deviceId: deviceId ? { exact: deviceId } : undefined, facingMode: 'environment' }
+            });
+
+            cameraStream = stream;
+            cameraPreview.srcObject = stream;
+            cameraPreviewWrapper.classList.remove('d-none');
+            scanDeviceStatus.textContent = 'Kamera aktif — siap memindai barcode.';
+            scanDeviceStatus.className = 'form-control form-control-sm bg-light text-success';
+        } catch (error) {
+            cameraPreviewWrapper.classList.add('d-none');
+            scanDeviceStatus.textContent = 'Kamera tidak tersedia; gunakan scanner USB/keyboard.';
+            scanDeviceStatus.className = 'form-control form-control-sm bg-light text-warning';
+        }
+    }
+
+    scanDeviceSelect.addEventListener('change', async function () {
+        const value = this.value;
+        if (value === 'keyboard') {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            cameraPreviewWrapper.classList.add('d-none');
+            scanDeviceStatus.textContent = 'Menunggu input keyboard/scanner…';
+            scanDeviceStatus.className = 'form-control form-control-sm bg-light text-muted';
+            return;
+        }
+
+        const deviceId = value.replace('camera:', '');
+        await startCameraPreview(deviceId);
+    });
+
+    populateCameraDevices();
+
+    function setFeedback(message, tone = 'muted') {
+        skuFeedback.textContent = message;
+        skuFeedback.className = 'small mt-2 text-' + tone;
+    }
+
+    async function addItemFromSku(sku) {
+        const normalized = (sku || '').trim();
+        if (!normalized) return;
+
+        try {
+            setFeedback('Memvalidasi SKU di server…', 'primary');
+            const response = await fetch(`/items/lookup?sku=${encodeURIComponent(normalized)}`);
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                setFeedback(result.message || 'SKU tidak ditemukan. Coba cek kembali atau masukkan data manual.', 'danger');
+                skuInput.value = '';
+                return;
+            }
+
+            const item = result.item;
+            const existing = pickers.find(p => p.selectedId === item.id);
+            if (existing) {
+                const qtyInput = existing.row.querySelector('.qty-input');
+                const current = Number(qtyInput.value || 0);
+                qtyInput.value = Math.min(current + 1, item.available_qty || current + 1);
+                setFeedback(`Barang "${item.name}" sudah ada di daftar, qty ditambah 1.`, 'success');
+                skuInput.value = '';
+                return;
+            }
+
+            const row = createRow(false);
+            const display = row.querySelector('.item-picker-display');
+            const hidden = row.querySelector('input[type="hidden"]');
+            const qty = row.querySelector('.qty-input');
+            const itemState = pickers[pickers.length - 1];
+
+            itemState.selectedId = item.id;
+            hidden.value = item.id;
+            qty.max = item.available_qty;
+            qty.value = 1;
+
+            display.querySelector('.display-text').className = 'display-text selected-text';
+            display.querySelector('.display-text').textContent = item.name + (item.sku ? ` (${item.sku})` : '') + ` — Stok: ${item.available_qty}`;
+            display.classList.remove('is-invalid');
+
+            const list = row.querySelector('.item-picker-list');
+            list.innerHTML = '<div class="item-picker-empty">Barang ditambahkan via scan SKU</div>';
+
+            setFeedback(`Barang "${item.name}" berhasil ditambahkan dari SKU ${item.sku}.`, 'success');
+            skuInput.value = '';
+            skuInput.focus();
+        } catch (error) {
+            setFeedback('Gagal memvalidasi SKU. Pastikan koneksi dan data SKU benar.', 'danger');
+            skuInput.value = '';
+        }
+    }
+
+    skuInput.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        addItemFromSku(skuInput.value);
+    });
+
+    skuInput.addEventListener('input', function () {
+        const value = skuInput.value.trim();
+        if (!value) {
+            setFeedback('Siap menerima input scanner…', 'muted');
+            return;
+        }
+
+        setFeedback('Memproses SKU…', 'primary');
     });
 
 })();

@@ -13,8 +13,7 @@ use App\Models\Loan;
 
 class User extends Authenticatable
 {
-    // Gunakan trait HasRoles di sini
-    use Notifiable, HasRoles; 
+    use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
         'name',

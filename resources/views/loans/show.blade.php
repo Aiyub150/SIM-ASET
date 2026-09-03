@@ -125,6 +125,37 @@
 
 {{-- Form Pengembalian --}}
 @if($loan->status !== 'completed' && $pendingItems->count() > 0)
+<div class="card mb-4" style="border-color:#2563eb;">
+    <div class="card-header" style="background:#eff6ff; color:#1e40af; border-color:#2563eb;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="me-1" viewBox="0 0 16 16" style="margin-top:-2px;">
+            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-6a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm.5 4.5h-1v3.5h3v-1h-2V6.5z"/>
+        </svg>
+        Scan Barcode Pengembalian
+    </div>
+    <div class="card-body p-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label">Pilih Input Device</label>
+                <select id="return-scan-device-select" class="form-select">
+                    <option value="keyboard">Keyboard / Scanner USB</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Scan / Ketik SKU Barang yang Dikembalikan</label>
+                <input type="text" id="return-sku-input" class="form-control" placeholder="Contoh: ELEC-001" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+            <div class="col-md-2">
+                <button type="button" id="return-sku-submit" class="btn btn-outline-primary w-100">Cari Barang</button>
+            </div>
+        </div>
+        <div id="return-sku-feedback" class="small mt-2 text-muted">Siap menerima input scanner…</div>
+        <div id="return-camera-preview-wrapper" class="mt-3 d-none">
+            <div class="small text-muted mb-2">Preview kamera aktif</div>
+            <video id="return-camera-preview" class="w-100 rounded border" autoplay playsinline muted style="max-height: 220px; background: #111827;"></video>
+        </div>
+    </div>
+</div>
+
 <div class="card" style="border-color:#2563eb;">
     <div class="card-header" style="background:#eff6ff; color:#1e40af; border-color:#2563eb;">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="me-1" viewBox="0 0 16 16" style="margin-top:-2px;">
@@ -143,8 +174,8 @@
                         <select name="items[0][loan_item_id]" class="form-select loan-item-select" required>
                             <option value="">— Pilih Barang —</option>
                             @foreach($pendingItems as $pending)
-                                <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}">
-                                    {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
+                                <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}" data-sku="{{ $pending->item->sku }}">
+                                    {{ $pending->item->sku }} — {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
                                 </option>
                             @endforeach
                         </select>
@@ -177,8 +208,8 @@
             <select class="form-select loan-item-select" required>
                 <option value="">— Pilih Barang —</option>
                 @foreach($pendingItems as $pending)
-                    <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}">
-                        {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
+                    <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}" data-sku="{{ $pending->item->sku }}">
+                        {{ $pending->item->sku }} — {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
                     </option>
                 @endforeach
             </select>
@@ -233,6 +264,122 @@
                 idx++;
             });
         }
+
+        const returnSkuInput = document.getElementById('return-sku-input');
+        const returnSkuFeedback = document.getElementById('return-sku-feedback');
+        const returnScanDeviceSelect = document.getElementById('return-scan-device-select');
+        const returnCameraPreviewWrapper = document.getElementById('return-camera-preview-wrapper');
+        const returnCameraPreview = document.getElementById('return-camera-preview');
+        let returnCameraStream = null;
+
+        async function populateReturnCameraDevices() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoInputs = devices.filter(device => device.kind === 'videoinput');
+
+            videoInputs.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = `camera:${device.deviceId || index}`;
+                option.textContent = device.label || `Kamera ${index + 1}`;
+                returnScanDeviceSelect.appendChild(option);
+            });
+        }
+
+        async function startReturnCameraPreview(deviceId) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+
+            try {
+                if (returnCameraStream) {
+                    returnCameraStream.getTracks().forEach(track => track.stop());
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: deviceId ? { exact: deviceId } : undefined, facingMode: 'environment' }
+                });
+
+                returnCameraStream = stream;
+                returnCameraPreview.srcObject = stream;
+                returnCameraPreviewWrapper.classList.remove('d-none');
+                returnSkuFeedback.textContent = 'Kamera aktif — siap memindai barcode pengembalian.';
+                returnSkuFeedback.className = 'small mt-2 text-success';
+            } catch (error) {
+                returnCameraPreviewWrapper.classList.add('d-none');
+                returnSkuFeedback.textContent = 'Kamera tidak tersedia; gunakan scanner USB/keyboard.';
+                returnSkuFeedback.className = 'small mt-2 text-warning';
+            }
+        }
+
+        returnScanDeviceSelect.addEventListener('change', async function () {
+            const value = this.value;
+            if (value === 'keyboard') {
+                if (returnCameraStream) {
+                    returnCameraStream.getTracks().forEach(track => track.stop());
+                    returnCameraStream = null;
+                }
+                returnCameraPreviewWrapper.classList.add('d-none');
+                returnSkuFeedback.textContent = 'Siap menerima input scanner…';
+                returnSkuFeedback.className = 'small mt-2 text-muted';
+                return;
+            }
+
+            const deviceId = value.replace('camera:', '');
+            await startReturnCameraPreview(deviceId);
+        });
+
+        populateReturnCameraDevices();
+
+        function findLoanItemBySku(sku) {
+            const normalized = (sku || '').trim().toUpperCase();
+            if (!normalized) return null;
+
+            const selects = Array.from(document.querySelectorAll('.loan-item-select'));
+            for (const select of selects) {
+                for (const option of Array.from(select.options)) {
+                    const text = (option.textContent || '').toUpperCase();
+                    const skuText = (option.getAttribute('data-sku') || '').toUpperCase();
+                    if (option.value && (skuText === normalized || text.includes(normalized))) {
+                        return { select, option };
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function applyReturnedSkuMatch(sku) {
+            const normalized = (sku || '').trim();
+            if (!normalized) return;
+
+            const match = findLoanItemBySku(normalized);
+            if (!match) {
+                returnSkuFeedback.textContent = 'SKU tidak cocok dengan barang yang masih dipinjam.';
+                returnSkuFeedback.className = 'small mt-2 text-danger';
+                return;
+            }
+
+            const { select, option } = match;
+            const row = select.closest('.item-row');
+            const qtyInput = row.querySelector('.return-qty-input');
+            const max = option.getAttribute('data-max');
+            select.value = option.value;
+            qtyInput.setAttribute('max', max);
+            qtyInput.value = max;
+            returnSkuFeedback.textContent = 'Barang cocok ditemukan. Jumlah pengembalian otomatis diisi.';
+            returnSkuFeedback.className = 'small mt-2 text-success';
+        }
+
+        const handleReturnScan = (event) => {
+            if (event.type === 'keydown' && event.key !== 'Enter') return;
+            if (event.type === 'click' || event.key === 'Enter') {
+                event.preventDefault();
+                applyReturnedSkuMatch(returnSkuInput.value);
+                returnSkuInput.value = '';
+            }
+        };
+
+        returnSkuInput.addEventListener('keydown', handleReturnScan);
+        document.getElementById('return-sku-submit').addEventListener('click', handleReturnScan);
     });
 </script>
 @endpush
