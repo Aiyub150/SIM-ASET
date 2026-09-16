@@ -21,7 +21,7 @@
             </div>
             <div class="card-body p-4">
                 <form action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}"
-                      method="POST">
+                      method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($user)) @method('PUT') @endif
 
@@ -67,6 +67,21 @@
                         <div class="form-text text-muted" style="font-size:.78rem;">
                             Super Admin: akses penuh + user management · Admin: akses operasional · Staff Logistik: hanya peminjaman miliknya
                         </div>
+                    </div>
+
+                    {{-- Foto Profil --}}
+                    <div class="mb-3">
+                        <label class="form-label">Foto Profil (Opsional)</label>
+                        @if(isset($user) && $user->avatar)
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;">
+                            </div>
+                        @endif
+                        <input type="file" name="avatar" class="form-control @error('avatar') is-invalid @enderror" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted" style="font-size:.78rem;">
+                            Format yang didukung: JPG, PNG, WEBP. Maksimal 2MB.
+                        </div>
+                        @error('avatar') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <hr class="my-4">

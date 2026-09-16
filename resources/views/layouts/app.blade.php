@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIM-ASET — Inventaris Aset Daerah')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/sim-aset_logo.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -13,10 +14,10 @@
         :root {
             --sidebar-width: 250px;
             --topbar-height: 64px;
-            /* Vue Notus inspired colors */
-            --primary: #ec4899; /* Pink-500 */
-            --primary-dark: #be185d; /* Pink-700 */
-            --primary-light: #fdf2f8; /* Pink-50 */
+            /* Blue theme */
+            --primary: #2563eb; /* Blue-600 */
+            --primary-dark: #1d4ed8; /* Blue-700 */
+            --primary-light: #eff6ff; /* Blue-50 */
             --sidebar-bg: #1e293b; /* Slate-800 */
             --sidebar-hover: #334155; /* Slate-700 */
             --sidebar-active: #475569; /* Slate-600 */
@@ -444,9 +445,13 @@
 
         <div class="sidebar-footer">
             <div class="user-card">
-                <div class="user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
+                @if(auth()->user()->avatar)
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="user-avatar" style="object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
+                @else
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                @endif
                 <div style="min-width:0;">
                     <div class="user-name text-truncate">{{ auth()->user()->name }}</div>
                     <div class="user-role text-truncate">{{ auth()->user()->roles->pluck('name')->first() ?? 'User' }}</div>

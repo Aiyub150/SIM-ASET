@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Picqer\Barcode\BarcodeGeneratorSVG;
 
@@ -149,7 +150,12 @@ class ItemController extends Controller
         $category = Category::findOrFail($request->category_id);
         $totalQty = $request->filled('total_qty') ? (int) $request->total_qty : 0;
 
-        $item = DB::transaction(function () use ($category, $totalQty, $request) {
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images/items', 'public');
+        }
+
+        $item = DB::transaction(function () use ($category, $totalQty, $request, $imagePath) {
             // Generate SKU di dalam transaksi agar autonumber aman
             $sku = $this->generateSkuInsideTransaction($category);
 
@@ -159,6 +165,7 @@ class ItemController extends Controller
                 'location_id'   => 1, // default; bisa ditambah field lokasi nanti
                 'name'          => $request->name,
                 'sku'           => $sku,
+                'image'         => $imagePath,
                 'total_qty'     => 0,
                 'available_qty' => 0,
             ]);
@@ -191,7 +198,16 @@ class ItemController extends Controller
     public function update(UpdateItemRequest $request, Item $item): RedirectResponse
     {
         // Nama boleh diperbarui; SKU dan category_id tidak berubah
-        $item->update(['name' => $request->name]);
+        $dataToUpdate = ['name' => $request->name];
+
+        if ($request->hasFile('image')) {
+            if ($item->image && Storage::disk('public')->exists($item->image)) {
+                Storage::disk('public')->delete($item->image);
+            }
+            $dataToUpdate['image'] = $request->file('image')->store('images/items', 'public');
+        }
+
+        $item->update($dataToUpdate);
 
         if ($request->filled('total_qty')) {
             $newTotal = (int) $request->total_qty;

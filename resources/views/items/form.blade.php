@@ -31,7 +31,7 @@
                     </div>
                 @endif
 
-                <form action="{{ isset($item) ? route('items.update', $item->id) : route('items.store') }}" method="POST">
+                <form action="{{ isset($item) ? route('items.update', $item->id) : route('items.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($item)) @method('PUT') @endif
 
@@ -99,6 +99,22 @@
                                value="{{ old('name', $item->name ?? '') }}"
                                placeholder="Contoh: Tenda Pleton 6x14 Meter" required>
                         @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    {{-- GAMBAR BARANG --}}
+                    <div class="mb-3">
+                        <label class="form-label">Foto Barang</label>
+                        @if(isset($item) && $item->image)
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $item->image) }}" alt="Foto Barang" style="max-height: 100px; border-radius: 8px;">
+                            </div>
+                        @endif
+                        <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted" style="font-size:.78rem;">
+                            Format yang didukung: JPG, PNG, WEBP. Maksimal 2MB.
+                            @if(isset($item) && $item->image) <br><em>Upload gambar baru untuk mengganti gambar lama.</em> @endif
+                        </div>
+                        @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     {{-- QTY — hanya Super Admin --}}

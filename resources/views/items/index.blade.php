@@ -59,6 +59,7 @@
                     <th class="ps-4" style="width:5%;"><input type="checkbox" id="select-all-header" class="form-check-input" aria-label="Pilih semua barang"></th>
                     <th style="width:5%;">No</th>
                     <th style="width:14%;">Kode (SKU)</th>
+                    <th>Foto</th>
                     <th>Nama Barang</th>
                     <th style="width:14%;">Kategori</th>
                     <th class="text-center" style="width:11%;">Total Fisik</th>
@@ -78,6 +79,13 @@
                             <span style="font-family:monospace; font-size:.82rem; font-weight:600; color:#2563eb;">
                                 {{ $item->sku }}
                             </span>
+                        </td>
+                        <td>
+                            @if($item->image)
+                                <img src="{{ asset('storage/' . $item->image) }}" alt="Foto" style="max-height: 40px; border-radius: 4px;">
+                            @else
+                                <span class="text-muted" style="font-size: 0.75rem;">Tidak ada gambar</span>
+                            @endif
                         </td>
                         <td style="font-weight:500;">{{ $item->name }}</td>
                         <td>

@@ -12,13 +12,21 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
+
+        $loanQuery = Loan::query();
+        if ($isStaff) {
+            $loanQuery->where('user_id', $user->id);
+        }
+
         $totalItems = Item::count();
         $totalStock = Item::sum('total_qty');
-        $activeLoans = Loan::where('status', 'active')->count();
-        $overdueLoans = Loan::where('status', 'active')->where('due_date', '<', now())->count();
+        $activeLoans = (clone $loanQuery)->where('status', 'active')->count();
+        $overdueLoans = (clone $loanQuery)->where('status', 'active')->where('due_date', '<', now())->count();
         
-        $recentMovements = StockMovement::with(['item', 'user'])->latest()->take(5)->get();
-        $recentLoans = Loan::with(['borrower', 'user'])->latest()->take(5)->get();
+        $recentMovements = $isStaff ? collect() : StockMovement::with(['item', 'user'])->latest()->take(5)->get();
+        $recentLoans = (clone $loanQuery)->with(['borrower', 'user'])->latest()->take(5)->get();
         $lowStockItems = Item::where('available_qty', '<', 5)->take(5)->get(); // Example for low stock
 
         // Chart Data (6 bulan terakhir)
@@ -30,11 +38,11 @@ class DashboardController extends Controller
             $month = now()->subMonths($i);
             $chartLabels[] = $month->translatedFormat('M Y');
             
-            $chartLoans[] = Loan::whereYear('borrow_date', $month->year)
+            $chartLoans[] = (clone $loanQuery)->whereYear('borrow_date', $month->year)
                 ->whereMonth('borrow_date', $month->month)
                 ->count();
                 
-            $chartReturns[] = Loan::whereYear('return_date', $month->year)
+            $chartReturns[] = (clone $loanQuery)->whereYear('return_date', $month->year)
                 ->whereMonth('return_date', $month->month)
                 ->whereIn('status', ['completed', 'returned_partial'])
                 ->count();

@@ -22,6 +22,7 @@ class UpdateItemRequest extends FormRequest
                 'regex:' . $safeTextPattern,
             ],
             'total_qty'   => ['nullable', 'integer', 'min:0'],
+            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }
