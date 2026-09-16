@@ -27,6 +27,24 @@
 </div>
 
 <div class="card">
+    <div class="px-4 py-3 border-bottom bg-light">
+        <form method="GET" action="{{ route('loans.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari peminjam..." value="{{ request('search') }}">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                <a href="{{ route('loans.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead>

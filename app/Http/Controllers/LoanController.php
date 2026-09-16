@@ -37,18 +37,30 @@ class LoanController extends Controller
      * - Super Admin & Admin : semua transaksi
      * - Staff Logistik      : hanya transaksi yang dia buat sendiri
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $user  = Auth::user();
+        $search = $request->query('search');
+        $status = $request->query('status');
+
         $query = Loan::with(['borrower', 'user'])->orderBy('created_at', 'desc');
 
         if ($user->hasRole('Staff Logistik')) {
             $query->where('user_id', $user->id);
         }
 
-        $loans = $query->paginate(15);
+        $query->when($search, function ($q, $search) {
+            return $q->whereHas('borrower', function ($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%")
+                   ->orWhere('institution_name', 'like', "%{$search}%");
+            });
+        })->when($status, function ($q, $status) {
+            return $q->where('status', $status);
+        });
 
-        return view('loans.index', compact('loans'));
+        $loans = $query->paginate(15)->withQueryString();
+
+        return view('loans.index', compact('loans', 'search', 'status'));
     }
 
     /**

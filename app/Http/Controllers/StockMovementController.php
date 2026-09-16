@@ -18,13 +18,27 @@ class StockMovementController extends Controller
     /**
      * Menampilkan Kartu Stok (Ledger)
      */
-    public function index(): View
+    public function index(\Illuminate\Http\Request $request): View
     {
-        $movements = StockMovement::with(['item', 'user'])
-                                  ->orderBy('created_at', 'desc')
-                                  ->paginate(20);
+        $search = $request->query('search');
+        $type = $request->query('type');
 
-        return view('stocks.index', compact('movements'));
+        $movements = StockMovement::with(['item', 'user'])
+            ->when($search, function ($query, $search) {
+                return $query->where('reference_code', 'like', "%{$search}%")
+                             ->orWhereHas('item', function ($q) use ($search) {
+                                 $q->where('name', 'like', "%{$search}%")
+                                   ->orWhere('sku', 'like', "%{$search}%");
+                             });
+            })
+            ->when($type, function ($query, $type) {
+                return $query->where('type', $type);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('stocks.index', compact('movements', 'search', 'type'));
     }
 
     /**

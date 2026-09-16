@@ -189,9 +189,14 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-2">
-                <button type="button" id="btn-add-return" class="btn btn-sm btn-outline-primary">
-                    + Tambah Barang Lain
-                </button>
+                <div>
+                    <button type="button" id="btn-add-return" class="btn btn-sm btn-outline-primary me-2">
+                        + Tambah Barang Lain
+                    </button>
+                    <button type="button" id="btn-return-all" class="btn btn-sm btn-outline-success">
+                        Kembalikan Semua Sisa
+                    </button>
+                </div>
                 <button type="submit" class="btn btn-primary fw-bold px-4">
                     Eksekusi Pengembalian
                 </button>
@@ -262,6 +267,34 @@
                 attachMaxLogic(newRow);
                 container.appendChild(newRow);
                 idx++;
+            });
+        }
+
+        const btnReturnAll = document.getElementById('btn-return-all');
+        if (btnReturnAll) {
+            btnReturnAll.addEventListener('click', function () {
+                container.innerHTML = '';
+                const templateSelect = template.querySelector('.loan-item-select');
+                const options = Array.from(templateSelect.options).filter(opt => opt.value !== "");
+                
+                options.forEach((opt) => {
+                    const newRow = template.cloneNode(true);
+                    const sel = newRow.querySelector('.loan-item-select');
+                    const qty = newRow.querySelector('.return-qty-input');
+                    
+                    sel.setAttribute('name', `items[${idx}][loan_item_id]`);
+                    qty.setAttribute('name', `items[${idx}][return_qty]`);
+                    
+                    sel.value = opt.value;
+                    const max = opt.getAttribute('data-max');
+                    qty.setAttribute('max', max);
+                    qty.value = max;
+                    
+                    newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
+                    attachMaxLogic(newRow);
+                    container.appendChild(newRow);
+                    idx++;
+                });
             });
         }
 

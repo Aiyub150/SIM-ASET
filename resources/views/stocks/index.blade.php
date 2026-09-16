@@ -19,6 +19,25 @@
 </div>
 
 <div class="card">
+    <div class="px-4 py-3 border-bottom bg-light">
+        <form method="GET" action="{{ route('stocks.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari ref/nama/SKU..." value="{{ request('search') }}">
+            </div>
+            <div class="col-md-4">
+                <select name="type" class="form-select form-select-sm">
+                    <option value="">Semua Tipe Mutasi</option>
+                    <option value="in" {{ request('type') === 'in' ? 'selected' : '' }}>Masuk (Penambahan)</option>
+                    <option value="out" {{ request('type') === 'out' ? 'selected' : '' }}>Keluar (Pengurangan)</option>
+                    <option value="adjustment" {{ request('type') === 'adjustment' ? 'selected' : '' }}>Penyesuaian (Audit)</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                <a href="{{ route('stocks.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead>

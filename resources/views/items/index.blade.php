@@ -19,6 +19,25 @@
 </div>
 
 <div class="card">
+    <div class="px-4 py-3 border-bottom bg-light">
+        <form method="GET" action="{{ route('items.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari nama atau SKU..." value="{{ request('search') }}">
+            </div>
+            <div class="col-md-4">
+                <select name="category_id" class="form-select form-select-sm">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                <a href="{{ route('items.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
     <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom gap-3 flex-wrap">
         <label class="form-check mb-0 d-flex align-items-center gap-2">
             <input type="checkbox" id="select-all-items" class="form-check-input">
@@ -38,6 +57,7 @@
             <thead>
                 <tr>
                     <th class="ps-4" style="width:5%;"><input type="checkbox" id="select-all-header" class="form-check-input" aria-label="Pilih semua barang"></th>
+                    <th style="width:5%;">No</th>
                     <th style="width:14%;">Kode (SKU)</th>
                     <th>Nama Barang</th>
                     <th style="width:14%;">Kategori</th>
@@ -88,7 +108,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#cbd5e1" viewBox="0 0 16 16" class="d-block mx-auto mb-2">
                                 <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.922l6.5 2.6z"/>
                             </svg>

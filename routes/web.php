@@ -15,9 +15,7 @@ Route::get('/', function () {
 // Lapisan Pertahanan 1: Wajib Login
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return redirect()->route('loans.index');
-    })->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // ── MODUL PEMINJAMAN ──────────────────────────────────────────────
     // Semua user login bisa akses, tapi Staff hanya lihat miliknya sendiri

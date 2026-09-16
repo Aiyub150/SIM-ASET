@@ -20,10 +20,26 @@ class ItemController extends Controller
 {
     public function __construct(private StockService $stockService) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $items = Item::with('category')->orderBy('name', 'asc')->paginate(15);
-        return view('items.index', compact('items'));
+        $search = $request->query('search');
+        $categoryId = $request->query('category_id');
+
+        $items = Item::with('category')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->orderBy('name', 'asc')
+            ->paginate(15)
+            ->withQueryString();
+
+        $categories = Category::orderBy('name')->get();
+
+        return view('items.index', compact('items', 'categories', 'search', 'categoryId'));
     }
 
     public function lookupBySku(Request $request)
