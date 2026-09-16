@@ -50,10 +50,11 @@ class LoanController extends Controller
         }
 
         $query->when($search, function ($q, $search) {
-            return $q->whereHas('borrower', function ($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%")
-                   ->orWhere('institution_name', 'like', "%{$search}%");
-            });
+            return $q->where('loan_code', 'like', "%{$search}%")
+                ->orWhereHas('borrower', function ($q2) use ($search) {
+                    $q2->where('institution_name', 'like', "%{$search}%")
+                       ->orWhere('pic_name', 'like', "%{$search}%");
+                });
         })->when($status, function ($q, $status) {
             return $q->where('status', $status);
         });

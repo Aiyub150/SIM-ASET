@@ -5,21 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIM-ASET — Inventaris Aset Daerah')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet"/>
     <style>
         :root {
-            --sidebar-width: 240px;
-            --topbar-height: 60px;
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #eff6ff;
-            --sidebar-bg: #0f172a;
-            --sidebar-hover: #1e293b;
-            --sidebar-active: #1e3a5f;
-            --text-muted-custom: #64748b;
-            --border: #e2e8f0;
-            --surface: #f8fafc;
+            --sidebar-width: 250px;
+            --topbar-height: 64px;
+            /* Vue Notus inspired colors */
+            --primary: #ec4899; /* Pink-500 */
+            --primary-dark: #be185d; /* Pink-700 */
+            --primary-light: #fdf2f8; /* Pink-50 */
+            --sidebar-bg: #1e293b; /* Slate-800 */
+            --sidebar-hover: #334155; /* Slate-700 */
+            --sidebar-active: #475569; /* Slate-600 */
+            --text-muted-custom: #64748b; /* Slate-500 */
+            --border: #e2e8f0; /* Slate-200 */
+            --surface: #f1f5f9; /* Slate-100 */
         }
 
         * { box-sizing: border-box; }
@@ -356,7 +359,18 @@
         </div>
 
         <nav class="sidebar-nav">
-            <div class="nav-section-label">Transaksi</div>
+            <div class="nav-section-label">Utama</div>
+
+            <a href="{{ route('dashboard') }}"
+               class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5zm-2.5-3a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5zm5 4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm13 2v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1z"/>
+                </svg>
+                Dashboard
+            </a>
+
+            <div class="nav-section-label" style="margin-top:.5rem;">Transaksi</div>
 
             <a href="{{ route('loans.index') }}"
                class="sidebar-link {{ request()->routeIs('loans.*') ? 'active' : '' }}">
@@ -415,6 +429,15 @@
                     <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
                 </svg>
                 Kelola Pengguna
+            </a>
+            
+            <a href="{{ route('categories.index') }}"
+               class="sidebar-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M3.5 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 2h-9zM2.5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9z"/>
+                    <path fill-rule="evenodd" d="M6.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-3zM5 5.5A1.5 1.5 0 0 1 6.5 4h3A1.5 1.5 0 0 1 11 5.5v1A1.5 1.5 0 0 1 9.5 8h-3A1.5 1.5 0 0 1 5 6.5v-1z"/>
+                </svg>
+                Manajemen Kategori
             </a>
             @endrole
         </nav>

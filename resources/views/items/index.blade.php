@@ -45,9 +45,9 @@
         </label>
         <div class="d-flex align-items-center gap-2">
             <select id="label-print-type" class="form-select form-select-sm" style="width: 180px;">
-                <option value="both">Barcode 1D + QR 2D</option>
-                <option value="1d">Barcode 1D saja</option>
-                <option value="2d">QR 2D saja</option>
+                <option value="both">Barcode Standar & QR Code</option>
+                <option value="1d">Barcode Standar Saja</option>
+                <option value="2d">QR Code Saja</option>
             </select>
             <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary">Cetak Label Terpilih</button>
         </div>

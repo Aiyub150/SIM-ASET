@@ -38,4 +38,25 @@
             Masuk
         </button>
     </form>
+
+    <div class="mt-4 pt-3 border-top">
+        <p class="text-sm text-slate-500 font-semibold mb-2">Demo Accounts:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded p-3 text-xs text-slate-600">
+            <div class="mb-2 pb-2 border-b border-slate-200">
+                <span class="font-bold text-slate-800">Super Admin</span><br>
+                Email: superadmin@simaset.com<br>
+                Pass: password123
+            </div>
+            <div class="mb-2 pb-2 border-b border-slate-200">
+                <span class="font-bold text-slate-800">Admin</span><br>
+                Email: admin@simaset.com<br>
+                Pass: password123
+            </div>
+            <div>
+                <span class="font-bold text-slate-800">Staff</span><br>
+                Email: staff@simaset.com<br>
+                Pass: password123
+            </div>
+        </div>
+    </div>
 </x-guest-layout>

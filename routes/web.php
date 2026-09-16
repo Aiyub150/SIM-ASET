@@ -5,6 +5,7 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Halaman utama langsung diarahkan ke login
@@ -76,6 +77,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/',           [UserController::class, 'store'])->name('store');
         Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
         Route::put('/{user}',      [UserController::class, 'update'])->name('update');
+    });
+
+    // ── MODUL KATEGORI (Super Admin saja) ────────────────────────────────
+    Route::middleware(['role:Super Admin'])->prefix('categories')->name('categories.')->group(function () {
+        Route::get('/',            [CategoryController::class, 'index'])->name('index');
+        Route::post('/',           [CategoryController::class, 'store'])->name('store');
+        Route::put('/{category}',  [CategoryController::class, 'update'])->name('update');
+        Route::patch('/{category}/toggle', [CategoryController::class, 'toggleStatus'])->name('toggle');
     });
 
 });

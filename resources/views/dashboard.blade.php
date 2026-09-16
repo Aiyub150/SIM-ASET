@@ -93,4 +93,66 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0 fw-bold">Statistik Peminjaman & Pengembalian (6 Bulan Terakhir)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="loanChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('loanChart').getContext('2d');
+        const loanChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($chartLabels) !!},
+                datasets: [
+                    {
+                        label: 'Peminjaman Baru',
+                        data: {!! json_encode($chartLoans) !!},
+                        backgroundColor: 'rgba(236, 72, 153, 0.8)', // pink-500
+                        borderColor: 'rgba(236, 72, 153, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Pengembalian Selesai',
+                        data: {!! json_encode($chartReturns) !!},
+                        backgroundColor: 'rgba(34, 197, 94, 0.8)', // green-500
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush

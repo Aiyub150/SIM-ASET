@@ -173,7 +173,7 @@
                     </div>
                     <div id="camera-preview-wrapper" class="mt-3 d-none">
                         <div class="small text-muted mb-2">Preview kamera aktif</div>
-                        <video id="camera-preview" class="w-100 rounded border" autoplay playsinline muted style="max-height: 220px; background: #111827;"></video>
+                        <div id="camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px;"></div>
                     </div>
                 </div>
             </div>
@@ -501,40 +501,62 @@
     const scanDeviceSelect = document.getElementById('scan-device-select');
     const scanDeviceStatus = document.getElementById('scan-device-status');
     const cameraPreviewWrapper = document.getElementById('camera-preview-wrapper');
-    const cameraPreview = document.getElementById('camera-preview');
-    let cameraStream = null;
+    
+    let html5QrCode = null;
 
     async function populateCameraDevices() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoInputs = devices.filter(device => device.kind === 'videoinput');
-
-        if (!videoInputs.length) return;
-
-        videoInputs.forEach((device, index) => {
-            const option = document.createElement('option');
-            option.value = `camera:${device.deviceId || index}`;
-            option.textContent = device.label || `Kamera ${index + 1}`;
-            scanDeviceSelect.appendChild(option);
-        });
+        try {
+            const devices = await Html5Qrcode.getCameras();
+            if (devices && devices.length) {
+                devices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = `camera:${device.id}`;
+                    option.textContent = device.label || `Kamera ${index + 1}`;
+                    scanDeviceSelect.appendChild(option);
+                });
+            }
+        } catch (err) {
+            console.error("Error enumerating cameras:", err);
+        }
     }
 
     async function startCameraPreview(deviceId) {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("camera-reader");
+        }
 
         try {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
+            if (html5QrCode.isScanning) {
+                await html5QrCode.stop();
             }
 
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { deviceId: deviceId ? { exact: deviceId } : undefined, facingMode: 'environment' }
-            });
-
-            cameraStream = stream;
-            cameraPreview.srcObject = stream;
             cameraPreviewWrapper.classList.remove('d-none');
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            // Default to environment facing camera if deviceId is not explicitly selected
+            const cameraConfig = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" };
+
+            await html5QrCode.start(
+                cameraConfig,
+                config,
+                (decodedText, decodedResult) => {
+                    // Ketika barcode terdeteksi
+                    if (html5QrCode.isScanning) {
+                        // Pause sejenak agar tidak scan berulang kali dengan cepat
+                        html5QrCode.pause();
+                        skuInput.value = decodedText;
+                        addItemFromSku(decodedText).finally(() => {
+                            setTimeout(() => {
+                                if(html5QrCode.isScanning) html5QrCode.resume();
+                            }, 1500);
+                        });
+                    }
+                },
+                (errorMessage) => {
+                    // Ignore parse errors (which happen continuously when no QR is in view)
+                }
+            );
+
             scanDeviceStatus.textContent = 'Kamera aktif — siap memindai barcode.';
             scanDeviceStatus.className = 'form-control form-control-sm bg-light text-success';
         } catch (error) {
@@ -547,9 +569,8 @@
     scanDeviceSelect.addEventListener('change', async function () {
         const value = this.value;
         if (value === 'keyboard') {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
+            if (html5QrCode && html5QrCode.isScanning) {
+                await html5QrCode.stop();
             }
             cameraPreviewWrapper.classList.add('d-none');
             scanDeviceStatus.textContent = 'Menunggu input keyboard/scanner…';

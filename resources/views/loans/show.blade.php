@@ -151,7 +151,7 @@
         <div id="return-sku-feedback" class="small mt-2 text-muted">Siap menerima input scanner…</div>
         <div id="return-camera-preview-wrapper" class="mt-3 d-none">
             <div class="small text-muted mb-2">Preview kamera aktif</div>
-            <video id="return-camera-preview" class="w-100 rounded border" autoplay playsinline muted style="max-height: 220px; background: #111827;"></video>
+            <div id="return-camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px;"></div>
         </div>
     </div>
 </div>
@@ -237,6 +237,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         function attachMaxLogic(row) {
@@ -302,38 +303,58 @@
         const returnSkuFeedback = document.getElementById('return-sku-feedback');
         const returnScanDeviceSelect = document.getElementById('return-scan-device-select');
         const returnCameraPreviewWrapper = document.getElementById('return-camera-preview-wrapper');
-        const returnCameraPreview = document.getElementById('return-camera-preview');
-        let returnCameraStream = null;
+        
+        let html5QrCodeReturn = null;
 
         async function populateReturnCameraDevices() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoInputs = devices.filter(device => device.kind === 'videoinput');
-
-            videoInputs.forEach((device, index) => {
-                const option = document.createElement('option');
-                option.value = `camera:${device.deviceId || index}`;
-                option.textContent = device.label || `Kamera ${index + 1}`;
-                returnScanDeviceSelect.appendChild(option);
-            });
+            try {
+                const devices = await Html5Qrcode.getCameras();
+                if (devices && devices.length) {
+                    devices.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = `camera:${device.id}`;
+                        option.textContent = device.label || `Kamera ${index + 1}`;
+                        returnScanDeviceSelect.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Error enumerating cameras:", err);
+            }
         }
 
         async function startReturnCameraPreview(deviceId) {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+            if (!html5QrCodeReturn) {
+                html5QrCodeReturn = new Html5Qrcode("return-camera-reader");
+            }
 
             try {
-                if (returnCameraStream) {
-                    returnCameraStream.getTracks().forEach(track => track.stop());
+                if (html5QrCodeReturn.isScanning) {
+                    await html5QrCodeReturn.stop();
                 }
 
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { deviceId: deviceId ? { exact: deviceId } : undefined, facingMode: 'environment' }
-                });
-
-                returnCameraStream = stream;
-                returnCameraPreview.srcObject = stream;
                 returnCameraPreviewWrapper.classList.remove('d-none');
+                
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                const cameraConfig = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" };
+
+                await html5QrCodeReturn.start(
+                    cameraConfig,
+                    config,
+                    (decodedText, decodedResult) => {
+                        if (html5QrCodeReturn.isScanning) {
+                            html5QrCodeReturn.pause();
+                            returnSkuInput.value = decodedText;
+                            applyReturnedSkuMatch(decodedText);
+                            setTimeout(() => {
+                                if(html5QrCodeReturn.isScanning) html5QrCodeReturn.resume();
+                            }, 1500);
+                        }
+                    },
+                    (errorMessage) => {
+                        // ignore
+                    }
+                );
+
                 returnSkuFeedback.textContent = 'Kamera aktif — siap memindai barcode pengembalian.';
                 returnSkuFeedback.className = 'small mt-2 text-success';
             } catch (error) {
@@ -346,9 +367,8 @@
         returnScanDeviceSelect.addEventListener('change', async function () {
             const value = this.value;
             if (value === 'keyboard') {
-                if (returnCameraStream) {
-                    returnCameraStream.getTracks().forEach(track => track.stop());
-                    returnCameraStream = null;
+                if (html5QrCodeReturn && html5QrCodeReturn.isScanning) {
+                    await html5QrCodeReturn.stop();
                 }
                 returnCameraPreviewWrapper.classList.add('d-none');
                 returnSkuFeedback.textContent = 'Siap menerima input scanner…';
