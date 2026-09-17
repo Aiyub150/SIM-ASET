@@ -411,6 +411,9 @@
                 Kartu Stok
             </a>
 
+            @endhasanyrole
+
+            <div class="nav-section-label" style="margin-top:.5rem;">Laporan & Analitik</div>
             <a href="{{ route('reports.index') }}"
                class="sidebar-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -419,7 +422,6 @@
                 </svg>
                 Laporan
             </a>
-            @endhasanyrole
 
             @role('Super Admin')
             <div class="nav-section-label" style="margin-top:.5rem;">Administrasi</div>

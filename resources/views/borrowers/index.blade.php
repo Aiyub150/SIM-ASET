@@ -44,16 +44,17 @@
                         <td class="text-muted" style="font-size:.83rem;">{{ $borrower->address ?: '—' }}</td>
                         <td class="text-center">
                             @if($borrower->latitude && $borrower->longitude)
-                                <div class="mini-map-container shadow-sm border" 
-                                     style="width: 100%; height: 60px; cursor: pointer; border-radius: 4px; overflow: hidden; position: relative;"
-                                     title="Klik untuk memperbesar peta"
+                                <button type="button" class="btn btn-sm btn-outline-info"
                                      data-name="{{ $borrower->institution_name }}"
                                      data-lat="{{ $borrower->latitude }}"
                                      data-lng="{{ $borrower->longitude }}"
                                      onclick="showMap(this)">
-                                     <div id="mini-map-{{ $borrower->id }}" style="width: 100%; height: 100%;"></div>
-                                     <div style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1000; background: transparent;"></div>
-                                </div>
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt me-1" viewBox="0 0 16 16">
+                                        <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                                        <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                     </svg>
+                                     Lihat Peta
+                                </button>
                             @else
                                 <span class="text-muted" style="font-size: 0.8rem;">Tidak ada koordinat</span>
                             @endif
@@ -144,30 +145,5 @@
         }, { once: true });
     }
 
-    // Initialize mini maps for each row
-    document.addEventListener('DOMContentLoaded', function() {
-        const miniMaps = document.querySelectorAll('.mini-map-container');
-        miniMaps.forEach(container => {
-            const id = container.querySelector('div[id^="mini-map-"]').id;
-            const lat = parseFloat(container.dataset.lat);
-            const lng = parseFloat(container.dataset.lng);
-            
-            const map = L.map(id, {
-                zoomControl: false,
-                dragging: false,
-                scrollWheelZoom: false,
-                doubleClickZoom: false,
-                boxZoom: false,
-                keyboard: false,
-                attributionControl: false
-            }).setView([lat, lng], 14);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
-            }).addTo(map);
-            
-            L.marker([lat, lng]).addTo(map);
-        });
-    });
 </script>
 @endpush

@@ -67,12 +67,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create',  [StockMovementController::class, 'create'])->name('create');
             Route::post('/',       [StockMovementController::class, 'store'])->name('store');
         });
+    });
 
-        // MODUL LAPORAN
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/',            [ReportController::class, 'index'])->name('index');
-            Route::get('/export-pdf',  [ReportController::class, 'exportPdf'])->name('export-pdf');
-        });
+    // MODUL LAPORAN (Accessible by Staff, Admin, Super Admin)
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/',            [ReportController::class, 'index'])->name('index');
+        Route::get('/export-pdf',  [ReportController::class, 'exportPdf'])->name('export-pdf');
     });
 
     // ── MODUL USER MANAGEMENT (Super Admin saja) ─────────────────────

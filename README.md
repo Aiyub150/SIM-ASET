@@ -431,3 +431,10 @@ Project ini dibuat untuk kebutuhan internal sistem inventaris aset daerah dan da
 Aiyub Heriyanto
 
 GitHub: https://github.com/Aiyub150
+
+ # #   I n t e g r a s i   &   A P I   E k s t e r n a l 
+ S I M - A S E T   m e n g g u n a k a n   A P I   d a r i   h t t p s : / / a p i . k e m e n d e s a . l i n k / l i b u r - n a s i o n a l   u n t u k   m e n a r i k   d a t a   H a r i   L i b u r   N a s i o n a l   y a n g   d i t a m p i l k a n   p a d a   D a s h b o a r d   d a n   M o d a l   K a l e n d e r .   A P I   i n i   d i - c a c h e   s e l a m a   1   h a r i   ( 2 4   j a m )   d i   s i s i   s e r v e r   u n t u k   m e n g h e m a t   _ b a n d w i d t h _   d a n   m e m i n i m a l i s i r   _ d o w n t i m e _ . 
+ 
+ # #   P e r s y a r a t a n   F i t u r   S c a n n e r   ( K a m e r a ) 
+ F i t u r   p e m i n d a i a n   B a r c o d e   /   Q R   C o d e   p a d a   f o r m   p e m i n j a m a n   m e n g a n d a l k a n   A P I   g e t U s e r M e d i a   b a w a a n   b r o w s e r .   * * A g a r   b r o w s e r   m e n g i z i n k a n   a k s e s   k e   p e r a n g k a t   k a m e r a ,   a p l i k a s i   S I M - A S E T   h a r u s   d i j a l a n k a n   d i   a t a s   k o n e k s i   y a n g   a m a n   ( H T T P S ) * * .   J i k a   A n d a   m e n g a k s e s n y a   s e c a r a   l o k a l   d i   m e s i n   p e n g e m b a n g a n   ( m i s a l :   h t t p : / / l o c a l h o s t ) ,   b r o w s e r   p a d a   u m u m n y a   m e m b e r i k a n   p e n g e c u a l i a n   _ s e c u r e - c o n t e x t _ .   N a m u n ,   j i k a   A n d a   m e n g a k s e s n y a   d a r i   j a r i n g a n   L A N   ( h t t p : / / 1 9 2 . 1 6 8 . x . x ) ,   f i t u r   k a m e r a   k e m u n g k i n a n   b e s a r   a k a n   d i t o l a k   o l e h   b r o w s e r   s e l u l e r   m a u p u n   d e s k t o p .   G u n a k a n   S S L / T L S   p a d a   t a h a p a n   _ p r o d u c t i o n _   a t a u   _ s t a g i n g _ .  
+ 

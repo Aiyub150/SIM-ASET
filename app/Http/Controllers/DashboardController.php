@@ -74,7 +74,7 @@ class DashboardController extends Controller
             }
         }
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->has('cal_month')) {
             return response()->json([
                 'labels' => $chartLabels,
                 'loans' => $chartLoans,
@@ -82,7 +82,15 @@ class DashboardController extends Controller
             ]);
         }
 
-        $holidays = app(\App\Services\CalendarService::class)->getHolidaysForCurrentMonth();
+        $calMonth = (int) $request->query('cal_month', now()->month);
+        $calYear = (int) $request->query('cal_year', now()->year);
+        $calDate = \Carbon\Carbon::createFromDate($calYear, $calMonth, 1);
+
+        $holidays = app(\App\Services\CalendarService::class)->getHolidaysForCurrentMonth($calYear, $calMonth);
+
+        if ($request->ajax() && $request->has('cal_month')) {
+            return view('partials.calendar-widget', compact('calMonth', 'calYear', 'calDate', 'holidays'))->render();
+        }
 
         return view('dashboard', compact(
             'totalItems', 
@@ -99,7 +107,10 @@ class DashboardController extends Controller
             'isStaff',
             'isAdmin',
             'isSuperAdmin',
-            'holidays'
+            'holidays',
+            'calMonth',
+            'calYear',
+            'calDate'
         ));
     }
 }
