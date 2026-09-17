@@ -65,7 +65,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <div class="form-text text-muted" style="font-size:.78rem;">
-                            Super Admin: akses penuh + user management · Admin: akses operasional · Staff Logistik: hanya peminjaman miliknya
+                            Catatan : Super Admin Mendapatakan akses penuh dan user management | Admin mendapatakan akses operasional | Staff Logistik mendapatakan akses hanya untuk peminjaman miliknya.
                         </div>
                     </div>
 
