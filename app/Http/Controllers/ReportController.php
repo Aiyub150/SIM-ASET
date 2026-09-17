@@ -19,17 +19,28 @@ class ReportController extends Controller
         // Juga tetap kompatibel dengan format lama: ?month=MM&year=YYYY
         [$month, $year] = $this->parsePeriod($request);
 
-        $loans = Loan::with(['borrower'])
+        $user = auth()->user();
+        $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
+
+        $loanQuery = Loan::with(['borrower'])
             ->whereMonth('borrow_date', $month)
             ->whereYear('borrow_date', $year)
-            ->orderBy('borrow_date', 'asc')
-            ->get();
+            ->orderBy('borrow_date', 'asc');
 
-        $movements = StockMovement::with(['item'])
-            ->whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        if ($isStaff) {
+            $loanQuery->where('user_id', $user->id);
+        }
+        $loans = $loanQuery->get();
+
+        if ($isStaff) {
+            $movements = collect();
+        } else {
+            $movements = StockMovement::with(['item'])
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->orderBy('created_at', 'asc')
+                ->get();
+        }
 
         return view('reports.index', compact('loans', 'movements', 'month', 'year'));
     }
@@ -41,8 +52,20 @@ class ReportController extends Controller
     {
         [$month, $year] = $this->parsePeriod($request);
 
-        $loans     = Loan::with(['borrower'])->whereMonth('borrow_date', $month)->whereYear('borrow_date', $year)->get();
-        $movements = StockMovement::with(['item'])->whereMonth('created_at', $month)->whereYear('created_at', $year)->get();
+        $user = auth()->user();
+        $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
+
+        $loanQuery = Loan::with(['borrower'])->whereMonth('borrow_date', $month)->whereYear('borrow_date', $year);
+        if ($isStaff) {
+            $loanQuery->where('user_id', $user->id);
+        }
+        $loans = $loanQuery->get();
+
+        if ($isStaff) {
+            $movements = collect();
+        } else {
+            $movements = StockMovement::with(['item'])->whereMonth('created_at', $month)->whereYear('created_at', $year)->get();
+        }
 
         $monthName = Carbon::createFromFormat('m', $month)->translatedFormat('F');
 

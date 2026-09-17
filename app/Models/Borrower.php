@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Borrower extends Model
 {
-    protected $fillable = ['institution_name', 'pic_name', 'contact_number', 'address'];
+    protected $fillable = [
+        'institution_name',
+        'pic_name',
+        'contact_number',
+        'address',
+        'latitude',
+        'longitude',
+    ];
 
     public function loans(): HasMany
     {

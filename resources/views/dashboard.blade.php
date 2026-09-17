@@ -129,8 +129,22 @@
                     <p class="fs-5 mb-0">{{ now()->translatedFormat('F Y') }}</p>
                     <p class="text-muted">{{ now()->translatedFormat('l') }}</p>
                     
-                    <div class="p-2 mt-3 bg-light rounded text-muted small">
-                        (Data Kalender Libur Nasional dari API terintegrasi di sini)
+                    <div class="mt-3 text-start">
+                        <p class="mb-2 text-muted small fw-bold text-center">LIBUR NASIONAL BULAN INI</p>
+                        @if(isset($holidays) && count($holidays) > 0)
+                            <div class="list-group list-group-flush small">
+                                @foreach($holidays as $holiday)
+                                    <div class="list-group-item px-2 py-1 border-0 bg-light mb-1 rounded d-flex justify-content-between align-items-center">
+                                        <span class="text-truncate me-2" title="{{ $holiday['title'] }}">{{ $holiday['title'] }}</span>
+                                        <span class="badge {{ $holiday['is_cuti'] ? 'bg-warning text-dark' : 'bg-danger' }}">{{ \Carbon\Carbon::parse($holiday['date'])->format('d M') }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="p-2 bg-light rounded text-muted small text-center">
+                                Tidak ada libur nasional bulan ini.
+                            </div>
+                        @endif
                     </div>
 
                     <hr>
@@ -206,12 +220,12 @@
                         <option value="tahun">5 Tahun Terakhir</option>
                     </select>
                 </div>
-                <div class="card-body">
-                    <div id="chartLoading" class="text-center py-4 d-none">
+                <div class="card-body position-relative">
+                    <div id="chartLoading" class="position-absolute top-50 start-50 translate-middle d-none" style="z-index: 10;">
                         <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
                     </div>
                     <div style="position: relative; height: 300px; width: 100%;">
-                        <canvas id="loanChart"></canvas>
+                        <canvas id="loanChart" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -274,6 +288,24 @@
                     <h1 class="display-4 fw-bold text-primary mb-0">{{ now()->format('d') }}</h1>
                     <p class="fs-5 mb-0">{{ now()->translatedFormat('F Y') }}</p>
                     <p class="text-muted">{{ now()->translatedFormat('l') }}</p>
+                    
+                    <div class="mt-3 text-start">
+                        <p class="mb-2 text-muted small fw-bold text-center">LIBUR NASIONAL BULAN INI</p>
+                        @if(isset($holidays) && count($holidays) > 0)
+                            <div class="list-group list-group-flush small">
+                                @foreach($holidays as $holiday)
+                                    <div class="list-group-item px-2 py-1 border-0 bg-light mb-1 rounded d-flex justify-content-between align-items-center">
+                                        <span class="text-truncate me-2" title="{{ $holiday['title'] }}">{{ $holiday['title'] }}</span>
+                                        <span class="badge {{ $holiday['is_cuti'] ? 'bg-warning text-dark' : 'bg-danger' }}">{{ \Carbon\Carbon::parse($holiday['date'])->format('d M') }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="p-2 bg-light rounded text-muted small text-center">
+                                Tidak ada libur nasional bulan ini.
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             

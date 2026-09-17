@@ -49,12 +49,6 @@
                         @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">Role Akses</label>
-                        <input type="text" class="form-control bg-light" value="{{ strtoupper(auth()->user()->roles->pluck('name')->first() ?? 'USER') }}" readonly>
-                        <div class="form-text small">Hak akses tidak dapat diubah sendiri. Hubungi Super Admin.</div>
-                    </div>
-
                     <div class="d-flex align-items-center gap-3">
                         <button type="submit" class="btn btn-primary px-4">Simpan Perubahan</button>
                         @if (session('status') === 'profile-updated' || session('success'))

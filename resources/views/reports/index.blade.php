@@ -110,7 +110,8 @@
     </div>
 </div>
 
-{{-- Tabel Mutasi Stok --}}
+{{-- Tabel Mutasi Stok (Hanya Admin/Super Admin) --}}
+@if(!auth()->user()->hasRole('Staff') && !auth()->user()->hasRole('Staff Logistik'))
 <div class="mb-2">
     <div class="d-flex align-items-center gap-2 mb-3">
         <div style="width:3px; height:18px; background:#10b981; border-radius:2px;"></div>
@@ -164,6 +165,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @endsection
 

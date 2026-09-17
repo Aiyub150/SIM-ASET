@@ -23,10 +23,11 @@
         <thead>
             <tr>
                 <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 15%;">Tanggal Pinjam</th>
-                <th style="width: 20%;">Kode Transaksi</th>
-                <th style="width: 35%;">Instansi Peminjam</th>
-                <th style="width: 15%;">Tgl Jatuh Tempo</th>
+                <th style="width: 12%;">Tanggal Pinjam</th>
+                <th style="width: 15%;">Kode Transaksi</th>
+                <th style="width: 25%;">Instansi Peminjam</th>
+                <th style="width: 13%;">Nomor Telepon</th>
+                <th style="width: 20%;">Lokasi/Alamat</th>
                 <th style="width: 10%; text-align: center;">Status</th>
             </tr>
         </thead>
@@ -36,12 +37,13 @@
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $loan->borrow_date->format('d/m/Y') }}</td>
                     <td>{{ $loan->loan_code }}</td>
-                    <td>{{ $loan->borrower->institution_name }}</td>
-                    <td>{{ $loan->due_date->format('d/m/Y') }}</td>
+                    <td>{{ $loan->borrower->institution_name ?? $loan->user->name }}</td>
+                    <td>{{ $loan->borrower->contact_number ?? '-' }}</td>
+                    <td>{{ $loan->borrower->address ?? '-' }}</td>
                     <td class="text-center">{{ strtoupper($loan->status) }}</td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="text-center">Tidak ada transaksi tercatat.</td></tr>
+                <tr><td colspan="7" class="text-center">Tidak ada transaksi tercatat.</td></tr>
             @endforelse
         </tbody>
     </table>

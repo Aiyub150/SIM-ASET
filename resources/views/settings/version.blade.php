@@ -8,7 +8,7 @@
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body text-center p-5">
-                <img src="{{ asset('images/sim-aset_logo.svg') }}" alt="Logo SIM-ASET" class="mx-auto d-block" style="width: 100px; height: 100px; margin-bottom: 1.5rem;">
+                <img src="{{ asset('images/sim-aset_logo.svg') }}" alt="Logo SIM-ASET" class="d-inline-block" style="width: 100px; height: 100px; margin-bottom: 1.5rem;">
                 <h4 class="fw-bold mb-1">SIM-ASET</h4>
                 <p class="text-muted mb-4">Sistem Inventaris Aset Daerah</p>
 

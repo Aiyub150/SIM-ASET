@@ -517,14 +517,14 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16" style="margin-top:-2px;"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
-                    {!! session('success') !!}
+                    {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size:.75rem;"></button>
                 </div>
             @endif
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16" style="margin-top:-2px;"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
-                    {!! session('error') !!}
+                    {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size:.75rem;"></button>
                 </div>
             @endif
@@ -550,15 +550,29 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-             <div class="text-center p-4">
-                 <h6 class="fw-bold mb-3">{{ now()->translatedFormat('F Y') }}</h6>
-                 <div class="mb-3 text-muted" style="font-size: 0.85rem;">
-                     (Data Kalender dari API Nasional akan dimuat di sini)
+             <div class="p-3">
+                 <div class="text-center mb-3">
+                     <h6 class="fw-bold mb-1">{{ now()->translatedFormat('F Y') }}</h6>
+                     <span class="badge bg-primary">Hari ini: {{ now()->translatedFormat('d M Y') }}</span>
                  </div>
-                 <div class="p-3 bg-light rounded text-start" style="font-size: 0.85rem;">
-                     <strong>{{ now()->translatedFormat('d F Y') }}</strong><br>
-                     Hari ini
-                 </div>
+                 @php
+                     $globalHolidays = app(\App\Services\CalendarService::class)->getHolidaysForCurrentMonth();
+                 @endphp
+                 <p class="text-muted small fw-bold mb-2">LIBUR NASIONAL</p>
+                 @if(count($globalHolidays) > 0)
+                     <div class="list-group list-group-flush small border rounded">
+                         @foreach($globalHolidays as $holiday)
+                             <div class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center">
+                                 <span>{{ $holiday['title'] }}</span>
+                                 <span class="badge {{ $holiday['is_cuti'] ? 'bg-warning text-dark' : 'bg-danger' }}">{{ \Carbon\Carbon::parse($holiday['date'])->format('d M') }}</span>
+                             </div>
+                         @endforeach
+                     </div>
+                 @else
+                     <div class="p-3 bg-light rounded text-muted small text-center">
+                         Tidak ada libur nasional bulan ini.
+                     </div>
+                 @endif
              </div>
           </div>
         </div>

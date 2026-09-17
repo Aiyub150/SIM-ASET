@@ -58,6 +58,14 @@
                         @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
+                    <div class="mb-4">
+                        <label class="form-label">Titik Koordinat (Peta) <span class="text-muted" style="font-weight:400;">(opsional)</span></label>
+                        <div id="map" style="height: 300px; border-radius: 6px; border: 1px solid #dee2e6;" class="mb-2"></div>
+                        <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude') }}">
+                        <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude') }}">
+                        <div class="form-text">Geser atau klik pada peta untuk menentukan lokasi presisi instansi.</div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Simpan Instansi</button>
                 </form>
             </div>
@@ -66,3 +74,40 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Default koordinat (Indonesia - Jakarta)
+        let lat = document.getElementById('latitude').value || -6.2088;
+        let lng = document.getElementById('longitude').value || 106.8456;
+        let zoom = document.getElementById('latitude').value ? 15 : 5;
+
+        const map = L.map('map').setView([lat, lng], zoom);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+        // Jika map diklik, pindahkan marker
+        map.on('click', function(e) {
+            let latlng = e.latlng;
+            marker.setLatLng(latlng);
+            document.getElementById('latitude').value = latlng.lat;
+            document.getElementById('longitude').value = latlng.lng;
+        });
+
+        // Jika marker digeser
+        marker.on('dragend', function(e) {
+            let latlng = marker.getLatLng();
+            document.getElementById('latitude').value = latlng.lat;
+            document.getElementById('longitude').value = latlng.lng;
+        });
+    });
+</script>
+@endpush

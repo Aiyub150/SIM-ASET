@@ -344,6 +344,15 @@
         const list     = row.querySelector('.item-picker-list');
         const qtyInput = row.querySelector('.qty-input');
 
+        function escapeHtml(unsafe) {
+            return (unsafe || '').toString()
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
         // Render semua opsi ke list
         function renderOptions(query = '') {
             const q    = query.trim().toLowerCase();
@@ -372,7 +381,7 @@
                 opt.dataset.id  = item.id;
                 opt.dataset.max = item.qty;
                 opt.innerHTML   = `
-                    <span class="option-name">${item.name}${item.sku ? ` <small style="color:#94a3b8;">(${item.sku})</small>` : ''}</span>
+                    <span class="option-name">${escapeHtml(item.name)}${item.sku ? ` <small style="color:#94a3b8;">(${escapeHtml(item.sku)})</small>` : ''}</span>
                     <span class="option-badge ${item.qty === 0 ? 'zero' : ''}">
                         ${isUsed ? 'Dipilih' : 'Stok: ' + item.qty}
                     </span>`;
@@ -385,7 +394,7 @@
             });
 
             if (!hasVisible) {
-                list.innerHTML = `<div class="item-picker-empty">Tidak ada barang yang cocok${q ? ` untuk "<b>${q}</b>"` : ''}</div>`;
+                list.innerHTML = `<div class="item-picker-empty">Tidak ada barang yang cocok${q ? ` untuk "<b>${escapeHtml(q)}</b>"` : ''}</div>`;
             }
         }
 
@@ -538,9 +547,32 @@
 
             cameraPreviewWrapper.classList.remove('d-none');
             
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            // Default to environment facing camera if deviceId is not explicitly selected
-            const cameraConfig = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" };
+            const config = { 
+                fps: 10, 
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    const minEdgeSizeThreshold = 250;
+                    const edgeSizePercentage = 0.75;
+                    const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                    const qrboxSize = Math.floor(minEdgeSize * edgeSizePercentage);
+                    return {
+                        width: Math.max(qrboxSize, minEdgeSizeThreshold),
+                        height: Math.max(qrboxSize, minEdgeSizeThreshold)
+                    };
+                },
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.QR_CODE,
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                    Html5QrcodeSupportedFormats.ITF
+                ]
+            };
+            
+            // Fallback strategy for camera config
+            let cameraConfig = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" };
 
             await html5QrCode.start(
                 cameraConfig,

@@ -32,6 +32,8 @@ class UpdateBorrowerRequest extends FormRequest
             ],
             'contact_number'   => ['required', 'string', 'max:20', 'regex:/^[0-9+\-()\s]{4,20}$/'],
             'address'          => ['nullable', 'string', 'max:1000', 'regex:/^[\pL\pN\s\.\-\/&(),\':;#+]+$/u'],
+            'latitude'         => ['nullable', 'string', 'max:50'],
+            'longitude'        => ['nullable', 'string', 'max:50'],
         ];
     }
 }

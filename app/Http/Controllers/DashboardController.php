@@ -82,6 +82,8 @@ class DashboardController extends Controller
             ]);
         }
 
+        $holidays = app(\App\Services\CalendarService::class)->getHolidaysForCurrentMonth();
+
         return view('dashboard', compact(
             'totalItems', 
             'totalStock', 
@@ -96,7 +98,8 @@ class DashboardController extends Controller
             'period',
             'isStaff',
             'isAdmin',
-            'isSuperAdmin'
+            'isSuperAdmin',
+            'holidays'
         ));
     }
 }

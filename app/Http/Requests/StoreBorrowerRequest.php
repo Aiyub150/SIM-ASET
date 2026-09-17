@@ -30,6 +30,8 @@ class StoreBorrowerRequest extends FormRequest
             ],
             'contact_number'   => ['required', 'string', 'max:50', 'regex:/^[0-9+\-()\s]{4,50}$/'],
             'address'          => ['nullable', 'string', 'max:500', 'regex:/^[\pL\pN\s\.\-\/&(),\':;#+]+$/u'],
+            'latitude'         => ['nullable', 'string', 'max:50'],
+            'longitude'        => ['nullable', 'string', 'max:50'],
         ];
     }
 
