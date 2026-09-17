@@ -175,20 +175,23 @@ Model / Database
 
 Berikut beberapa preview halaman utama dari aplikasi yang tersedia di folder docs/images dengan versi final yang dimaksudkan untuk dokumentasi.
 
+### Dashboard
+![Preview Dashboard](docs/images/dashboardv3.png)
+
 ### Master Barang
-![Preview Master Barang](docs/images/itemsv2.png)
+![Preview Master Barang](docs/images/itemsv3.png)
 
 ### Daftar Peminjam
-![Preview Daftar Peminjam](docs/images/borrowersv2.png)
+![Preview Daftar Peminjam](docs/images/borrowersv3.png)
 
 ### Daftar Peminjaman
-![Preview Daftar Peminjaman](docs/images/loansv2.png)
+![Preview Daftar Peminjaman](docs/images/loansv3.png)
 
 ### Form Peminjaman
-![Preview Form Peminjaman](docs/images/loan-createv2.png)
+![Preview Form Peminjaman](docs/images/loan-createv3.png)
 
 ### Kartu Stok / Mutasi
-![Preview Kartu Stok](docs/images/stock-movementsv2.png)
+![Preview Kartu Stok](docs/images/stock-movementsv3.png)
 
 ### Laporan
 ![Preview Laporan](docs/images/reportsv2.png)
