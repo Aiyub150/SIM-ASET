@@ -256,18 +256,24 @@
 @endsection
 
 @push('scripts')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
 (function () {
-    $('#borrower_id').select2({
-        theme: 'bootstrap-5',
-        placeholder: '— Pilih Instansi —',
-        width: '100%'
-    });
+    const borrowerSel = document.getElementById('borrower_id');
+    if (borrowerSel) {
+        new TomSelect(borrowerSel, {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: '— Pilih Instansi —',
+            render: {
+                no_results: function(data, escape) {
+                    return '<div class="no-results" style="padding: 10px; color: #6c757d;">Tidak ada instansi yang cocok.</div>';
+                }
+            }
+        });
+    }
 
     // ── Data Sumber ──────────────────────────────────────
     const ITEMS = JSON.parse(document.getElementById('items-data').textContent);

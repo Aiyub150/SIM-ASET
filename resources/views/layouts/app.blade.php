@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <style>
         :root {
             --sidebar-width: 250px;
@@ -441,6 +442,23 @@
                 Manajemen Kategori
             </a>
             @endrole
+
+            <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
+            <a href="{{ route('profile.edit') }}"
+               class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+                Edit Profil
+            </a>
+            <a href="{{ route('settings.version') }}"
+               class="sidebar-link {{ request()->routeIs('settings.version') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                </svg>
+                Informasi Versi
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -482,7 +500,14 @@
             </button>
             <span class="page-title">@yield('page-title', 'Dashboard')</span>
             <div class="ms-auto d-flex align-items-center gap-2">
-                <span class="text-muted" style="font-size:.8rem;">{{ now()->translatedFormat('d F Y') }}</span>
+                @hasanyrole('Super Admin|Admin')
+                <button type="button" class="btn btn-sm btn-light border d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#calendarModal" style="width: 32px; height: 32px; padding: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                    </svg>
+                </button>
+                @endhasanyrole
+                <span class="text-muted fw-medium" style="font-size:.85rem;">{{ now()->translatedFormat('d F Y') }}</span>
             </div>
         </div>
 
@@ -516,11 +541,36 @@
         </footer>
     </div>
 
+    <!-- Calendar Modal -->
+    <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="calendarModalLabel">Kalender</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+             <div class="text-center p-4">
+                 <h6 class="fw-bold mb-3">{{ now()->translatedFormat('F Y') }}</h6>
+                 <div class="mb-3 text-muted" style="font-size: 0.85rem;">
+                     (Data Kalender dari API Nasional akan dimuat di sini)
+                 </div>
+                 <div class="p-3 bg-light rounded text-start" style="font-size: 0.85rem;">
+                     <strong>{{ now()->translatedFormat('d F Y') }}</strong><br>
+                     Hari ini
+                 </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Overlay mobile -->
     <div id="sidebar-overlay" onclick="toggleSidebar()"
          style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:999;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
     <script>
         function toggleSidebar() {

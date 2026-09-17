@@ -96,7 +96,28 @@ Laporan & PDF
 
 ---
 
-## Arsitektur Proses Bisnis
+## Arsitektur Aplikasi
+
+Aplikasi dibangun menggunakan pola arsitektur MVC (Model-View-Controller) dengan Service Layer untuk memisahkan logika bisnis yang kompleks dari Controller.
+
+### Tech Stack
+- **Backend**: Laravel 12.x, PHP 8.2+
+- **Frontend**: Bootstrap 5.x, Blade Templating, TomSelect/Select2, Chart.js
+- **Database**: SQLite (Development), MySQL/MariaDB (Production)
+- **Otentikasi & Otorisasi**: Laravel Breeze, Spatie Laravel Permission
+
+### Struktur Database & ERD Context
+
+Berikut adalah gambaran relasi entitas utama dalam sistem:
+- **`users`**: Menyimpan data login dan role (Super Admin, Admin, Staff Logistik).
+- **`categories`**: Klasifikasi master barang (memiliki `prefix` untuk generate SKU).
+- **`items`**: Master data barang, terhubung dengan `categories`. Menyimpan total qty dan available qty.
+- **`borrowers`**: Entitas instansi/pihak luar yang meminjam barang.
+- **`loans`**: Data header transaksi peminjaman (terhubung ke `users` pembuat dan `borrowers`).
+- **`loan_items`**: Detail barang apa saja yang dipinjam beserta jumlahnya (terhubung ke `loans` dan `items`).
+- **`stock_movements`**: Ledger mutasi stok (in/out), terhubung ke `items` dan `users`, tidak pernah di-delete untuk menjaga audit trail.
+
+### Alur Proses Bisnis (Service Layer)
 
 Project ini memisahkan logika bisnis dari controller agar lebih aman dan terstruktur.
 
@@ -108,18 +129,16 @@ Routes
 Controller
   ↓
 Service Layer
-  ├─ LoanService
-  └─ StockService
+  ├─ LoanService (Transaksi Peminjaman & Pengembalian)
+  └─ StockService (Mutasi & Ledger Stok)
   ↓
 Model / Database
 ```
 
-### Penjelasan singkat
-
 - `LoanService` menangani pembuatan transaksi peminjaman dan proses pengembalian.
 - `StockService` menangani mutasi stok dan perubahan saldo barang.
-- `lockForUpdate()` dipakai untuk mencegah race condition saat transaksi terjadi bersamaan.
-- perubahan stok tidak dilakukan dengan update langsung yang sembarangan; semuanya dicatat melalui mutasi ledger.
+- Penggunaan **Database Transactions** dan `lockForUpdate()` dipakai untuk mencegah race condition saat mutasi/transaksi terjadi bersamaan.
+- Perubahan ketersediaan stok (`available_qty`) terjadi otomatis beriringan dengan `stock_movements` atau status dari `loan_items`.
 
 ---
 

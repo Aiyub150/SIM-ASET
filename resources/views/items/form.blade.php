@@ -35,13 +35,8 @@
                     @csrf
                     @if(isset($item)) @method('PUT') @endif
 
-                    {{-- KATEGORI — wajib, menentukan prefix SKU --}}
                     <div class="mb-3">
                         <label class="form-label">Kategori Barang</label>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.02 1.02 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
-                            <input type="text" class="form-control form-control-sm" id="category-search" placeholder="Cari kategori..." autocomplete="off">
-                        </div>
                         <select name="category_id" id="category_id"
                                 class="form-select @error('category_id') is-invalid @enderror"
                                 {{ isset($item) ? 'disabled' : 'required' }}>
@@ -154,41 +149,47 @@
 @push('scripts')
 @if(!isset($item))
 <script>
-(function () {
-    const sel     = document.getElementById('category_id');
-    const search  = document.getElementById('category-search');
+document.addEventListener('DOMContentLoaded', function () {
+    const sel = document.getElementById('category_id');
     const preview = document.getElementById('sku_preview');
 
-    function filterOptions() {
-        if (!search || !sel) return;
-        const q = search.value.trim().toLowerCase();
-        Array.from(sel.options).forEach((option) => {
-            if (!option.value) {
-                option.hidden = false;
+    if (sel) {
+        new TomSelect(sel, {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: '— Pilih Kategori —',
+            render: {
+                no_results: function(data, escape) {
+                    return '<div class="no-results" style="padding: 10px; color: #6c757d;">Tidak ada kategori yang cocok.</div>';
+                }
+            }
+        });
+
+        function updatePreview() {
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt || !opt.dataset.prefix) {
+                if (preview) {
+                    preview.value = '';
+                    preview.placeholder = 'Pilih kategori untuk melihat pratinjau SKU';
+                }
                 return;
             }
-            option.hidden = q !== '' && !option.text.toLowerCase().includes(q);
-        });
-    }
-
-    function updatePreview() {
-        const opt = sel.options[sel.selectedIndex];
-        if (!opt || !opt.dataset.prefix) {
-            preview.value = '';
-            preview.placeholder = 'Pilih kategori untuk melihat pratinjau SKU';
-            return;
+            if (preview) {
+                const prefix = opt.dataset.prefix;
+                const num = parseInt(opt.dataset.next, 10);
+                preview.value = prefix + '-' + String(num).padStart(3, '0');
+            }
         }
-        const prefix = opt.dataset.prefix;
-        const num    = parseInt(opt.dataset.next, 10);
-        preview.value = prefix + '-' + String(num).padStart(3, '0');
+
+        sel.addEventListener('change', updatePreview);
+
+        // Restore preview on old() or load
+        if (sel.value) updatePreview();
     }
-
-    search?.addEventListener('input', filterOptions);
-    sel.addEventListener('change', updatePreview);
-
-    // Restore saat ada old() setelah validation error
-    if (sel.value) updatePreview();
-})();
+});
 </script>
 @endif
 @endpush
