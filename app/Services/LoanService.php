@@ -21,10 +21,10 @@ class LoanService
         // DB::transaction akan membatalkan SEMUA perubahan database jika terjadi 1 saja error (Rollback)
         return DB::transaction(function () use ($data, $userId) {
             
-            // 1. Generate Kode Peminjaman Unik (Format: PJM-YYYYMMDD-XXXX)
+            // 1. Generate Kode Peminjaman Unik (Format: PJM-YYYYMMDD-XXXXX)
             $datePrefix = now()->format('Ymd');
-            $todayLoansCount = Loan::whereDate('created_at', now()->toDateString())->count();
-            $loanCode = 'PJM-' . $datePrefix . '-' . str_pad($todayLoansCount + 1, 4, '0', STR_PAD_LEFT);
+            // Menggunakan Str::random(5) untuk mencegah race condition (Bentrok P0)
+            $loanCode = 'PJM-' . $datePrefix . '-' . strtoupper(\Illuminate\Support\Str::random(5));
 
             // 2. Insert Data ke Tabel loans (Header)
             $loan = Loan::create([
@@ -53,8 +53,21 @@ class LoanService
                 }
 
                 // 5. Kurangi stok TERSEDIA saja. Total fisik (total_qty) tidak disentuh.
+                $balanceBefore = $item->available_qty;
                 $item->available_qty -= $itemData['qty'];
                 $item->save();
+
+                // 5.b. Catat Mutasi Stok Keluar (P0 Fix)
+                \App\Models\StockMovement::create([
+                    'reference_code' => $loan->loan_code,
+                    'item_id'        => $item->id,
+                    'user_id'        => $userId,
+                    'type'           => 'out',
+                    'qty'            => $itemData['qty'],
+                    'balance_before' => $balanceBefore,
+                    'balance_after'  => $item->available_qty,
+                    'notes'          => 'Peminjaman barang',
+                ]);
 
                 // 6. Insert Data ke Tabel loan_items (Detail)
                 $loan->loanItems()->create([
@@ -122,8 +135,21 @@ class LoanService
 
                 // 4. Kembalikan stok ke Gudang Utama (Master Item)
                 $item = Item::where('id', $loanItem->item_id)->lockForUpdate()->first();
+                $balanceBefore = $item->available_qty;
                 $item->available_qty += $returnData['return_qty'];
                 $item->save();
+
+                // 4.b. Catat Mutasi Stok Masuk (P0 Fix)
+                \App\Models\StockMovement::create([
+                    'reference_code' => $loan->loan_code,
+                    'item_id'        => $item->id,
+                    'user_id'        => $userId,
+                    'type'           => 'in',
+                    'qty'            => $returnData['return_qty'],
+                    'balance_before' => $balanceBefore,
+                    'balance_after'  => $item->available_qty,
+                    'notes'          => 'Pengembalian barang pinjaman',
+                ]);
             }
 
             // 5. Verifikasi Status Transaksi Otomatis

@@ -20,9 +20,9 @@ class RoleAndAdminSeeder extends Seeder
 
         // 2. Super Admin — akses penuh termasuk user management
         $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@pemda.go.id'],
+            ['email' => 'superadmin@simaset.com'],
             [
-                'name'     => 'Bapak Kepala Gudang',
+                'name'     => 'Seeder Super Admin',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -30,9 +30,9 @@ class RoleAndAdminSeeder extends Seeder
 
         // 3. Admin — akses semua fitur operasional, kecuali user management
         $admin = User::firstOrCreate(
-            ['email' => 'admin@pemda.go.id'],
+            ['email' => 'admin@simaset.com'],
             [
-                'name'     => 'Admin Pemda',
+                'name'     => 'Seeder Admin',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -40,9 +40,9 @@ class RoleAndAdminSeeder extends Seeder
 
         // 4. Staff Logistik — hanya bisa input & lihat peminjaman miliknya sendiri
         $staff = User::firstOrCreate(
-            ['email' => 'staff@pemda.go.id'],
+            ['email' => 'staff@simaset.com'],
             [
-                'name'     => 'Petugas Frontdesk',
+                'name'     => 'Seeder Staff',
                 'password' => Hash::make('password123'),
             ]
         );
