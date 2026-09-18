@@ -91,7 +91,7 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
 ![Preview Kartu Stok](docs/images/stock-movementsv3.png)
 
 ### Laporan
-![Preview Laporan](docs/images/reportsv2.png)
+![Preview Laporan](docs/images/reportsv3.png)
 
 ---
 
