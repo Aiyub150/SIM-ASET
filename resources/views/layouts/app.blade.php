@@ -392,6 +392,7 @@
                 </svg>
                 Data Instansi
             </a>
+            @endhasanyrole
 
             <a href="{{ route('items.index') }}"
                class="sidebar-link {{ request()->routeIs('items.*') ? 'active' : '' }}">
@@ -401,6 +402,7 @@
                 Master Barang
             </a>
 
+            @hasanyrole('Super Admin|Admin')
             <div class="nav-section-label" style="margin-top:.5rem;">Pengelolaan</div>
 
             <a href="{{ route('stocks.index') }}"
@@ -410,7 +412,6 @@
                 </svg>
                 Kartu Stok
             </a>
-
             @endhasanyrole
 
             <div class="nav-section-label" style="margin-top:.5rem;">Laporan & Analitik</div>

@@ -10,12 +10,14 @@
         <h5 class="fw-bold mb-0">Master Data Barang</h5>
         <p class="text-muted mb-0" style="font-size:.82rem;">Daftar seluruh inventaris aset yang terdaftar</p>
     </div>
+    @hasanyrole('Super Admin|Admin')
     <a href="{{ route('items.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Tambah Barang
     </a>
+    @endhasanyrole
 </div>
 
 <div class="card">
@@ -38,6 +40,7 @@
             </div>
         </form>
     </div>
+    @hasanyrole('Super Admin|Admin')
     <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom gap-3 flex-wrap">
         <label class="form-check mb-0 d-flex align-items-center gap-2">
             <input type="checkbox" id="select-all-items" class="form-check-input">
@@ -52,11 +55,14 @@
             <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary">Cetak Label Terpilih</button>
         </div>
     </div>
+    @endhasanyrole
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
+                    @hasanyrole('Super Admin|Admin')
                     <th class="ps-4" style="width:5%;"><input type="checkbox" id="select-all-header" class="form-check-input" aria-label="Pilih semua barang"></th>
+                    @endhasanyrole
                     <th style="width:5%;">No</th>
                     <th style="width:14%;">Kode (SKU)</th>
                     <th>Foto</th>
@@ -64,16 +70,20 @@
                     <th style="width:14%;">Kategori</th>
                     <th class="text-center" style="width:11%;">Total Fisik</th>
                     <th class="text-center" style="width:11%;">Tersedia</th>
+                    @hasanyrole('Super Admin|Admin')
                     <th class="text-center pe-4" style="width:9%;">Aksi</th>
+                    @endhasanyrole
                 </tr>
             </thead>
             <tbody>
                 @forelse($items as $index => $item)
                     @php $utilization = $item->total_qty > 0 ? round((($item->total_qty - $item->available_qty) / $item->total_qty) * 100) : 0; @endphp
                     <tr>
+                        @hasanyrole('Super Admin|Admin')
                         <td class="ps-4">
                             <input type="checkbox" class="form-check-input item-checkbox" value="{{ $item->id }}" aria-label="Pilih {{ $item->name }}">
                         </td>
+                        @endhasanyrole
                         <td class="text-muted">{{ $items->firstItem() + $index }}</td>
                         <td>
                             <span style="font-family:monospace; font-size:.82rem; font-weight:600; color:#2563eb;">
@@ -107,12 +117,14 @@
                                 </div>
                             @endif
                         </td>
+                        @hasanyrole('Super Admin|Admin')
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-2">
                                 <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                                 <a href="{{ route('items.label', $item->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">Cetak Label</a>
                             </div>
                         </td>
+                        @endhasanyrole
                     </tr>
                 @empty
                     <tr>

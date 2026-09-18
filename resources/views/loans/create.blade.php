@@ -172,8 +172,8 @@
                         <div id="sku-scan-feedback" class="small mt-2 text-muted">Siap menerima input scanner…</div>
                     </div>
                     <div id="camera-preview-wrapper" class="mt-3 d-none">
-                        <div class="small text-muted mb-2">Preview kamera aktif</div>
-                        <div id="camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px;"></div>
+                        <div class="small text-muted mb-2 text-center">Preview kamera aktif</div>
+                        <div id="camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px; max-width: 400px; margin: 0 auto;"></div>
                     </div>
                 </div>
             </div>
@@ -256,12 +256,14 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
 (function () {
     const borrowerSel = document.getElementById('borrower_id');
     if (borrowerSel) {
         new TomSelect(borrowerSel, {
             create: false,
+            plugins: ['dropdown_input'],
             sortField: {
                 field: "text",
                 direction: "asc"

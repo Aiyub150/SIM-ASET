@@ -150,8 +150,8 @@
         </div>
         <div id="return-sku-feedback" class="small mt-2 text-muted">Siap menerima input scanner…</div>
         <div id="return-camera-preview-wrapper" class="mt-3 d-none">
-            <div class="small text-muted mb-2">Preview kamera aktif</div>
-            <div id="return-camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px;"></div>
+            <div class="small text-muted mb-2 text-center">Preview kamera aktif</div>
+            <div id="return-camera-reader" class="w-100 rounded border" style="background: #111827; min-height: 250px; max-width: 400px; margin: 0 auto;"></div>
         </div>
     </div>
 </div>

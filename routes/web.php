@@ -38,12 +38,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->name('items.lookup');
     Route::get('/items/{item}/label', [ItemController::class, 'printLabel'])->name('items.label');
 
+    // MODUL MASTER BARANG (VIEW) - Accessible by all roles
+    Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+
     // ── MODUL OPERASIONAL (Admin & Super Admin) ───────────────────────
     Route::middleware(['role:Super Admin|Admin'])->group(function () {
 
-        // MODUL MASTER BARANG
+        // MODUL MASTER BARANG (CREATE/EDIT)
         Route::prefix('items')->name('items.')->group(function () {
-            Route::get('/',            [ItemController::class, 'index'])->name('index');
             Route::get('/create',      [ItemController::class, 'create'])->name('create');
             Route::post('/',           [ItemController::class, 'store'])->name('store');
             Route::get('/labels',      [ItemController::class, 'printLabels'])->name('labels');
