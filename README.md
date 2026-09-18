@@ -78,6 +78,9 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
 ### Daftar Peminjam
 ![Preview Daftar Peminjam](docs/images/borrowersv3.png)
 
+### Map Peminjam
+![Preview Map Peminjam](docs/images/mappopupv3.png)
+
 ### Daftar Peminjaman
 ![Preview Daftar Peminjaman](docs/images/loansv3.png)
 

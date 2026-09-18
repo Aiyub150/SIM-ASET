@@ -20,8 +20,8 @@
                 <div class="text-start bg-light p-4 rounded text-muted" style="font-size: 0.9rem;">
                     <p class="mb-2"><strong>Platform:</strong> Laravel 12.x / PHP 8.2+</p>
                     <p class="mb-2"><strong>Frontend:</strong> Bootstrap 5, Blade, TomSelect</p>
-                    <p class="mb-2"><strong>Lisensi:</strong> Internal Use Only</p>
-                    <p class="mb-0"><strong>Pengembang:</strong> Aiyub Heriyanto</p>
+                    <p class="mb-2"><strong>Lisensi:</strong> Free Open-Source</p>
+                    <p class="mb-0"><strong>Dibuat Oleh:</strong> Aiyub Heriyanto</p>
                 </div>
             </div>
             <div class="card-footer bg-white text-center py-3 text-muted" style="font-size: 0.85rem;">

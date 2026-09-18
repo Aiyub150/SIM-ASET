@@ -423,8 +423,19 @@
                 Laporan
             </a>
 
-            @role('Super Admin')
+            @hasanyrole('Super Admin|Admin')
             <div class="nav-section-label" style="margin-top:.5rem;">Administrasi</div>
+            <a href="{{ route('categories.index') }}"
+               class="sidebar-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M3.5 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 2h-9zM2.5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9z"/>
+                    <path fill-rule="evenodd" d="M6.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-3zM5 5.5A1.5 1.5 0 0 1 6.5 4h3A1.5 1.5 0 0 1 11 5.5v1A1.5 1.5 0 0 1 9.5 8h-3A1.5 1.5 0 0 1 5 6.5v-1z"/>
+                </svg>
+                Manajemen Kategori
+            </a>
+            @endhasanyrole
+
+            @role('Super Admin')
             <a href="{{ route('users.index') }}"
                class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -433,15 +444,6 @@
                     <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
                 </svg>
                 Kelola Pengguna
-            </a>
-            
-            <a href="{{ route('categories.index') }}"
-               class="sidebar-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M3.5 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 12.5 2h-9zM2.5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9z"/>
-                    <path fill-rule="evenodd" d="M6.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-3zM5 5.5A1.5 1.5 0 0 1 6.5 4h3A1.5 1.5 0 0 1 11 5.5v1A1.5 1.5 0 0 1 9.5 8h-3A1.5 1.5 0 0 1 5 6.5v-1z"/>
-                </svg>
-                Manajemen Kategori
             </a>
             @endrole
 

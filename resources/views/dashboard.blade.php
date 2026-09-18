@@ -49,16 +49,36 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-white text-dark h-100 border-0 shadow-sm" style="border-left: 4px solid #2563eb !important;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1" style="font-size: 0.8rem;">Total Barang</h6>
+                                <h3 class="mb-0 fw-bold">{{ number_format($totalItems) }}</h3>
+                            </div>
+                            <div style="font-size: 2rem; color: #2563eb; opacity: 0.8;"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-white text-dark h-100 border-0 shadow-sm" style="border-left: 4px solid #16a34a !important;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1" style="font-size: 0.8rem;">Stok Fisik Keseluruhan</h6>
+                                <h3 class="mb-0 fw-bold">{{ number_format($totalStock) }}</h3>
+                            </div>
+                            <div style="font-size: 2rem; color: #16a34a; opacity: 0.8;"><i class="fa-solid fa-cubes"></i></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="card bg-warning text-dark h-100 border-0 shadow-sm">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-title text-black-50 mb-1">Peminjaman Aktif</h6>
-                                <h2 class="mb-0 fw-bold">{{ number_format($activeLoans) }}</h2>
+                                <h6 class="card-title text-black-50 mb-1">Peminjaman Aktif (Anda)</h6>
+                                <h3 class="mb-0 fw-bold">{{ number_format($activeLoans) }}</h3>
                             </div>
-                            <div style="font-size: 2.5rem; opacity: 0.2;">
-                                <i class="fa-solid fa-hand-holding-hand"></i>
-                            </div>
+                            <div style="font-size: 2rem; opacity: 0.2;"><i class="fa-solid fa-hand-holding-hand"></i></div>
                         </div>
                     </div>
                 </div>
@@ -67,11 +87,9 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="card-title text-white-50 mb-1">Peminjaman Terlambat</h6>
-                                <h2 class="mb-0 fw-bold">{{ number_format($overdueLoans) }}</h2>
+                                <h3 class="mb-0 fw-bold">{{ number_format($overdueLoans) }}</h3>
                             </div>
-                            <div style="font-size: 2.5rem; opacity: 0.3;">
-                                <i class="fa-solid fa-clock-rotate-left"></i>
-                            </div>
+                            <div style="font-size: 2rem; opacity: 0.3;"><i class="fa-solid fa-clock-rotate-left"></i></div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +163,20 @@
 @else
     {{-- ADMIN & SUPER ADMIN LAYOUT --}}
     <div class="row mb-4">
-        <div class="col-md-3 col-6 mb-3 mb-md-0">
+        @if($isSuperAdmin)
+        <div class="col-lg col-md-4 col-6 mb-3 mb-lg-0">
+            <div class="card bg-info text-white h-100 border-0 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1" style="font-size: 0.8rem;">Total Pengguna</h6>
+                        <h3 class="mb-0 fw-bold">{{ number_format($totalUsers) }}</h3>
+                    </div>
+                    <div style="font-size: 2rem; opacity: 0.3;"><i class="fa-solid fa-users"></i></div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <div class="col-lg col-md-4 col-6 mb-3 mb-lg-0">
             <div class="card bg-primary text-white h-100 border-0 shadow-sm">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
@@ -156,7 +187,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6 mb-3 mb-md-0">
+        <div class="col-lg col-md-4 col-6 mb-3 mb-lg-0">
             <div class="card bg-success text-white h-100 border-0 shadow-sm">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
@@ -167,7 +198,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6">
+        <div class="col-lg col-md-6 col-6 mb-3 mb-lg-0">
             <div class="card bg-warning text-dark h-100 border-0 shadow-sm">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
@@ -178,7 +209,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6">
+        <div class="col-lg col-md-6 col-12">
             <div class="card bg-danger text-white h-100 border-0 shadow-sm">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>

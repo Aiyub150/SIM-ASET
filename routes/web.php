@@ -84,8 +84,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{user}',      [UserController::class, 'update'])->name('update');
     });
 
-    // ── MODUL KATEGORI (Super Admin saja) ────────────────────────────────
-    Route::middleware(['role:Super Admin'])->prefix('categories')->name('categories.')->group(function () {
+    // ── MODUL KATEGORI (Super Admin & Admin) ────────────────────────────────
+    Route::middleware(['role:Super Admin|Admin'])->prefix('categories')->name('categories.')->group(function () {
         Route::get('/',            [CategoryController::class, 'index'])->name('index');
         Route::post('/',           [CategoryController::class, 'store'])->name('store');
         Route::put('/{category}',  [CategoryController::class, 'update'])->name('update');

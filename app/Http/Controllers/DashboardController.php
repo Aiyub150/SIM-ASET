@@ -26,6 +26,7 @@ class DashboardController extends Controller
         $totalStock = Item::sum('total_qty');
         $activeLoans = (clone $loanQuery)->where('status', 'active')->count();
         $overdueLoans = (clone $loanQuery)->where('status', 'active')->where('due_date', '<', now())->count();
+        $totalUsers = \App\Models\User::count();
         
         $recentMovements = $isStaff ? collect() : StockMovement::with(['item', 'user'])->latest()->take(5)->get();
         $recentLoans = (clone $loanQuery)->with(['borrower', 'user'])->latest()->take(5)->get();
@@ -97,6 +98,7 @@ class DashboardController extends Controller
             'totalStock', 
             'activeLoans', 
             'overdueLoans',
+            'totalUsers',
             'recentMovements',
             'recentLoans',
             'lowStockItems',
