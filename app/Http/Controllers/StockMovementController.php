@@ -25,11 +25,13 @@ class StockMovementController extends Controller
 
         $movements = StockMovement::with(['item', 'user'])
             ->when($search, function ($query, $search) {
-                return $query->where('reference_code', 'like', "%{$search}%")
-                             ->orWhereHas('item', function ($q) use ($search) {
-                                 $q->where('name', 'like', "%{$search}%")
-                                   ->orWhere('sku', 'like', "%{$search}%");
-                             });
+                return $query->where(function ($subQ) use ($search) {
+                    $subQ->where('reference_code', 'like', "%{$search}%")
+                         ->orWhereHas('item', function ($q) use ($search) {
+                             $q->where('name', 'like', "%{$search}%")
+                               ->orWhere('sku', 'like', "%{$search}%");
+                         });
+                });
             })
             ->when($type, function ($query, $type) {
                 return $query->where('type', $type);

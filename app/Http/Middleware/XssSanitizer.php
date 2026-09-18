@@ -9,6 +9,17 @@ use Symfony\Component\HttpFoundation\Response;
 class XssSanitizer
 {
     /**
+     * The attributes that should never be sanitized.
+     *
+     * @var array<int, string>
+     */
+    protected array $except = [
+        'password',
+        'password_confirmation',
+        'current_password',
+    ];
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
@@ -17,8 +28,8 @@ class XssSanitizer
     {
         $input = $request->all();
 
-        array_walk_recursive($input, function (&$value) {
-            if (! is_string($value)) {
+        array_walk_recursive($input, function (&$value, $key) {
+            if (! is_string($value) || in_array($key, $this->except, true)) {
                 return;
             }
 
