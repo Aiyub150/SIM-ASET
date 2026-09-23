@@ -70,9 +70,14 @@ class StockMovementController extends Controller
                 ->with('success', "Mutasi Stok ({$action}) berhasil dicatat. Ref: <strong>{$movement->reference_code}</strong>");
 
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('StockMovementController@store error: ' . $e->getMessage(), ['exception' => $e]);
+            $userMessage = ($e instanceof \Illuminate\Database\QueryException || str_contains($e->getMessage(), 'SQLSTATE'))
+                ? 'Terjadi kesalahan sistem saat memproses mutasi stok. Silakan coba lagi.'
+                : $e->getMessage();
+
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', $userMessage);
         }
     }
 

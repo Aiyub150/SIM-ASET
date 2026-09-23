@@ -69,23 +69,32 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th class="ps-4" style="width:12%;">Tanggal</th>
-                        <th style="width:22%;">Kode Transaksi</th>
+                        <th class="ps-4" style="width:5%;">No</th>
+                        <th style="width:10%;">Tanggal</th>
+                        <th style="width:16%;">Kode Transaksi</th>
                         <th>Instansi Peminjam</th>
-                        <th style="width:15%;">Jatuh Tempo</th>
-                        <th class="text-center pe-4" style="width:12%;">Status</th>
+                        <th style="width:13%;">No. Telepon</th>
+                        <th style="width:18%;">Lokasi/Alamat</th>
+                        <th style="width:10%;">Jatuh Tempo</th>
+                        <th class="text-center pe-4" style="width:10%;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($loans as $loan)
+                    @forelse($loans as $index => $loan)
                         <tr>
-                            <td class="ps-4" style="font-size:.85rem;">{{ $loan->borrow_date->format('d/m/Y') }}</td>
+                            <td class="ps-4 text-muted" style="font-size:.85rem;">{{ $index + 1 }}</td>
+                            <td style="font-size:.85rem;">{{ $loan->borrow_date->format('d/m/Y') }}</td>
                             <td>
                                 <span style="font-family:monospace; font-size:.82rem; font-weight:600; color:#2563eb;">
                                     {{ $loan->loan_code }}
                                 </span>
                             </td>
-                            <td style="font-weight:500;">{{ $loan->borrower->institution_name }}</td>
+                            <td style="font-weight:500;">
+                                {{ $loan->borrower->institution_name }}
+                                <div class="text-muted small" style="font-size:.75rem;">PIC: {{ $loan->borrower->pic_name }}</div>
+                            </td>
+                            <td style="font-size:.85rem;">{{ $loan->borrower->contact_number ?? '—' }}</td>
+                            <td style="font-size:.82rem; color:#475569;">{{ \Illuminate\Support\Str::limit($loan->borrower->address ?? '—', 35) }}</td>
                             <td style="font-size:.85rem;">{{ $loan->due_date->format('d/m/Y') }}</td>
                             <td class="text-center pe-4">
                                 @if($loan->status === 'completed')
@@ -99,7 +108,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted" style="font-size:.85rem;">
+                            <td colspan="8" class="text-center py-4 text-muted" style="font-size:.85rem;">
                                 Tidak ada transaksi peminjaman di periode ini.
                             </td>
                         </tr>

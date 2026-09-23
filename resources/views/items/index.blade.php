@@ -121,7 +121,28 @@
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-2">
                                 <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                <a href="{{ route('items.label', $item->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">Cetak Label</a>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Cetak Label
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
+                                        <li>
+                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => 'both']) }}" target="_blank">
+                                                Standar (Barcode + QR)
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => '1d']) }}" target="_blank">
+                                                Barcode 1D Saja
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" target="_blank">
+                                                QR Code 2D Saja
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                         @endhasanyrole

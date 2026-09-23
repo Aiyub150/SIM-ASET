@@ -62,10 +62,6 @@
 
                     <div class="mb-3">
                         <label class="form-label">Pilih Barang</label>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.02 1.02 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
-                            <input type="text" class="form-control form-control-sm" id="stock-item-search" placeholder="Cari barang..." autocomplete="off">
-                        </div>
                         <select name="item_id" id="stock_item_id" class="form-select @error('item_id') is-invalid @enderror" required>
                             <option value="">— Pilih Barang —</option>
                             @foreach($items as $item)
@@ -125,7 +121,6 @@
     const input  = document.getElementById('reference_code');
     const btnReset = document.getElementById('btn-reset-ref');
     const stockItemSelect = document.getElementById('stock_item_id');
-    const stockItemSearch = document.getElementById('stock-item-search');
 
     if (btnReset && input) {
         btnReset.addEventListener('click', function () {
@@ -134,16 +129,20 @@
         });
     }
 
-    if (stockItemSelect && stockItemSearch) {
-        stockItemSearch.addEventListener('input', function () {
-            const value = this.value.trim().toLowerCase();
-            Array.from(stockItemSelect.options).forEach((option) => {
-                if (!option.value) {
-                    option.hidden = false;
-                    return;
+    if (stockItemSelect) {
+        new TomSelect(stockItemSelect, {
+            create: false,
+            plugins: ['dropdown_input'],
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: '— Pilih atau cari barang… —',
+            render: {
+                no_results: function(data, escape) {
+                    return '<div class="no-results" style="padding: 10px; color: #6c757d;">Barang tidak ditemukan.</div>';
                 }
-                option.hidden = value !== '' && !option.text.toLowerCase().includes(value);
-            });
+            }
         });
     }
 })();

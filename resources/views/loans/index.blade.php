@@ -30,7 +30,7 @@
     <div class="px-4 py-3 border-bottom bg-light">
         <form method="GET" action="{{ route('loans.index') }}" class="row g-2 align-items-center">
             <div class="col-md-4">
-                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari peminjam..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari kode, peminjam, barang, pencatat..." value="{{ request('search') }}">
             </div>
             <div class="col-md-4">
                 <select name="status" class="form-select form-select-sm">

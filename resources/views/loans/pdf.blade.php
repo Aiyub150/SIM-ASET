@@ -63,6 +63,16 @@
             <td>{{ $loan->borrower->institution_name }}</td>
         </tr>
         <tr>
+            <td>Nomor Telepon</td>
+            <td>:</td>
+            <td>{{ $loan->borrower->contact_number ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Alamat</td>
+            <td>:</td>
+            <td>{{ $loan->borrower->address ?? '-' }}</td>
+        </tr>
+        <tr>
             <td colspan="3">Selanjutnya disebut sebagai <strong>PIHAK KEDUA</strong>.</td>
         </tr>
     </table>

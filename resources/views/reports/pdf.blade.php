@@ -18,7 +18,7 @@
     <h3 class="text-center" style="margin-top: 0; font-weight: normal;">Periode: {{ $monthName }} {{ $year }}</h3>
     <hr style="border: 1px solid #000; margin-bottom: 20px;">
 
-    <div class="section-title">A. RINCIAN TRANSAKSI PEMINJAMAN ASET</div>
+    <div class="section-title">{{ isset($movements) && $movements->isNotEmpty() ? 'A. RINCIAN TRANSAKSI PEMINJAMAN ASET' : 'RINCIAN TRANSAKSI PEMINJAMAN ASET' }}</div>
     <table>
         <thead>
             <tr>
@@ -48,6 +48,7 @@
         </tbody>
     </table>
 
+    @if(isset($movements) && $movements->isNotEmpty())
     <div class="section-title">B. RINCIAN BUKU BESAR (MUTASI FISIK ASET)</div>
     <table>
         <thead>
@@ -61,7 +62,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($movements as $index => $mov)
+            @foreach($movements as $index => $mov)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $mov->created_at->format('d/m/Y H:i') }}</td>
@@ -70,11 +71,10 @@
                     <td class="text-center">{{ strtoupper($mov->type) }}</td>
                     <td class="text-center">{{ $mov->qty }}</td>
                 </tr>
-            @empty
-                <tr><td colspan="6" class="text-center">Tidak ada mutasi stok tercatat.</td></tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
+    @endif
 
     <div style="margin-top: 40px; float: right; width: 300px; text-align: center;">
         <p>Mengetahui,</p>

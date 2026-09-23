@@ -330,4 +330,78 @@ class SimAsetCoreTest extends TestCase
         $this->assertNotNull($user);
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check($passwordWithSpecialChars, $user->password));
     }
+
+    /**
+     * Test 10: Loan dynamic search by item name and item SKU
+     */
+    public function test_loan_search_by_item_name_and_sku(): void
+    {
+        $loanService = app(LoanService::class);
+        $loan = $loanService->createLoan([
+            'borrower_id' => $this->borrower->id,
+            'borrow_date' => now()->toDateString(),
+            'due_date' => now()->addDays(3)->toDateString(),
+            'items' => [
+                ['item_id' => $this->item1->id, 'qty' => 1],
+            ]
+        ], $this->admin->id);
+
+        // Search by item SKU (ELEC-001)
+        $responseSku = $this->actingAs($this->admin)->get('/loans?search=ELEC-001');
+        $responseSku->assertOk();
+        $responseSku->assertSee($loan->loan_code);
+
+        // Search by item name (Laptop Asus)
+        $responseName = $this->actingAs($this->admin)->get('/loans?search=Laptop');
+        $responseName->assertOk();
+        $responseName->assertSee($loan->loan_code);
+
+        // Search for non-existent item
+        $responseNone = $this->actingAs($this->admin)->get('/loans?search=NonExistentItemNameXYZ');
+        $responseNone->assertOk();
+        $responseNone->assertDontSee($loan->loan_code);
+    }
+
+    /**
+     * Test 11: StockService strictly rejects invalid movement types
+     */
+    public function test_stock_service_rejects_invalid_movement_type(): void
+    {
+        $stockService = app(StockService::class);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Tipe mutasi tidak valid.');
+
+        $stockService->adjustStock([
+            'item_id' => $this->item1->id,
+            'type' => 'invalid_type_here',
+            'qty' => 1,
+            'reference_code' => 'BAST/2026/09/999',
+        ], $this->admin->id);
+    }
+
+    /**
+     * Test 12: Staff report hides stock mutations
+     */
+    public function test_staff_report_does_not_contain_stock_mutations(): void
+    {
+        // Admin creates a stock movement
+        $stockService = app(StockService::class);
+        $stockService->adjustStock([
+            'item_id' => $this->item1->id,
+            'type' => 'in',
+            'qty' => 2,
+            'reference_code' => 'BAST/' . now()->format('Y/m') . '/001',
+        ], $this->admin->id);
+
+        // Staff visits report page
+        $responseStaff = $this->actingAs($this->staff1)->get('/reports?period=' . now()->format('Y-m'));
+        $responseStaff->assertOk();
+        $responseStaff->assertDontSee('Mutasi Stok Fisik');
+
+        // Admin visits report page - sees Mutasi Stok Fisik
+        $responseAdmin = $this->actingAs($this->admin)->get('/reports?period=' . now()->format('Y-m'));
+        $responseAdmin->assertOk();
+        $responseAdmin->assertSee('Mutasi Stok Fisik');
+    }
 }

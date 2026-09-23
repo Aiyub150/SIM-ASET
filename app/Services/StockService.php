@@ -31,15 +31,22 @@ class StockService
                 throw new Exception("Jumlah mutasi harus lebih besar dari 0.");
             }
 
+            $allowedTypes = ['in', 'out', 'broken', 'lost'];
+            if (!in_array($data['type'] ?? '', $allowedTypes, true)) {
+                throw new Exception("Tipe mutasi tidak valid.");
+            }
+
             // 2. Tentukan operator penambahan atau pengurangan
             $isAddition = $data['type'] === 'in';
+
             $balanceBefore = $item->total_qty;
 
             if ($isAddition) {
+                // Mutasi masuk menambah total dan stok tersedia
                 $item->total_qty += $data['qty'];
                 $item->available_qty += $data['qty'];
             } else {
-                // Untuk kasus 'out', 'broken', 'lost'
+                // Mutasi keluar/rusak/hilang mengurangi stok
                 if ($item->available_qty < $data['qty']) {
                     throw new Exception(
                         "Stok tersedia tidak mencukupi untuk dikurangi. " .
@@ -65,7 +72,7 @@ class StockService
                 'qty'            => $data['qty'],
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $balanceAfter,
-                'notes'          => $data['notes'],
+                'notes'          => $data['notes'] ?? null,
             ]);
         });
     }

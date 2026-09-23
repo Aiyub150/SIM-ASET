@@ -306,19 +306,41 @@
         
         let html5QrCodeReturn = null;
 
+        function addFallbackReturnCameraOptions() {
+            if (!returnScanDeviceSelect.querySelector('option[value="camera:environment"]')) {
+                const optBack = document.createElement('option');
+                optBack.value = 'camera:environment';
+                optBack.textContent = 'Kamera Belakang (Mobile / Default)';
+                returnScanDeviceSelect.appendChild(optBack);
+            }
+            if (!returnScanDeviceSelect.querySelector('option[value="camera:user"]')) {
+                const optFront = document.createElement('option');
+                optFront.value = 'camera:user';
+                optFront.textContent = 'Kamera Depan / Webcam';
+                returnScanDeviceSelect.appendChild(optFront);
+            }
+        }
+
         async function populateReturnCameraDevices() {
             try {
-                const devices = await Html5Qrcode.getCameras();
-                if (devices && devices.length) {
-                    devices.forEach((device, index) => {
-                        const option = document.createElement('option');
-                        option.value = `camera:${device.id}`;
-                        option.textContent = device.label || `Kamera ${index + 1}`;
-                        returnScanDeviceSelect.appendChild(option);
-                    });
+                if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+                    const devices = await Html5Qrcode.getCameras();
+                    if (devices && devices.length > 0) {
+                        devices.forEach((device, index) => {
+                            const option = document.createElement('option');
+                            option.value = `camera:${device.id}`;
+                            option.textContent = device.label || `Kamera ${index + 1}`;
+                            returnScanDeviceSelect.appendChild(option);
+                        });
+                    } else {
+                        addFallbackReturnCameraOptions();
+                    }
+                } else {
+                    addFallbackReturnCameraOptions();
                 }
             } catch (err) {
-                console.error("Error enumerating cameras:", err);
+                console.warn("Camera enumeration warning (fallback added):", err);
+                addFallbackReturnCameraOptions();
             }
         }
 
@@ -335,7 +357,14 @@
                 returnCameraPreviewWrapper.classList.remove('d-none');
                 
                 const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                const cameraConfig = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: "environment" };
+                let cameraConfig;
+                if (deviceId === 'environment' || deviceId === 'user') {
+                    cameraConfig = { facingMode: deviceId };
+                } else if (deviceId) {
+                    cameraConfig = { deviceId: { exact: deviceId } };
+                } else {
+                    cameraConfig = { facingMode: "environment" };
+                }
 
                 await html5QrCodeReturn.start(
                     cameraConfig,
@@ -358,8 +387,18 @@
                 returnSkuFeedback.textContent = 'Kamera aktif — siap memindai barcode pengembalian.';
                 returnSkuFeedback.className = 'small mt-2 text-success';
             } catch (error) {
+                console.error("Return camera preview start error:", error);
                 returnCameraPreviewWrapper.classList.add('d-none');
-                returnSkuFeedback.textContent = 'Kamera tidak tersedia; gunakan scanner USB/keyboard.';
+                const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                let message = 'Kamera tidak tersedia; gunakan scanner USB/keyboard.';
+                if (!isSecure) {
+                    message = 'Akses kamera pada browser memerlukan protokol HTTPS atau localhost.';
+                } else if (error && (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError')) {
+                    message = 'Izin kamera ditolak. Harap izinkan akses kamera pada browser Anda.';
+                } else if (error && error.name === 'NotFoundError') {
+                    message = 'Kamera fisik tidak ditemukan pada perangkat Anda.';
+                }
+                returnSkuFeedback.textContent = message;
                 returnSkuFeedback.className = 'small mt-2 text-warning';
             }
         }

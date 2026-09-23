@@ -35,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{loan}/return', [LoanController::class, 'returnItems'])->name('return');
     });
 
-    Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->name('items.lookup');
+    Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->middleware('throttle:60,1')->name('items.lookup');
     Route::get('/items/{item}/label', [ItemController::class, 'printLabel'])->name('items.label');
 
     // MODUL MASTER BARANG (VIEW) - Accessible by all roles

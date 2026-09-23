@@ -43,7 +43,7 @@ class LoanController extends Controller
         $search = $request->query('search');
         $status = $request->query('status');
 
-        $query = Loan::with(['borrower', 'user'])->orderBy('created_at', 'desc');
+        $query = Loan::with(['borrower', 'user', 'loanItems.item'])->orderBy('created_at', 'desc');
 
         if ($user->hasRole('Staff Logistik')) {
             $query->where('user_id', $user->id);
@@ -60,6 +60,10 @@ class LoanController extends Controller
                      })
                      ->orWhereHas('user', function ($q3) use ($search) {
                          $q3->where('name', 'like', "%{$search}%");
+                     })
+                     ->orWhereHas('loanItems.item', function ($q4) use ($search) {
+                         $q4->where('name', 'like', "%{$search}%")
+                            ->orWhere('sku', 'like', "%{$search}%");
                      });
             });
         })->when($status, function ($q, $status) {
@@ -84,9 +88,14 @@ class LoanController extends Controller
                 ->with('success', "Peminjaman berhasil dicatat dengan kode: {$loan->loan_code}");
 
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('LoanController@store error: ' . $e->getMessage(), ['exception' => $e]);
+            $userMessage = ($e instanceof \Illuminate\Database\QueryException || str_contains($e->getMessage(), 'SQLSTATE'))
+                ? 'Terjadi kesalahan sistem saat memproses peminjaman. Silakan coba lagi.'
+                : $e->getMessage();
+
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', $userMessage);
         }
     }
 
@@ -112,9 +121,14 @@ class LoanController extends Controller
                 ->with('success', $message);
 
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('LoanController@returnItems error: ' . $e->getMessage(), ['exception' => $e]);
+            $userMessage = ($e instanceof \Illuminate\Database\QueryException || str_contains($e->getMessage(), 'SQLSTATE'))
+                ? 'Terjadi kesalahan sistem saat memproses pengembalian. Silakan coba lagi.'
+                : $e->getMessage();
+
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', $userMessage);
         }
     }
 
