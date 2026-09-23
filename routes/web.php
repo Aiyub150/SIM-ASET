@@ -13,6 +13,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Halaman Buku Panduan Penggunaan & UI/UX (Dapat diakses publik maupun oleh user login)
+Route::view('/guide', 'guide')->name('guide');
+
 // Lapisan Pertahanan 1: Wajib Login
 Route::middleware(['auth'])->group(function () {
 

@@ -404,4 +404,48 @@ class SimAsetCoreTest extends TestCase
         $responseAdmin->assertOk();
         $responseAdmin->assertSee('Mutasi Stok Fisik');
     }
+
+    /**
+     * Test 13: Guest can access user guide from login page and see author attribution
+     */
+    public function test_guest_can_access_guide_page(): void
+    {
+        // Login page contains link to guide
+        $responseLogin = $this->get('/login');
+        $responseLogin->assertOk();
+        $responseLogin->assertSee(route('guide'));
+        $responseLogin->assertSee('Buku Panduan Penggunaan SIM-ASET');
+
+        // Guide page is publicly accessible without login
+        $responseGuide = $this->get('/guide');
+        $responseGuide->assertOk();
+        $responseGuide->assertSee('Buku Panduan Penggunaan SIM-ASET');
+        $responseGuide->assertSee('Aiyub Heriyanto');
+        $responseGuide->assertSee('2026');
+        $responseGuide->assertSee('Masuk ke Sistem');
+    }
+
+    /**
+     * Test 14: All roles have guide link in their sidebar navigation
+     */
+    public function test_all_roles_have_guide_menu_in_sidebar(): void
+    {
+        // 1. Super Admin
+        $respSuper = $this->actingAs($this->superAdmin)->get('/dashboard');
+        $respSuper->assertOk();
+        $respSuper->assertSee('Panduan Penggunaan');
+        $respSuper->assertSee(route('guide'));
+
+        // 2. Admin
+        $respAdmin = $this->actingAs($this->admin)->get('/dashboard');
+        $respAdmin->assertOk();
+        $respAdmin->assertSee('Panduan Penggunaan');
+        $respAdmin->assertSee(route('guide'));
+
+        // 3. Staff Logistik
+        $respStaff = $this->actingAs($this->staff1)->get('/dashboard');
+        $respStaff->assertOk();
+        $respStaff->assertSee('Panduan Penggunaan');
+        $respStaff->assertSee(route('guide'));
+    }
 }

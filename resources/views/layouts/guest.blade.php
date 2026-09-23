@@ -69,7 +69,9 @@
                 {{ $slot }}
             </div>
         </div>
-        <p class="text-center text-white mt-3" style="opacity:.6; font-size:.8rem;">© {{ date('Y') }} Sistem Inventaris Aset Daerah</p>
+        <p class="text-center text-white mt-3" style="opacity:.75; font-size:.8rem;">
+            © {{ date('Y') }} Sistem Inventaris Aset Daerah &bull; <a href="{{ route('guide') }}" class="text-white text-decoration-underline">Panduan Penggunaan</a>
+        </p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
