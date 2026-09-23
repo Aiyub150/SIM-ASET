@@ -79,10 +79,13 @@
                     <span class="text-muted d-block" style="font-size: 0.72rem;">Sistem Inventaris Aset Daerah</span>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-none d-md-inline-block px-3 py-2" style="font-size: 0.75rem;">
-                    Buku Panduan v1.0.0 (2026)
-                </span>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('guide.pdf') }}" target="_blank" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 fw-semibold py-2 px-3" style="border-radius: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                    </svg>
+                    Cetak PDF
+                </a>
                 <a href="{{ route('login') }}" class="btn-login-header">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>

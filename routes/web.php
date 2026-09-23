@@ -15,6 +15,14 @@ Route::get('/', function () {
 
 // Halaman Buku Panduan Penggunaan & UI/UX (Dapat diakses publik maupun oleh user login)
 Route::view('/guide', 'guide')->name('guide');
+Route::get('/guide/pdf', function () {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions([
+        'isRemoteEnabled' => true,
+        'chroot' => [public_path(), base_path()],
+    ])->loadView('guide_pdf');
+    $pdf->setPaper('A4', 'portrait');
+    return $pdf->stream('Buku_Panduan_SIM-ASET_2026.pdf');
+})->name('guide.pdf');
 
 // Lapisan Pertahanan 1: Wajib Login
 Route::middleware(['auth'])->group(function () {

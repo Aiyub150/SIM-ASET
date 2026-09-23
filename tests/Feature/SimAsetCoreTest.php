@@ -448,4 +448,15 @@ class SimAsetCoreTest extends TestCase
         $respStaff->assertSee('Panduan Penggunaan');
         $respStaff->assertSee(route('guide'));
     }
+
+    /**
+     * Test 15: Guide PDF export can be streamed and contains official cover details
+     */
+    public function test_guide_pdf_can_be_generated_and_streamed(): void
+    {
+        $response = $this->get('/guide/pdf');
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+    }
 }

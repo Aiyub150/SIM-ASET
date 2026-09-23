@@ -153,15 +153,6 @@
                     <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.78rem; padding: 0.5rem 0.8rem;">
                         Modul: Peminjaman &bull; Master Barang &bull; Kartu Stok &bull; Laporan BAST
                     </span>
-                    @guest
-                    <a href="{{ route('login') }}" class="btn btn-sm btn-light fw-bold px-3 py-2 ms-auto" style="border-radius: 8px;">
-                        Masuk ke Aplikasi &rarr;
-                    </a>
-                    @else
-                    <a href="{{ route('dashboard') }}" class="btn btn-sm btn-light fw-bold px-3 py-2 ms-auto" style="border-radius: 8px;">
-                        Buka Dashboard &rarr;
-                    </a>
-                    @endguest
                 </div>
             </div>
 
@@ -187,6 +178,12 @@
                 </svg>
                 Daftar Topik Panduan:
             </span>
+            <a href="{{ route('guide.pdf') }}" target="_blank" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2 fw-semibold px-3 py-1 shadow-sm" style="border-radius: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                </svg>
+                Cetak / Unduh PDF Panduan
+            </a>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="#pengenalan" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">1. Filosofi & Tampilan UI/UX</a>
@@ -743,8 +740,13 @@
             </div>
         </div>
 
-        <div class="text-center mt-4 pt-3 border-top">
-            <p class="text-muted small mb-3">SIM-ASET &bull; Dikembangkan dan Disempurnakan untuk Tata Kelola Logistik Pemerintah Daerah</p>
+        <div class="text-center mt-4 pt-3 border-top d-flex justify-content-center flex-wrap gap-2">
+            <a href="{{ route('guide.pdf') }}" target="_blank" class="btn btn-outline-danger px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2" style="border-radius: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                </svg>
+                Cetak Dokumen PDF Panduan
+            </a>
             @guest
             <a href="{{ route('login') }}" class="btn btn-primary px-4 py-2 fw-semibold" style="border-radius: 8px;">
                 Masuk ke Halaman Login &rarr;
