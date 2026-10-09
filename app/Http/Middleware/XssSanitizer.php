@@ -33,12 +33,18 @@ class XssSanitizer
                 return;
             }
 
+            // Strip script and style blocks completely, along with event attributes and dangerous protocols
             $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $decoded = preg_replace('/%3C|%3E|%26|(?:on[a-z]+\s*=|javascript:|vbscript:|data:text\/html)/i', '', $decoded);
-            $decoded = strip_tags($decoded);
-            $decoded = preg_replace('/\s+/', ' ', $decoded);
+            $sanitized = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $decoded);
+            $sanitized = preg_replace('/%3C|%3E|(?:on[a-z]+\s*=|javascript:|vbscript:|data:text\/html)/i', '', $sanitized);
+            $sanitized = strip_tags($sanitized);
 
-            $value = trim($decoded);
+            // Normalize line endings and collapse multiple horizontal spaces while preserving newlines
+            $sanitized = str_replace(["\r\n", "\r"], "\n", $sanitized);
+            $sanitized = preg_replace('/[^\S\n]+/', ' ', $sanitized);
+            $sanitized = preg_replace('/\n{3,}/', "\n\n", $sanitized);
+
+            $value = trim($sanitized);
         });
 
         $request->merge($input);

@@ -75,4 +75,21 @@ class SecurityValidationTest extends TestCase
         $this->assertTrue($borrowerValidator->fails());
         $this->assertArrayHasKey('institution_name', $borrowerValidator->errors()->toArray());
     }
+
+    public function test_xss_sanitizer_preserves_multiline_formatting(): void
+    {
+        $middleware = new \App\Http\Middleware\XssSanitizer();
+        $request = \Illuminate\Http\Request::create('/test', 'POST', [
+            'notes' => "Baris 1\nBaris 2\r\nBaris 3",
+            'description' => "Paragraf 1\n\nParagraf 2",
+            'malicious' => "<script>alert(1)</script>Halo Dunia",
+        ]);
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals("Baris 1\nBaris 2\nBaris 3", $req->input('notes'));
+            $this->assertEquals("Paragraf 1\n\nParagraf 2", $req->input('description'));
+            $this->assertEquals("Halo Dunia", $req->input('malicious'));
+            return new \Symfony\Component\HttpFoundation\Response();
+        });
+    }
 }
