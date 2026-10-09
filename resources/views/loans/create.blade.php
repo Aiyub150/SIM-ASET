@@ -20,7 +20,7 @@
     });
 @endphp
 <script id="items-data" type="application/json">
-{!! json_encode($itemsJson) !!}
+@json($itemsJson)
 </script>
 
 <style>

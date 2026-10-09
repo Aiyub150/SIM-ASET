@@ -333,11 +333,11 @@
         let loanChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: {!! json_encode($chartLabels) !!},
+                labels: @json($chartLabels),
                 datasets: [
                     {
                         label: 'Peminjaman',
-                        data: {!! json_encode($chartLoans) !!},
+                        data: @json($chartLoans),
                         backgroundColor: 'rgba(37, 99, 235, 0.8)', // blue-600
                         borderColor: 'rgba(37, 99, 235, 1)',
                         borderWidth: 1,
@@ -345,7 +345,7 @@
                     },
                     {
                         label: 'Pengembalian',
-                        data: {!! json_encode($chartReturns) !!},
+                        data: @json($chartReturns),
                         backgroundColor: 'rgba(34, 197, 94, 0.8)', // green-500
                         borderColor: 'rgba(34, 197, 94, 1)',
                         borderWidth: 1,

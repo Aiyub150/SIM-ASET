@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --sidebar-width: 250px;
@@ -597,6 +598,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function toggleSidebar() {
@@ -605,6 +607,45 @@
             const isOpen   = sidebar.classList.toggle('open');
             overlay.style.display = isOpen ? 'block' : 'none';
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+
+            @if(session('success'))
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: @json(session('success'))
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Perhatian',
+                    text: @json(session('error')),
+                    confirmButtonColor: '#2563eb'
+                });
+            @endif
+
+            @if(session('status') && !session('success'))
+                Toast.fire({
+                    icon: 'info',
+                    title: 'Informasi',
+                    text: @json(session('status'))
+                });
+            @endif
+        });
     </script>
 
     @stack('scripts')
