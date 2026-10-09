@@ -507,7 +507,12 @@
         if (ITEMS.length === 0) return;
         const usedCount = pickers.filter(p => p.selectedId !== null).length;
         if (usedCount >= ITEMS.length) {
-            alert('Semua barang yang tersedia sudah ditambahkan ke daftar.');
+            Swal.fire({
+                icon: 'info',
+                title: 'Informasi',
+                text: 'Semua barang yang tersedia sudah ditambahkan ke daftar.',
+                confirmButtonColor: '#2563eb'
+            });
             return;
         }
         container.appendChild(createRow(false));

@@ -387,7 +387,12 @@
                     loanChart.update();
                 })
                 .catch(err => {
-                    alert('Gagal memuat statistik. Silakan coba lagi.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal memuat statistik. Silakan coba lagi.',
+                        confirmButtonColor: '#2563eb'
+                    });
                     console.error(err);
                 })
                 .finally(() => {

@@ -129,11 +129,21 @@
                     document.getElementById('longitude').value = lng;
                     addressInput.value = data[0].display_name;
                 } else {
-                    alert('Lokasi tidak ditemukan.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tidak Ditemukan',
+                        text: 'Lokasi tidak ditemukan.',
+                        confirmButtonColor: '#2563eb'
+                    });
                 }
             } catch (error) {
                 console.error("Geocoding error:", error);
-                alert('Terjadi kesalahan saat mencari lokasi.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan saat mencari lokasi.',
+                    confirmButtonColor: '#2563eb'
+                });
             }
             btnMapSearch.textContent = 'Cari';
         }

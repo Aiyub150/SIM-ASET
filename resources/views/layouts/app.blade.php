@@ -608,6 +608,15 @@
             overlay.style.display = isOpen ? 'block' : 'none';
         }
 
+        window.alert = function (message) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: String(message),
+                confirmButtonColor: '#2563eb'
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             const Toast = Swal.mixin({
                 toast: true,
@@ -638,6 +647,15 @@
                 });
             @endif
 
+            @if($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi Gagal',
+                    html: @json('<div class="text-start">' . implode('<br>', $errors->all()) . '</div>'),
+                    confirmButtonColor: '#2563eb'
+                });
+            @endif
+
             @if(session('status') && !session('success'))
                 Toast.fire({
                     icon: 'info',
@@ -645,6 +663,28 @@
                     text: @json(session('status'))
                 });
             @endif
+
+            document.addEventListener('submit', function (e) {
+                const form = e.target;
+                if (form && form.dataset && form.dataset.confirm && !form.dataset.confirmed) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: form.dataset.confirm,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563eb',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Lanjutkan',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.dataset.confirmed = 'true';
+                            form.submit();
+                        }
+                    });
+                }
+            });
         });
     </script>
 

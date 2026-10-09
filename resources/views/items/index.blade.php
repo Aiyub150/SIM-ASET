@@ -195,7 +195,12 @@
                 .map(cb => cb.value);
 
             if (!selected.length) {
-                alert('Pilih minimal satu barang terlebih dahulu.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perhatian',
+                    text: 'Pilih minimal satu barang terlebih dahulu.',
+                    confirmButtonColor: '#2563eb'
+                });
                 return;
             }
 

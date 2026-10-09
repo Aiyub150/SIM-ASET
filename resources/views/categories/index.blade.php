@@ -5,13 +5,6 @@
 
 @section('content')
 
-@if(session('success'))
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>Berhasil!</strong> {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@endif
-
 <div class="card mb-4">
     <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
         <span>Daftar Kategori Barang</span>
@@ -58,10 +51,10 @@
                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $category->id }}">
                             Edit
                         </button>
-                        <form action="{{ route('categories.toggle', $category->id) }}" method="POST" class="d-inline">
+                        <form action="{{ route('categories.toggle', $category->id) }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin {{ $category->is_active ? 'menonaktifkan' : 'mengaktifkan' }} kategori ini?">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}" onclick="return confirm('Apakah Anda yakin ingin {{ $category->is_active ? 'menonaktifkan' : 'mengaktifkan' }} kategori ini?')">
+                            <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
                                 {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                             </button>
                         </form>
