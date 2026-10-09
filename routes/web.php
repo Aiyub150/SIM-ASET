@@ -17,8 +17,8 @@ Route::get('/', function () {
 Route::view('/guide', 'guide')->name('guide');
 Route::get('/guide/pdf', function () {
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions([
-        'isRemoteEnabled' => true,
-        'chroot' => [public_path(), base_path()],
+        'isRemoteEnabled' => false,
+        'chroot' => [public_path()],
     ])->loadView('guide_pdf');
     $pdf->setPaper('A4', 'portrait');
     return $pdf->stream('Buku_Panduan_SIM-ASET_2026.pdf');
@@ -47,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->middleware('throttle:60,1')->name('items.lookup');
+    Route::get('/items/labels', [ItemController::class, 'printLabels'])->name('items.labels');
     Route::get('/items/{item}/label', [ItemController::class, 'printLabel'])->name('items.label');
 
     // MODUL MASTER BARANG (VIEW) - Accessible by all roles
@@ -59,9 +60,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('items')->name('items.')->group(function () {
             Route::get('/create',      [ItemController::class, 'create'])->name('create');
             Route::post('/',           [ItemController::class, 'store'])->name('store');
-            Route::get('/labels',      [ItemController::class, 'printLabels'])->name('labels');
             Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
-            Route::get('/{item}/label', [ItemController::class, 'printLabel'])->name('label');
             Route::put('/{item}',      [ItemController::class, 'update'])->name('update');
         });
 
