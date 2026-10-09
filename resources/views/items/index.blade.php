@@ -47,10 +47,10 @@
             <span>Pilih semua</span>
         </label>
         <div class="d-flex align-items-center gap-2">
-            <select id="label-print-type" class="form-select form-select-sm" style="width: 180px;">
-                <option value="both">Barcode Standar & QR Code</option>
-                <option value="1d">Barcode Standar Saja</option>
-                <option value="2d">QR Code Saja</option>
+            <select id="label-print-type" class="form-select form-select-sm" style="width: 230px;">
+                <option value="2d" selected>Barcode Kotak (QR Code) — Rekomendasi</option>
+                <option value="both">Kombinasi (Garis + Kotak)</option>
+                <option value="1d">Barcode Garis (1D Saja)</option>
             </select>
             <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary">Cetak Label Terpilih</button>
         </div>
@@ -127,18 +127,18 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
                                         <li>
-                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => 'both']) }}" target="_blank">
-                                                Standar (Barcode + QR)
+                                            <a class="dropdown-item py-1 fw-medium" href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" target="_blank">
+                                                Barcode Kotak (QR Code)
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => '1d']) }}" target="_blank">
-                                                Barcode 1D Saja
+                                            <a class="dropdown-item py-1 text-muted" href="{{ route('items.label', ['item' => $item->id, 'type' => 'both']) }}" target="_blank">
+                                                Kombinasi (Garis + Kotak)
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item py-1" href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" target="_blank">
-                                                QR Code 2D Saja
+                                            <a class="dropdown-item py-1 text-muted" href="{{ route('items.label', ['item' => $item->id, 'type' => '1d']) }}" target="_blank">
+                                                Barcode Garis (1D Saja)
                                             </a>
                                         </li>
                                     </ul>
@@ -199,7 +199,7 @@
                 return;
             }
 
-            const type = document.getElementById('label-print-type')?.value || 'both';
+            const type = document.getElementById('label-print-type')?.value || '2d';
             const url = new URL('{{ route('items.labels') }}', window.location.origin);
             url.searchParams.set('type', type);
             selected.forEach(id => url.searchParams.append('items[]', id));

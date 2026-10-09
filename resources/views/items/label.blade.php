@@ -12,7 +12,7 @@
         }
         .label {
             width: 160px;
-            padding: 10px 10px 8px;
+            padding: 10px 8px 8px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             text-align: center;
@@ -22,30 +22,33 @@
             vertical-align: top;
         }
         .sku {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin-top: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
+            color: #111827;
         }
         .name {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
-            line-height: 1.4;
-            min-height: 28px;
+            line-height: 1.3;
+            min-height: 26px;
+            max-height: 38px;
             overflow: hidden;
+            color: #374151;
         }
         .qr {
-            width: 64px;
-            height: 64px;
-            margin: 8px auto;
+            width: 90px;
+            height: 90px;
+            margin: 4px auto 6px;
             display: block;
         }
         .barcode {
-            width: 120px;
+            width: 130px;
             height: 42px;
             display: block;
-            margin: 0 auto;
+            margin: 0 auto 6px;
         }
     </style>
 </head>

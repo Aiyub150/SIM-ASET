@@ -141,7 +141,7 @@
                 </select>
             </div>
             <div class="col-md-5">
-                <label class="form-label">Scan / Ketik SKU Barang yang Dikembalikan</label>
+                <label class="form-label">Scan Barcode Kotak (QR Code) / Ketik SKU</label>
                 <input type="text" id="return-sku-input" class="form-control" placeholder="Contoh: ELEC-001" autocomplete="off" spellcheck="false" autofocus>
             </div>
             <div class="col-md-2">
@@ -356,7 +356,13 @@
 
                 returnCameraPreviewWrapper.classList.remove('d-none');
                 
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                const config = { 
+                    fps: 15, 
+                    qrbox: { width: 220, height: 220 },
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.QR_CODE
+                    ]
+                };
                 let cameraConfig;
                 if (deviceId === 'environment' || deviceId === 'user') {
                     cameraConfig = { facingMode: deviceId };

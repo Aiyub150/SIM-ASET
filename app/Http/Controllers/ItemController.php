@@ -80,7 +80,7 @@ class ItemController extends Controller
 
     public function printLabel(Item $item, Request $request)
     {
-        $type = strtolower((string) $request->query('type', 'both'));
+        $type = strtolower((string) $request->query('type', '2d'));
         $labelData = $this->buildLabelData($item, $type);
 
         $pdf = Pdf::loadView('items.label', ['items' => $labelData]);
@@ -103,7 +103,7 @@ class ItemController extends Controller
             return back()->with('error', 'Barang yang dipilih tidak ditemukan.');
         }
 
-        $type = strtolower((string) $request->query('type', 'both'));
+        $type = strtolower((string) $request->query('type', '2d'));
         $labelData = $items->flatMap(function (Item $item) use ($type) {
             return $this->buildLabelData($item, $type);
         })->all();
@@ -116,9 +116,9 @@ class ItemController extends Controller
 
     private function buildLabelData(Item $item, string $type): array
     {
-        $types = ['1d', '2d'];
+        $types = ['1d', '2d', 'both'];
         if (!in_array($type, $types, true)) {
-            $type = 'both';
+            $type = '2d';
         }
 
         $barcodeImg = null;

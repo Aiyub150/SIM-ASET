@@ -150,8 +150,8 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                         <div>
-                            <div class="fw-bold text-primary">Scan Barcode / Ketik SKU di Sini</div>
-                            <small class="text-muted">Gunakan scanner USB atau kamera web untuk menambah barang secara cepat</small>
+                            <div class="fw-bold text-primary">Scan Barcode Kotak (QR Code) / Ketik SKU di Sini</div>
+                            <small class="text-muted">Arahkan barcode kotak (QR Code) ke kamera atau gunakan scanner USB</small>
                         </div>
                         <div class="text-muted small">Fallback manual tetap tersedia</div>
                     </div>
@@ -584,14 +584,7 @@
                     };
                 },
                 formatsToSupport: [
-                    Html5QrcodeSupportedFormats.QR_CODE,
-                    Html5QrcodeSupportedFormats.CODE_128,
-                    Html5QrcodeSupportedFormats.CODE_39,
-                    Html5QrcodeSupportedFormats.EAN_13,
-                    Html5QrcodeSupportedFormats.EAN_8,
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.UPC_E,
-                    Html5QrcodeSupportedFormats.ITF
+                    Html5QrcodeSupportedFormats.QR_CODE
                 ]
             };
             
