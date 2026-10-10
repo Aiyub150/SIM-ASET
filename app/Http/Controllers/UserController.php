@@ -49,6 +49,14 @@ class UserController extends Controller
 
         $user->syncRoles($data['role']);
 
+        \App\Services\ActivityLogger::log(
+            'CREATE',
+            'Pengguna',
+            "Menambahkan pengguna baru: {$user->name} ({$user->email}) dengan peran {$data['role']}",
+            ['user_id' => $user->id, 'role' => $data['role']],
+            $request
+        );
+
         return redirect()
             ->route('users.index')
             ->with('success', "Pengguna \"{$user->name}\" berhasil ditambahkan dengan role: {$data['role']}");
@@ -96,8 +104,16 @@ class UserController extends Controller
 
         $user->syncRoles($data['role']);
 
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Pengguna',
+            "Memperbarui data pengguna: {$user->name} ({$user->email})",
+            ['user_id' => $user->id, 'role' => $data['role']],
+            $request
+        );
+
         return redirect()
             ->route('users.index')
-            ->with('success', "Data pengguna \"{$user->name}\" berhasil diperbarui.");
+            ->with('success', "Pengguna \"{$user->name}\" berhasil diperbarui.");
     }
 }

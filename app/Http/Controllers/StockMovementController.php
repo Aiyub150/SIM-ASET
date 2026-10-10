@@ -65,6 +65,14 @@ class StockMovementController extends Controller
 
             $action = $movement->type === 'in' ? 'Penambahan' : 'Pengurangan';
 
+            \App\Services\ActivityLogger::log(
+                'STOCK_ADJUST',
+                'Mutasi Stok',
+                "Mencatat mutasi stok ({$action}) dengan kode referensi {$movement->reference_code}",
+                ['movement_id' => $movement->id, 'type' => $movement->type, 'ref' => $movement->reference_code],
+                $request
+            );
+
             return redirect()
                 ->route('stocks.index')
                 ->with('success', "Mutasi Stok ({$action}) berhasil dicatat. Ref: <strong>{$movement->reference_code}</strong>");

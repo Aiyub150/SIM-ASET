@@ -83,6 +83,14 @@ class LoanController extends Controller
         try {
             $loan = $this->loanService->createLoan($request->validated(), Auth::id());
 
+            \App\Services\ActivityLogger::log(
+                'LOAN_CREATE',
+                'Peminjaman',
+                "Mencatat peminjaman baru dengan nomor referensi {$loan->loan_code}",
+                ['loan_id' => $loan->id, 'loan_code' => $loan->loan_code],
+                $request
+            );
+
             return redirect()
                 ->route('loans.index')
                 ->with('success', "Peminjaman berhasil dicatat dengan kode: {$loan->loan_code}");
@@ -111,6 +119,14 @@ class LoanController extends Controller
 
         try {
             $updatedLoan = $this->loanService->processReturn($loan->id, $request->validated(), Auth::id());
+
+            \App\Services\ActivityLogger::log(
+                'LOAN_RETURN',
+                'Peminjaman',
+                "Memproses pengembalian peminjaman barang untuk kode {$loan->loan_code}",
+                ['loan_id' => $loan->id, 'loan_code' => $loan->loan_code],
+                $request
+            );
 
             $message = $updatedLoan->status === 'completed'
                 ? "Pengembalian berhasil. Transaksi {$loan->loan_code} telah SELESAI sepenuhnya."

@@ -186,6 +186,14 @@ class ItemController extends Controller
             return $item;
         });
 
+        \App\Services\ActivityLogger::log(
+            'CREATE',
+            'Barang',
+            "Menambahkan barang inventaris baru: {$item->name} (SKU: {$item->sku})",
+            ['item_id' => $item->id, 'sku' => $item->sku, 'name' => $item->name],
+            $request
+        );
+
         return redirect()
             ->route('items.index')
             ->with('success', "Barang \"{$item->name}\" berhasil ditambahkan dengan SKU: {$item->sku}");
@@ -210,6 +218,14 @@ class ItemController extends Controller
         }
 
         $item->update($dataToUpdate);
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Barang',
+            "Memperbarui informasi barang: {$item->name} (SKU: {$item->sku})",
+            ['item_id' => $item->id, 'sku' => $item->sku, 'name' => $item->name],
+            $request
+        );
 
         if ($request->filled('total_qty')) {
             $newTotal = (int) $request->total_qty;

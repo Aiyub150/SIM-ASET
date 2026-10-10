@@ -28,6 +28,14 @@ class CategoryController extends Controller
             'is_active' => true,
         ]);
 
+        \App\Services\ActivityLogger::log(
+            'CREATE',
+            'Kategori',
+            "Menambahkan kategori baru: {$request->name}",
+            ['name' => $request->name, 'sku_prefix' => $request->sku_prefix],
+            $request
+        );
+
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
@@ -45,6 +53,14 @@ class CategoryController extends Controller
             'description' => $request->description,
         ]);
 
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Kategori',
+            "Memperbarui kategori: {$category->name}",
+            ['category_id' => $category->id, 'name' => $request->name],
+            $request
+        );
+
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
@@ -53,6 +69,15 @@ class CategoryController extends Controller
         $category->update(['is_active' => !$category->is_active]);
         
         $status = $category->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Kategori',
+            "Mengubah status kategori {$category->name} menjadi {$status}",
+            ['category_id' => $category->id, 'is_active' => $category->is_active],
+            request()
+        );
+
         return redirect()->route('categories.index')->with('success', "Kategori berhasil {$status}.");
     }
 }
