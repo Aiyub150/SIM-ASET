@@ -454,6 +454,22 @@
                 </svg>
                 Kelola Pengguna
             </a>
+            <a href="{{ route('superadmin.log-server') }}"
+               class="sidebar-link {{ request()->routeIs('superadmin.log-server*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 14.5 0h-13zM1 1.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-13z"/>
+                    <path d="M4.854 4.146a.5.5 0 0 1 0 .708L3.707 6l1.147 1.146a.5.5 0 0 1-.708.708l-1.5-1.5a.5.5 0 0 1 0-.708l1.5-1.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L12.293 6l-1.147 1.146a.5.5 0 0 0 .708.708l1.5-1.5a.5.5 0 0 0 0-.708l-1.5-1.5a.5.5 0 0 0-.708 0zM7 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                Log Server
+            </a>
+            <a href="{{ route('superadmin.log-history') }}"
+               class="sidebar-link {{ request()->routeIs('superadmin.log-history*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.376.862c.324.23.633.486.924.764l.698-.716a8.01 8.01 0 0 0-1.07-1.025l-.552.977zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                </svg>
+                Log History
+            </a>
             @endrole
 
             <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>

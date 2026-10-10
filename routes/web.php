@@ -96,6 +96,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{user}',      [UserController::class, 'update'])->name('update');
     });
 
+    // ── MODUL KHUSUS SUPERADMIN: LOG SERVER & LOG HISTORY ────────────
+    Route::middleware(['role:Super Admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+        Route::get('/log-server',           [\App\Http\Controllers\SuperAdminController::class, 'logServer'])->name('log-server');
+        Route::post('/log-server/clear',    [\App\Http\Controllers\SuperAdminController::class, 'clearLogServer'])->name('log-server.clear');
+        Route::get('/log-server/download', [\App\Http\Controllers\SuperAdminController::class, 'downloadLogServer'])->name('log-server.download');
+        Route::get('/log-history',          [\App\Http\Controllers\SuperAdminController::class, 'logHistory'])->name('log-history');
+    });
+
     // ── MODUL KATEGORI (Super Admin & Admin) ────────────────────────────────
     Route::middleware(['role:Super Admin|Admin'])->prefix('categories')->name('categories.')->group(function () {
         Route::get('/',            [CategoryController::class, 'index'])->name('index');
