@@ -35,9 +35,16 @@
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-2">
-                                <div style="width:32px; height:32px; border-radius:50%; background:#2563eb; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.75rem; font-weight:700; flex-shrink:0;">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                </div>
+                                @if($user->avatar)
+                                    <img src="{{ asset('storage/' . $user->avatar) }}"
+                                         alt="{{ $user->name }}"
+                                         class="rounded-circle shadow-sm"
+                                         style="width:36px; height:36px; object-fit:cover; flex-shrink:0; border:1px solid #e2e8f0;">
+                                @else
+                                    <div style="width:36px; height:36px; border-radius:50%; background:#2563eb; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.8rem; font-weight:700; flex-shrink:0;">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                @endif
                                 <span style="font-weight:500;">{{ $user->name }}</span>
                                 @if($user->id === auth()->id())
                                     <span class="badge" style="background:#eff6ff; color:#2563eb; font-size:.7rem;">Anda</span>
