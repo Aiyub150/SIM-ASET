@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\XssSanitizer::class,
         ]);
 
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
