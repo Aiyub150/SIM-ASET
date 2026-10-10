@@ -80,14 +80,18 @@
     .ui-element-card {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 1.25rem;
         height: 100%;
-        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
     .ui-element-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border-color: #cbd5e1;
     }
     .step-badge {
         width: 28px;
@@ -100,7 +104,7 @@
         justify-content: center;
         font-weight: 700;
         font-size: 0.85rem;
-        margin-right: 0.5rem;
+        margin-right: 0.75rem;
         flex-shrink: 0;
     }
     .step-item {
@@ -113,6 +117,72 @@
         font-size: 0.78rem;
         padding: 0.35rem 0.75rem;
         border-radius: 6px;
+    }
+
+    /* ── FAQ ACCORDION ────────────────────────── */
+    .faq-accordion .accordion-item {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+        margin-bottom: 0.85rem;
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .faq-accordion .accordion-item:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    }
+    .faq-accordion .accordion-button {
+        font-size: 0.95rem;
+        padding: 1.1rem 1.25rem;
+        color: #1e293b;
+        background-color: #ffffff;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .faq-accordion .accordion-button:not(.collapsed) {
+        color: #1d4ed8;
+        background-color: #eff6ff;
+        border-bottom: 1px solid #dbeafe;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        font-weight: 600;
+    }
+    .faq-accordion .accordion-button:focus {
+        box-shadow: none !important;
+    }
+    .faq-accordion .accordion-collapse {
+        visibility: visible !important;
+    }
+    .faq-accordion .accordion-collapse.collapse.show {
+        visibility: visible !important;
+        display: block !important;
+    }
+    .faq-accordion .accordion-body {
+        padding: 1.25rem;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: #334155 !important;
+        background: #ffffff;
+        visibility: visible !important;
+    }
+
+    /* ── ROLE CARD ────────────────────────────── */
+    .role-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .role-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+    .role-card .card-header {
+        padding: 0.85rem 1.25rem;
+        border-bottom: none;
     }
 </style>
 
@@ -220,8 +290,8 @@
         </p>
 
         <div class="row g-3 mt-2">
-            <div class="col-md-6 col-lg-3">
-                <div class="ui-element-card">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
                     <div class="fw-bold text-dark mb-1">
                         <span class="text-primary me-1">&bull;</span> Navigasi Sidebar (Kiri)
                     </div>
@@ -230,8 +300,8 @@
                     </p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="ui-element-card">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
                     <div class="fw-bold text-dark mb-1">
                         <span class="text-success me-1">&bull;</span> Kartu Metrik (Angka Kunci)
                     </div>
@@ -240,8 +310,8 @@
                     </p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="ui-element-card">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
                     <div class="fw-bold text-dark mb-1">
                         <span class="text-warning me-1">&bull;</span> Label & Lencana Warna
                     </div>
@@ -252,8 +322,8 @@
                     </p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="ui-element-card">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
                     <div class="fw-bold text-dark mb-1">
                         <span class="text-info me-1">&bull;</span> Kotak Pencarian Terpadu
                     </div>
@@ -407,22 +477,28 @@
                 </div>
             </div>
 
-            <div class="col-lg-5 mt-4 mt-lg-0">
-                <div class="bg-light p-3 rounded border">
-                    <div class="fw-bold text-dark mb-2" style="font-size: 0.85rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#10b981" class="me-1" viewBox="0 0 16 16">
-                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                        </svg>
-                        Fitur Keamanan: Validasi Stok Otomatis
+            <div class="col-lg-5 mt-4 mt-lg-0 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between" style="border-left: 4px solid #10b981;">
+                    <div>
+                        <div class="fw-bold text-dark mb-2" style="font-size: 0.9rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#10b981" class="me-1" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                            Fitur Keamanan: Validasi Stok Otomatis
+                        </div>
+                        <p class="text-muted small mb-3" style="line-height: 1.7;">
+                            Sistem tidak akan mengizinkan peminjaman melebihi stok yang saat ini tersedia (<em>Available Qty</em>). Jika ada 5 unit fisik namun 3 sedang dipinjam instansi lain, sistem membatasi maksimal hanya 2 unit yang dapat dipinjam.
+                        </p>
                     </div>
-                    <p class="text-muted small mb-2" style="line-height: 1.6;">
-                        Sistem tidak akan mengizinkan peminjaman melebihi stok yang saat ini tersedia (<em>Available Qty</em>). Jika ada 5 unit fisik namun 3 sedang dipinjam instansi lain, sistem membatasi maksimal hanya 2 unit yang dapat dipinjam.
-                    </p>
                     <div class="border-top pt-2">
-                        <small class="text-muted d-block">Contoh Perhitungan:</small>
-                        <span class="badge bg-secondary">Total Fisik: 10</span> &minus; 
-                        <span class="badge bg-warning text-dark">Sedang Dipinjam: 4</span> &equals; 
-                        <span class="badge bg-success">Tersedia: 6 Unit</span>
+                        <small class="text-muted d-block mb-1">Contoh Perhitungan:</small>
+                        <div class="d-flex flex-wrap gap-1 align-items-center">
+                            <span class="badge bg-secondary">Total Fisik: 10</span>
+                            <span class="text-muted">&minus;</span>
+                            <span class="badge bg-warning text-dark">Dipinjam: 4</span>
+                            <span class="text-muted">&equals;</span>
+                            <span class="badge bg-success">Tersedia: 6 Unit</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -451,30 +527,36 @@
         </p>
 
         <div class="row g-3">
-            <div class="col-md-4">
-                <div class="ui-element-card">
-                    <h6 class="fw-bold text-success mb-2">1. Kembalikan Semua Sisa</h6>
-                    <p class="text-muted small mb-0">
-                        Jika seluruh barang telah kembali dalam kondisi utuh, klik tombol hijau <strong>"Kembalikan Semua Sisa"</strong>. Sistem akan mengisi seluruh kuantitas sisa hutang secara otomatis. Transaksi berubah status menjadi <span class="badge bg-success">Selesai</span>.
-                    </p>
+            <div class="col-md-4 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-success mb-2">1. Kembalikan Semua Sisa</h6>
+                        <p class="text-muted small mb-0" style="line-height: 1.7;">
+                            Jika seluruh barang telah kembali dalam kondisi utuh, klik tombol hijau <strong>"Kembalikan Semua Sisa"</strong>. Sistem akan mengisi seluruh kuantitas sisa hutang secara otomatis. Transaksi berubah status menjadi <span class="badge bg-success">Selesai</span>.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="ui-element-card">
-                    <h6 class="fw-bold text-primary mb-2">2. Pengembalian Bertahap (Parsial)</h6>
-                    <p class="text-muted small mb-0">
-                        Bila instansi baru memulangkan 2 dari 5 unit barang, cukup ketik angka 2 pada input jumlah. Sisa 3 unit akan tetap tercatat sebagai tanggungan dan status transaksi tetap <span class="badge" style="background:#fef3c7; color:#92400e;">Aktif</span> sampai semua lunas.
-                    </p>
+            <div class="col-md-4 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-primary mb-2">2. Pengembalian Bertahap (Parsial)</h6>
+                        <p class="text-muted small mb-0" style="line-height: 1.7;">
+                            Bila instansi baru memulangkan 2 dari 5 unit barang, cukup ketik angka 2 pada input jumlah. Sisa 3 unit akan tetap tercatat sebagai tanggungan dan status transaksi tetap <span class="badge" style="background:#fef3c7; color:#92400e;">Aktif</span> sampai semua lunas.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="ui-element-card">
-                    <h6 class="fw-bold text-dark mb-2">3. Verifikasi via Scan Barcode</h6>
-                    <p class="text-muted small mb-0">
-                        Saat barang masuk kembali ke pintu gudang, petugas dapat langsung mengarahkan scanner ke label barang. Sistem langsung mencocokkan item pada transaksi tersebut dan mengisi jumlah pengembalian secara presisi.
-                    </p>
+            <div class="col-md-4 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-2">3. Verifikasi via Scan Barcode</h6>
+                        <p class="text-muted small mb-0" style="line-height: 1.7;">
+                            Saat barang masuk kembali ke pintu gudang, petugas dapat langsung mengarahkan scanner ke label barang. Sistem langsung mencocokkan item pada transaksi tersebut dan mengisi jumlah pengembalian secara presisi.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -496,35 +578,37 @@
             </div>
         </div>
 
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h6 class="fw-bold text-dark mb-2">Penomoran SKU Otomatis Berbasis Kategori</h6>
-                <p class="text-muted small" style="line-height: 1.7;">
-                    Setiap barang yang didaftarkan akan secara otomatis mendapatkan nomor <strong>SKU (Stock Keeping Unit)</strong> berdasarkan awalan kategori. Contoh: kategori <em>Elektronik</em> (awalan <code>ELEC</code>) akan menghasilkan <code>ELEC-001</code>, <code>ELEC-002</code>, dan seterusnya secara berurutan dan terkunci.
-                </p>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-7 d-flex flex-column justify-content-between">
+                <div>
+                    <h6 class="fw-bold text-dark mb-2">Penomoran SKU Otomatis Berbasis Kategori</h6>
+                    <p class="text-muted small" style="line-height: 1.7;">
+                        Setiap barang yang didaftarkan akan secara otomatis mendapatkan nomor <strong>SKU (Stock Keeping Unit)</strong> berdasarkan awalan kategori. Contoh: kategori <em>Elektronik</em> (awalan <code>ELEC</code>) akan menghasilkan <code>ELEC-001</code>, <code>ELEC-002</code>, dan seterusnya secara berurutan dan terkunci.
+                    </p>
 
-                <h6 class="fw-bold text-dark mb-2">Pilihan Format Cetak Label</h6>
-                <p class="text-muted small mb-2">Pada menu <em>Master Barang</em>, Anda dapat mencetak stiker label aset dengan 3 pilihan format:</p>
-                <div class="list-group list-group-flush mb-3">
-                    <div class="list-group-item px-0 py-2 border-0">
-                        <span class="badge bg-primary me-2">Standar (Barcode + QR)</span>
-                        <small class="text-muted">Menampilkan barcode garis 1D di atas dan QR Code 2D di bawah, lengkap dengan SKU dan nama instansi.</small>
-                    </div>
-                    <div class="list-group-item px-0 py-2 border-0">
-                        <span class="badge bg-secondary me-2">Barcode 1D Saja</span>
-                        <small class="text-muted">Format garis lurus tradisional, cocok untuk dipindai menggunakan pemindai barcode pistol laser standar.</small>
-                    </div>
-                    <div class="list-group-item px-0 py-2 border-0">
-                        <span class="badge bg-info text-white me-2">QR Code 2D Saja</span>
-                        <small class="text-muted">Format kotak matriks 2D beresolusi tinggi, sangat responsif dipindai melalui kamera ponsel petugas.</small>
+                    <h6 class="fw-bold text-dark mb-2">Pilihan Format Cetak Label</h6>
+                    <p class="text-muted small mb-2">Pada menu <em>Master Barang</em>, Anda dapat mencetak stiker label aset dengan 3 pilihan format:</p>
+                    <div class="list-group list-group-flush mb-0">
+                        <div class="list-group-item px-0 py-2 border-0">
+                            <span class="badge bg-primary me-2">Barcode Kotak (QR Code 2D) — Standar Utama</span>
+                            <small class="text-muted">Format kotak matriks 2D beresolusi tinggi, bebas redundansi, dan sangat responsif dipindai melalui scanner USB maupun kamera HP.</small>
+                        </div>
+                        <div class="list-group-item px-0 py-2 border-0">
+                            <span class="badge bg-secondary me-2">Barcode 1D Saja</span>
+                            <small class="text-muted">Format garis lurus tradisional, cocok untuk dipindai menggunakan pemindai barcode laser konvensional.</small>
+                        </div>
+                        <div class="list-group-item px-0 py-2 border-0">
+                            <span class="badge bg-info text-white me-2">Garis 1D + Kotak QR 2D</span>
+                            <small class="text-muted">Format kombinasi barcode garis di atas dan QR Code di samping/bawah untuk fleksibilitas arsip ganda.</small>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-5 text-center">
-                <div class="p-3 bg-light rounded border">
-                    <div class="fw-bold text-dark mb-2" style="font-size: 0.85rem;">Contoh Tampilan Label SIM-ASET</div>
-                    <div class="p-3 bg-white border rounded d-inline-block shadow-sm" style="max-width: 240px; text-align: center;">
+            <div class="col-lg-5 text-center d-flex align-items-stretch">
+                <div class="p-4 bg-light rounded-3 border w-100 d-flex flex-column justify-content-center align-items-center shadow-sm">
+                    <div class="fw-bold text-dark mb-3" style="font-size: 0.88rem;">Contoh Tampilan Label SIM-ASET</div>
+                    <div class="p-3 bg-white border rounded-3 d-inline-block shadow-sm" style="max-width: 240px; text-align: center;">
                         <div class="fw-bold" style="font-size: 0.72rem; color: #1e3a5f;">PEMERINTAH DAERAH PROVINSI</div>
                         <div class="text-muted" style="font-size: 0.65rem; margin-bottom: 6px;">DINAS PENGELOLAAN ASET</div>
                         <div class="p-2 border rounded bg-light mb-2">
@@ -559,22 +643,30 @@
         </p>
 
         <div class="row g-3">
-            <div class="col-md-6">
-                <div class="p-3 bg-light rounded border h-100">
-                    <h6 class="fw-bold text-success mb-2">Penambahan Stok (Tipe: In)</h6>
-                    <p class="text-muted small mb-2">
-                        Digunakan saat ada pengadaan barang baru dari APBD, hibah instansi lain, atau penemuan barang inventaris yang belum tercatat.
-                    </p>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle">Efek: Total Fisik (+) &amp; Stok Tersedia (+)</span>
+            <div class="col-md-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-success mb-2">Penambahan Stok (Tipe: In)</h6>
+                        <p class="text-muted small mb-3" style="line-height: 1.7;">
+                            Digunakan saat ada pengadaan barang baru dari APBD, hibah instansi lain, atau penemuan barang inventaris yang belum tercatat.
+                        </p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Efek: Total Fisik (+) &amp; Stok Tersedia (+)</span>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="p-3 bg-light rounded border h-100">
-                    <h6 class="fw-bold text-danger mb-2">Pengurangan Stok (Tipe: Out / Broken / Lost)</h6>
-                    <p class="text-muted small mb-2">
-                        Digunakan saat barang dihapuskan dari buku aset, barang rusak berat/afkir yang tidak dapat dipakai lagi, atau hilang karena bencana/pencurian.
-                    </p>
-                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Efek: Total Fisik (&minus;) &amp; Stok Tersedia (&minus;)</span>
+            <div class="col-md-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-danger mb-2">Pengurangan Stok (Tipe: Out / Broken / Lost)</h6>
+                        <p class="text-muted small mb-3" style="line-height: 1.7;">
+                            Digunakan saat barang dihapuskan dari buku aset, barang rusak berat/afkir yang tidak dapat dipakai lagi, atau hilang karena bencana/pencurian.
+                        </p>
+                    </div>
+                    <div>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Efek: Total Fisik (&minus;) &amp; Stok Tersedia (&minus;)</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -601,29 +693,33 @@
         </div>
 
         <div class="row g-3">
-            <div class="col-lg-6">
-                <h6 class="fw-bold text-dark mb-2">Laporan Rekapitulasi Bulanan</h6>
-                <p class="text-muted small" style="line-height: 1.7;">
-                    Menu <strong>Laporan</strong> menyajikan rekapitulasi transaksi pada periode bulan dan tahun yang dipilih. Dilengkapi filter pemilih bulan kalender interaktif sehingga Anda dapat memeriksa data masa lalu ataupun proyeksi ke depan dengan satu sentuhan.
-                </p>
-                <ul class="text-muted small ps-3">
-                    <li>Kolom tabel menyajikan No, Tanggal, Kode Transaksi, Instansi Peminjam (lengkap dengan nama PIC), Nomor Telepon, Lokasi/Alamat, dan Status.</li>
-                    <li>Dapat diekspor langsung ke dokumen PDF berorientasi lanskap untuk arsip bulanan dinas.</li>
-                </ul>
+            <div class="col-lg-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <h6 class="fw-bold text-dark mb-2">Laporan Rekapitulasi Bulanan</h6>
+                    <p class="text-muted small" style="line-height: 1.7;">
+                        Menu <strong>Laporan</strong> menyajikan rekapitulasi transaksi pada periode bulan dan tahun yang dipilih. Dilengkapi filter pemilih bulan kalender interaktif sehingga Anda dapat memeriksa data masa lalu ataupun proyeksi ke depan dengan satu sentuhan.
+                    </p>
+                    <ul class="text-muted small ps-3 mb-0">
+                        <li>Kolom tabel menyajikan No, Tanggal, Kode Transaksi, Instansi Peminjam (lengkap dengan nama PIC), Nomor Telepon, Lokasi/Alamat, dan Status.</li>
+                        <li>Dapat diekspor langsung ke dokumen PDF berorientasi lanskap untuk arsip bulanan dinas.</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="col-lg-6">
-                <h6 class="fw-bold text-dark mb-2">Berita Acara Serah Terima (BAST) PDF</h6>
-                <p class="text-muted small" style="line-height: 1.7;">
-                    Dokumen BAST dicetak setiap kali ada serah terima peminjaman barang. Dokumen ini memuat:
-                </p>
-                <ul class="text-muted small ps-3">
-                    <li>Kop surat resmi kedinasan dan nomor surat BAST.</li>
-                    <li>Identitas <strong>PIHAK PERTAMA</strong> (Admin/Staff Logistik penyedia barang).</li>
-                    <li>Identitas <strong>PIHAK KEDUA</strong> (Nama Peminjam, Instansi, Nomor Telepon, dan Alamat).</li>
-                    <li>Tabel daftar barang yang diserahkan beserta batas waktu jatuh tempo pengembalian.</li>
-                    <li>Kolom tanda tangan bermaterai/kedinasan kedua belah pihak.</li>
-                </ul>
+            <div class="col-lg-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <h6 class="fw-bold text-dark mb-2">Berita Acara Serah Terima (BAST) PDF</h6>
+                    <p class="text-muted small" style="line-height: 1.7;">
+                        Dokumen BAST dicetak setiap kali ada serah terima peminjaman barang. Dokumen ini memuat:
+                    </p>
+                    <ul class="text-muted small ps-3 mb-0">
+                        <li>Kop surat resmi kedinasan dan nomor surat BAST.</li>
+                        <li>Identitas <strong>PIHAK PERTAMA</strong> (Admin/Staff Logistik penyedia barang).</li>
+                        <li>Identitas <strong>PIHAK KEDUA</strong> (Nama Peminjam, Instansi, Nomor Telepon, dan Alamat).</li>
+                        <li>Tabel daftar barang yang diserahkan beserta batas waktu jatuh tempo pengembalian.</li>
+                        <li>Kolom tanda tangan bermaterai/kedinasan kedua belah pihak.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -646,22 +742,26 @@
         </div>
 
         <div class="row g-3">
-            <div class="col-md-6">
-                <div class="p-3 bg-light rounded border h-100">
-                    <h6 class="fw-bold text-dark mb-2">Menggunakan Scanner USB / Bluetooth</h6>
-                    <p class="text-muted small mb-0" style="line-height: 1.6;">
-                        Alat scanner barcode fisik (bentuk pistol genggam) bekerja seperti keyboard komputer. Cukup colokkan kabel USB ke komputer atau hubungkan bluetooth. Letakkan kursor pada kolom input scan lalu tembakkan laser ke label. Barcode akan langsung terinput dan diproses seketika.
-                    </p>
+            <div class="col-md-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-2">Menggunakan Scanner USB / Bluetooth</h6>
+                        <p class="text-muted small mb-0" style="line-height: 1.7;">
+                            Alat scanner barcode fisik (bentuk pistol genggam) bekerja seperti keyboard komputer. Cukup colokkan kabel USB ke komputer atau hubungkan bluetooth. Letakkan kursor pada kolom input scan lalu tembakkan laser ke label. Barcode akan langsung terinput dan diproses seketika.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="p-3 bg-light rounded border h-100">
-                    <h6 class="fw-bold text-dark mb-2">Menggunakan Kamera Laptop / Smartphone</h6>
-                    <p class="text-muted small mb-2" style="line-height: 1.6;">
-                        Pada kotak pemilih perangkat, pilih <strong>"Kamera Belakang (Mobile)"</strong> atau <strong>"Kamera Depan / Webcam"</strong>. Kotak preview video kamera akan muncul di layar.
-                    </p>
-                    <div class="small text-muted bg-white p-2 rounded border">
+            <div class="col-md-6 d-flex align-items-stretch">
+                <div class="ui-element-card w-100 justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-2">Menggunakan Kamera Laptop / Smartphone</h6>
+                        <p class="text-muted small mb-3" style="line-height: 1.7;">
+                            Pada kotak pemilih perangkat, pilih <strong>"Kamera Belakang (Mobile)"</strong> atau <strong>"Kamera Depan / Webcam"</strong>. Kotak preview video kamera akan muncul di layar.
+                        </p>
+                    </div>
+                    <div class="small text-muted bg-white p-2 rounded-2 border">
                         <strong>Catatan Izin Browser:</strong> Pastikan Anda menekan tombol <em>"Izinkan / Allow"</em> saat browser meminta izin kamera, serta gunakan koneksi aman (HTTPS atau localhost).
                     </div>
                 </div>
@@ -686,54 +786,54 @@
             </div>
         </div>
 
-        <div class="accordion" id="faqAccordion">
-            <div class="accordion-item border mb-2 rounded">
+        <div class="accordion faq-accordion" id="faqAccordion">
+            <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
                         Mengapa akun Staff Logistik tidak bisa melihat data peminjaman milik staf lain?
                     </button>
                 </h2>
                 <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body text-muted small" style="line-height: 1.6;">
+                    <div class="accordion-body">
                         Hal ini merupakan penerapan prinsip akuntabilitas dan pemisahan wewenang. Setiap staf bertanggung jawab penuh atas barang yang diserahterimakan di mejanya. Hanya Administrator dan Super Admin yang memiliki kewenangan mengaudit seluruh transaksi secara komprehensif.
                     </div>
                 </div>
             </div>
 
-            <div class="accordion-item border mb-2 rounded">
+            <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
                         Bagaimana jika barang yang dikembalikan peminjam dalam keadaan rusak atau hilang?
                     </button>
                 </h2>
                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body text-muted small" style="line-height: 1.6;">
+                    <div class="accordion-body">
                         Selesaikan transaksi pengembalian di menu Peminjaman terlebih dahulu agar status transaksi tuntas, kemudian Administrator wajib mencatat pengurangan stok di menu <strong>Kartu Stok</strong> dengan memilih tipe <em>"Rusak (Broken)"</em> atau <em>"Hilang (Lost)"</em> disertai nomor surat Berita Acara Kerusakan/Kehilangan sebagai dasar pembukuan aset daerah.
                     </div>
                 </div>
             </div>
 
-            <div class="accordion-item border mb-2 rounded">
+            <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
                         Apakah barcode label dapat dicetak menggunakan printer biasa (kertas HVS / stiker)?
                     </button>
                 </h2>
                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body text-muted small" style="line-height: 1.6;">
+                    <div class="accordion-body">
                         Ya. Output cetak label SIM-ASET berformat PDF dengan standar vektor SVG sehingga sangat tajam dan tidak pecah. Anda dapat mencetaknya menggunakan printer kantor biasa di kertas stiker label HVS, stiker thermal, maupun kertas glossy khusus inventaris barang.
                     </div>
                 </div>
             </div>
 
-            <div class="accordion-item border rounded">
+            <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
                         Siapa yang dapat saya hubungi bila terjadi kendala teknis atau lupa password?
                     </button>
                 </h2>
                 <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body text-muted small" style="line-height: 1.6;">
+                    <div class="accordion-body">
                         Silakan hubungi <strong>Super Admin</strong> dinas Anda. Super Admin memiliki menu <em>Kelola Pengguna</em> untuk mereset kata sandi Anda dan memverifikasi profil akun.
                     </div>
                 </div>
