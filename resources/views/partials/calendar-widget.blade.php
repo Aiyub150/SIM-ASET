@@ -94,7 +94,7 @@
                 $holidayData = $isHoliday ? $holidayMap[$currentDateStr] : null;
                 
                 $isSunday = $calDate->copy()->setDay($day)->dayOfWeekIso === 7;
-                $isToday = $currentDateStr === now()->format('Y-m-d');
+                $isToday = $currentDateStr === \App\Services\TimezoneHelper::now()->format('Y-m-d');
                 
                 $classes = ['cal-cell'];
                 if ($isToday) $classes[] = 'today';

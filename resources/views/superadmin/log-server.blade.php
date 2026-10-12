@@ -150,7 +150,7 @@
                         @endphp
                         <tr>
                             <td class="ps-3 font-monospace text-muted" style="font-size: 0.78rem;">
-                                {{ $log['timestamp'] }}
+                                {{ \App\Services\TimezoneHelper::format($log['timestamp']) }}
                             </td>
                             <td>
                                 <span class="badge {{ $badgeClass }} px-2 py-1 rounded" style="font-size: 0.7rem; font-weight: 600;">

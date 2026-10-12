@@ -65,7 +65,7 @@
             @foreach($movements as $index => $mov)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $mov->created_at->format('d/m/Y H:i') }}</td>
+                    <td>{{ $mov->created_at->formatUserTz('d/m/Y H:i') }}</td>
                     <td>{{ $mov->reference_code }}</td>
                     <td>{{ $mov->item->name }}</td>
                     <td class="text-center">{{ strtoupper($mov->type) }}</td>

@@ -57,8 +57,8 @@
                     @php $isIn = $movement->type === 'in'; @endphp
                     <tr>
                         <td class="ps-4" style="font-size:.8rem; color:#64748b;">
-                            {{ $movement->created_at->format('d/m/Y') }}<br>
-                            <span style="font-size:.73rem;">{{ $movement->created_at->format('H:i') }}</span>
+                            {{ $movement->created_at->userTzDate('d/m/Y') }}<br>
+                            <span style="font-size:.73rem;">{{ $movement->created_at->userTzTime('H:i') }}</span>
                         </td>
                         <td>
                             <span style="font-family:monospace; font-size:.82rem; font-weight:600;">

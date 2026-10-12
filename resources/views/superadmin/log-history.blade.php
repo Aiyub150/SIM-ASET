@@ -107,8 +107,8 @@
                         @endphp
                         <tr>
                             <td class="ps-4 font-monospace text-muted" style="font-size: 0.78rem;">
-                                <div>{{ $log->created_at->format('d/m/Y') }}</div>
-                                <div class="small fw-semibold text-dark">{{ $log->created_at->format('H:i:s') }}</div>
+                                <div>{{ $log->created_at->userTzDate('d/m/Y') }}</div>
+                                <div class="small fw-semibold text-dark">{{ $log->created_at->userTzTime('H:i:s') }}</div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">

@@ -142,7 +142,7 @@
                 <tbody>
                     @forelse($movements as $mov)
                         <tr>
-                            <td class="ps-4" style="font-size:.85rem;">{{ $mov->created_at->format('d/m/Y') }}</td>
+                            <td class="ps-4" style="font-size:.85rem;">{{ $mov->created_at->userTzDate('d/m/Y') }}</td>
                             <td>
                                 <span style="font-family:monospace; font-size:.82rem; font-weight:600;">
                                     {{ $mov->reference_code }}

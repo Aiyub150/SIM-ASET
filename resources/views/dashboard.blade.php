@@ -277,7 +277,7 @@
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div class="text-truncate pe-2">
                                         <strong>{{ $movement->item->name }}</strong><br>
-                                        <small class="text-muted">{{ $movement->created_at->format('d M H:i') }} oleh {{ $movement->user->name }}</small>
+                                        <small class="text-muted">{{ $movement->created_at->formatUserTz('d M H:i') }} oleh {{ $movement->user->name }}</small>
                                     </div>
                                     <span class="badge {{ $movement->type === 'in' ? 'bg-success' : 'bg-danger' }}">
                                         {{ $movement->type === 'in' ? '+' : '-' }}{{ $movement->quantity }}
