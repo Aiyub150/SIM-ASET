@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\XssSanitizer::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ]);
 
         $middleware->trustProxies(at: '*');
