@@ -93,6 +93,28 @@ class SuperAdminLogTest extends TestCase
         $this->assertEquals('198.51.100.42', $resolvedIp);
     }
 
+    public function test_superadmin_log_history_renders_bootstrap_five_pagination(): void
+    {
+        for ($i = 1; $i <= 25; $i++) {
+            ActivityLog::create([
+                'user_id'     => $this->superAdmin->id,
+                'user_name'   => $this->superAdmin->name,
+                'user_role'   => 'Super Admin',
+                'action'      => 'LOGIN',
+                'module'      => 'Autentikasi',
+                'description' => "Aktivitas uji #{$i}",
+                'ip_address'  => '127.0.0.1',
+            ]);
+        }
+
+        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.log-history'));
+        $response->assertStatus(200);
+        $response->assertSee('pagination');
+        $response->assertSee('page-item');
+        $response->assertSee('page-link');
+        $response->assertDontSee('w-5 h-5'); // Tailwind unconstrained svg classes must not be present
+    }
+
     public function test_superadmin_can_clear_log_server(): void
     {
         $response = $this->actingAs($this->superAdmin)->post(route('superadmin.log-server.clear'));

@@ -97,4 +97,37 @@ class ItemSkuLookupTest extends TestCase
         $response->assertOk();
         $response->assertHeader('content-type', 'application/pdf');
     }
+
+    public function test_items_index_renders_direct_square_label_action_buttons_without_format_dropdown(): void
+    {
+        $roleAdmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin']);
+        $admin = User::factory()->create();
+        $admin->assignRole($roleAdmin);
+
+        $category = Category::create([
+            'name' => 'Elektronik',
+            'sku_prefix' => 'ELEC',
+        ]);
+        $location = Location::create([
+            'name' => 'Gudang Utama',
+            'address' => 'Jl. Test',
+        ]);
+
+        $item = Item::create([
+            'category_id' => $category->id,
+            'location_id' => $location->id,
+            'name' => 'Scanner',
+            'sku' => 'ELEC-004',
+            'total_qty' => 3,
+            'available_qty' => 3,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('items.index'));
+        $response->assertOk();
+        $response->assertSee('Cetak Label Terpilih');
+        $response->assertSee('Cetak Label');
+        $response->assertDontSee('label-print-type');
+        $response->assertDontSee('Barcode Garis (1D Saja)');
+        $response->assertDontSee('Kombinasi (Garis + Kotak)');
+    }
 }

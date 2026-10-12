@@ -320,6 +320,14 @@
             background: var(--primary);
             border-color: var(--primary);
         }
+        .pagination svg {
+            width: 1rem !important;
+            height: 1rem !important;
+            max-width: 1rem !important;
+            max-height: 1rem !important;
+            display: inline-block;
+            vertical-align: middle;
+        }
 
         /* ── MOBILE TOGGLE ───────────────────────── */
         .sidebar-toggle {
@@ -454,6 +462,10 @@
                 </svg>
                 Kelola Pengguna
             </a>
+            @endrole
+
+            <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
+            @role('Super Admin')
             <a href="{{ route('superadmin.log-server') }}"
                class="sidebar-link {{ request()->routeIs('superadmin.log-server*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -471,8 +483,6 @@
                 Log History
             </a>
             @endrole
-
-            <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
             <a href="{{ route('profile.edit') }}"
                class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">

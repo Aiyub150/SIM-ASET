@@ -46,13 +46,13 @@
             <input type="checkbox" id="select-all-items" class="form-check-input">
             <span>Pilih semua</span>
         </label>
-        <div class="d-flex align-items-center gap-2">
-            <select id="label-print-type" class="form-select form-select-sm" style="width: 230px;">
-                <option value="2d" selected>Barcode Kotak (QR Code) — Rekomendasi</option>
-                <option value="both">Kombinasi (Garis + Kotak)</option>
-                <option value="1d">Barcode Garis (1D Saja)</option>
-            </select>
-            <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary">Cetak Label Terpilih</button>
+        <div>
+            <button type="button" id="bulk-label-button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2 2h2v2H2z"/><path d="M6 0v6H0V0zM1 1v4h4V1zm4 7H0v6h6V8zm-5 1h4v4H1zm11-9h-2v2h2zm4 0h-6v6h6zm-5 1h4v4h-4zm-1 9h-2v2h2zm4 0h-2v2h2zm-2 2h-2v2h2zm4 0h-2v2h2zm-2 2h-2v2h2zm-4-4h-2v2h2zm2-2h-2v2h2zm-2-2h-2v2h2z"/>
+                </svg>
+                Cetak Label Terpilih
+            </button>
         </div>
     </div>
     @endhasanyrole
@@ -121,28 +121,12 @@
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-2">
                                 <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Cetak Label
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
-                                        <li>
-                                            <a class="dropdown-item py-1 fw-medium" href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" target="_blank">
-                                                Barcode Kotak (QR Code)
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-1 text-muted" href="{{ route('items.label', ['item' => $item->id, 'type' => 'both']) }}" target="_blank">
-                                                Kombinasi (Garis + Kotak)
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-1 text-muted" href="{{ route('items.label', ['item' => $item->id, 'type' => '1d']) }}" target="_blank">
-                                                Barcode Garis (1D Saja)
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <a href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" 
+                                   target="_blank" 
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Cetak Label Barcode Kotak">
+                                    Cetak Label
+                                </a>
                             </div>
                         </td>
                         @endhasanyrole
@@ -204,9 +188,8 @@
                 return;
             }
 
-            const type = document.getElementById('label-print-type')?.value || '2d';
             const url = new URL('{{ route('items.labels') }}', window.location.origin);
-            url.searchParams.set('type', type);
+            url.searchParams.set('type', '2d');
             selected.forEach(id => url.searchParams.append('items[]', id));
             window.open(url.toString(), '_blank');
         });
