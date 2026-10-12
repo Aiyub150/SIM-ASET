@@ -12,18 +12,38 @@ class TimezoneHelper
     public const DEFAULT_TIMEZONE = 'Asia/Jakarta';
 
     /**
+     * Normalize friendly or legacy Indonesian timezone aliases to official IANA identifiers.
+     */
+    public static function normalizeTimezone(?string $timezone): ?string
+    {
+        if (empty($timezone)) {
+            return null;
+        }
+
+        $map = [
+            'Asia/Denpasar'      => 'Asia/Makassar',
+            'Asia/Ujung_Pandang' => 'Asia/Makassar',
+            'WIB'                => 'Asia/Jakarta',
+            'WITA'               => 'Asia/Makassar',
+            'WIT'                => 'Asia/Jayapura',
+        ];
+
+        return $map[$timezone] ?? $timezone;
+    }
+
+    /**
      * Get the resolved user timezone.
      */
     public static function getUserTimezone(): string
     {
         // 1. Check if set in config / request during middleware
-        $configured = Config::get('app.user_timezone');
+        $configured = self::normalizeTimezone(Config::get('app.user_timezone'));
         if (!empty($configured) && self::isValidTimezone($configured)) {
             return $configured;
         }
 
         // 2. Check cookie from request
-        $cookieTz = Request::cookie('user_timezone');
+        $cookieTz = self::normalizeTimezone(Request::cookie('user_timezone'));
         if (!empty($cookieTz) && self::isValidTimezone($cookieTz)) {
             return $cookieTz;
         }
@@ -37,7 +57,8 @@ class TimezoneHelper
      */
     public static function isValidTimezone(string $timezone): bool
     {
-        return in_array($timezone, timezone_identifiers_list(), true);
+        $normalized = self::normalizeTimezone($timezone);
+        return in_array($normalized, timezone_identifiers_list(), true);
     }
 
     /**
@@ -45,7 +66,7 @@ class TimezoneHelper
      */
     public static function getTimezoneLabel(?string $timezone = null): string
     {
-        $tz = $timezone ?: self::getUserTimezone();
+        $tz = self::normalizeTimezone($timezone) ?: self::getUserTimezone();
 
         try {
             $now = Carbon::now($tz);
@@ -71,7 +92,7 @@ class TimezoneHelper
             return null;
         }
 
-        $targetTz = $timezone ?: self::getUserTimezone();
+        $targetTz = self::normalizeTimezone($timezone) ?: self::getUserTimezone();
 
         if ($dateTime instanceof Carbon) {
             return $dateTime->copy()->setTimezone($targetTz);
@@ -89,7 +110,7 @@ class TimezoneHelper
      */
     public static function now(?string $timezone = null): Carbon
     {
-        return Carbon::now($timezone ?: self::getUserTimezone());
+        return Carbon::now(self::normalizeTimezone($timezone) ?: self::getUserTimezone());
     }
 
     /**

@@ -19,7 +19,7 @@ class SetUserTimezoneMiddleware
             ?: $request->cookie('user_timezone');
 
         if ($timezone && TimezoneHelper::isValidTimezone($timezone)) {
-            Config::set('app.user_timezone', $timezone);
+            Config::set('app.user_timezone', TimezoneHelper::normalizeTimezone($timezone));
         } else {
             Config::set('app.user_timezone', TimezoneHelper::DEFAULT_TIMEZONE);
         }

@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
+        $middleware->encryptCookies(except: [
+            'user_timezone',
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\XssSanitizer::class,
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
