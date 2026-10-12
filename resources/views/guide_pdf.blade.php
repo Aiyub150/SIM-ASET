@@ -377,7 +377,7 @@
                 <tr>
                     <td style="font-weight: bold; color:#1e3a5f;">Versi Panduan</td>
                     <td>:</td>
-                    <td>Versi 1.0.0 (Panduan Pengguna)</td>
+                    <td>Versi 1.1.0 (Panduan Pengguna)</td>
                 </tr>
                 <tr>
                     <td style="font-weight: bold; color:#1e3a5f;">Tujuan Dokumen</td>

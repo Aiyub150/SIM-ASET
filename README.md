@@ -1,6 +1,12 @@
 # SIM-ASET: Technical Documentation
 
-SIM-ASET adalah sistem informasi manajemen inventaris aset daerah yang dikembangkan menggunakan kerangka kerja Laravel. Repositori ini berisi dokumentasi arsitektur, struktur basis data, spesifikasi sistem, serta panduan teknis operasional.
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/Aiyub150/SIM-ASET)
+[![Framework](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4.svg)](https://php.net)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Security](https://img.shields.io/badge/security-OWASP%20Hardened-success.svg)]()
+
+SIM-ASET adalah sistem informasi manajemen inventaris aset daerah yang dikembangkan menggunakan kerangka kerja Laravel. Repositori ini berisi dokumentasi arsitektur, struktur basis data, spesifikasi sistem, serta panduan teknis operasional (rilis stabil mutakhir: **Versi 1.1.0**).
 
 ## Spesifikasi Teknis (Tech Stack)
 
@@ -98,10 +104,47 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
 ## Keamanan Data (Security & Boundaries)
 
 1.  **Data Isolation Constraint (Tenant-like Boundaries)**:
-    Pengguna yang diikat pada peran `Staff Logistik` dipaksa patuh pada klausa kueri Eloquent global berbasis *identifier* (e.g., `where('user_id', auth()->id())`) pada lapis *Controller*. Skema arsitektur ini memisahkan blok data yang memungkinkan Staf A dicegah secaran *backend* untuk melakukan *read, update,* maupun injeksi memanipulasi *ID Payload* peminjaman milik Staf B di *route endpoint* yang terekspos manapun.
+    Pengguna yang diikat pada peran `Staff Logistik` dipaksa patuh pada klausa kueri Eloquent global berbasis *identifier* (e.g., `where('user_id', auth()->id())`) pada lapis *Controller*. Skema arsitektur ini memisahkan blok data yang memungkinkan Staf A dicegah secara *backend* untuk melakukan *read, update,* maupun injeksi memanipulasi *ID Payload* peminjaman milik Staf B di *route endpoint* yang terekspos manapun.
 2.  **Cross-Site Scripting (XSS) Mitigation**:
     *   Render DOM Sinkronus: *Output buffer* melalui mesin Blade ditangani oleh sintaks eksklusif `{{ }}` yang secara internal mengeksekusi instruksi `htmlspecialchars` bawaan PHP.
     *   Render DOM Asinkronus (AJAX): Respon tipe `application/json` yang dikonsumsi oleh blok perulangan JavaScript disanitasi menggunakan fungsi implementasi *context-aware escaping* yang merubah kode injeksi skrip (`<`, `>`, `&`, `"`, `'`) menjadi format HTML *entities* yang aman (*harmless*) sebelum disisipkan melalui *property* `innerHTML`.
+    *   Middleware Sanitasi `XssSanitizer`: Memangkas script berbahaya dan entity encoding berbahaya pada seluruh request mutasi.
+3.  **OWASP Security Headers**:
+    Mengimplementasikan `SecurityHeadersMiddleware` yang menyuntikkan standar proteksi web:
+    *   `X-Frame-Options: SAMEORIGIN` (mitigasi Clickjacking)
+    *   `X-Content-Type-Options: nosniff` (mitigasi MIME confusion)
+    *   `Referrer-Policy: strict-origin-when-cross-origin`
+    *   `Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=()`
+    *   `Strict-Transport-Security (HSTS)` saat HTTPS aktif
+    *   `Content-Security-Policy (CSP)` membatasi script dan resource hanya ke internal dan CDN terdaftar
+    *   Penyembunyian header identifikasi server `X-Powered-By`.
+4.  **Brute-Force & Rate Limiting**:
+    Pembatasan ketat percobaan autentikasi via middleware `throttle:5,1` pada rute `POST /login`.
+5.  **Audit Trail & Trusted Proxies**:
+    *   Konfigurasi `trustProxies` resmi di `bootstrap/app.php` untuk mencegah spoofing header `X-Forwarded-For`.
+    *   `ActivityLogger` mencatat IP asli pengguna secara akurat ke tabel `activity_logs`.
+
+---
+
+## Catatan Rilis & Pembaruan (Changelog)
+
+### [1.1.0] - 2026-10-12
+* **Fitur Baru (Super Admin)**:
+  * **Modul Log Server**: Pemantau riwayat log aplikasi Laravel secara live dengan filter tingkatan log (Info, Warning, Error), unduh berkas, dan utilitas pembersihan log berbasis dialog SweetAlert2. Dilengkapi resolver IP pengguna riil (bukan IP server proxy).
+  * **Modul Log History (Audit Trail)**: Pencatatan otomatis setiap aktivitas penting sistem (Login, Logout, Peminjaman, Mutasi Stok, Barang, Kategori, User) dengan inspeksi detail payload JSON.
+* **Peningkatan Keamanan (OWASP Compliance)**:
+  * Implementasi `SecurityHeadersMiddleware` (CSP, HSTS, X-Frame-Options, nosniff, dll.).
+  * Proteksi brute-force login dengan *rate limiting* `throttle:5,1`.
+  * Konfigurasi *trusted proxies* untuk integritas evaluasi IP pengguna.
+  * Patch keamanan dependensi kritis (`shell-quote` dan `league/commonmark`).
+  * Automated regression test suite untuk seluruh matriks otorisasi RBAC (36 endpoint).
+* **Peningkatan Antarmuka & UX**:
+  * Tampilan thumbnail foto profil/avatar pengguna (36px) pada tabel manajemen pengguna.
+  * Standarisasi cetak label inventaris berbasis 2D QR Code.
+  * Perbaikan interaktivitas accordion FAQ dan keseragaman kartu flexbox pada halaman Buku Panduan (`/guide`) serta template PDF resmi.
+
+### [1.0.0] - 2026-09-01
+* Rilis perdana sistem SIM-ASET dengan fitur inti: Dashboard ringkasan aset, Master Barang & SKU otomatis, Peminjam & Peta Interaktif Leaflet, Transaksi Peminjaman multi-barang, Kartu Stok / Ledger Mutasi, Laporan Bulanan & Ekspor PDF, serta Manajemen Peran (Super Admin, Admin, Staff Logistik).
 
 ---
 
