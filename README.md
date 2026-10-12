@@ -134,10 +134,12 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
   * **Modul Log History (Audit Trail)**: Pencatatan otomatis setiap aktivitas penting sistem (Login, Logout, Peminjaman, Mutasi Stok, Barang, Kategori, User) dengan inspeksi detail payload JSON.
 * **Peningkatan Keamanan (OWASP Compliance)**:
   * Implementasi `SecurityHeadersMiddleware` (CSP, HSTS, X-Frame-Options, nosniff, dll.).
-  * Proteksi brute-force login dengan *rate limiting* `throttle:5,1`.
+  * Mitigasi BFCache & History Leakage (CWE-525) dengan *Strict Anti-Cache Headers* (`no-store, no-cache, must-revalidate`) dan `Clear-Site-Data: "cache", "storage"` saat logout.
+  * Invalidation client-side via listener `pageshow` di master layout yang memaksa reload/redirect ke `/login` jika tombol back/undo ditekan pasca logout.
+  * Proteksi DoS & Brute-Force melalui *Rate Limiting* menyeluruh pada Login, Lupa Password, Ekspor PDF Laporan, Cetak Label Barcode, Operasi Log Server, dan Mutasi Transaksi Operasional.
   * Konfigurasi *trusted proxies* untuk integritas evaluasi IP pengguna.
   * Patch keamanan dependensi kritis (`shell-quote` dan `league/commonmark`).
-  * Automated regression test suite untuk seluruh matriks otorisasi RBAC (36 endpoint).
+  * Automated regression test suite untuk seluruh matriks otorisasi RBAC (36 endpoint) dan Rate Limiting / Anti-Cache (61 feature tests).
 * **Peningkatan Antarmuka & UX**:
   * Tampilan thumbnail foto profil/avatar pengguna (36px) pada tabel manajemen pengguna.
   * Standarisasi cetak label inventaris berbasis 2D QR Code.

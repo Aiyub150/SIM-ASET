@@ -38,7 +38,7 @@
                         </li>
                         <li class="mb-2 d-flex align-items-start gap-2">
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle mt-1">Security</span>
-                            <span><strong>Hardening Keamanan OWASP:</strong> Penerapan Security Headers (CSP, HSTS, X-Frame-Options, nosniff), rate limiting login (<code>throttle:5,1</code>), mitigasi IP spoofing via trusted proxies, dan sanitasi XSS.</span>
+                            <span><strong>Hardening Keamanan OWASP & Anti-Cache:</strong> Penerapan Security Headers (CSP, HSTS, X-Frame-Options, nosniff), perusakan sesi & mitigasi BFCache (CWE-525) via header <code>Clear-Site-Data</code> dan <code>no-store</code>, proteksi DoS via Rate Limiting pada Login, Lupa Password, Ekspor PDF Laporan, Cetak Label Barcode, dan Operasi Log Server.</span>
                         </li>
                         <li class="mb-2 d-flex align-items-start gap-2">
                             <span class="badge bg-success-subtle text-success border border-success-subtle mt-1">UI/UX</span>
