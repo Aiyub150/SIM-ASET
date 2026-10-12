@@ -60,6 +60,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')
+            ->withHeaders([
+                'Clear-Site-Data' => '"cache", "storage"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate, max-age=0, private',
+                'Pragma' => 'no-cache',
+                'Expires' => 'Fri, 01 Jan 1990 00:00:00 GMT',
+            ]);
     }
 }

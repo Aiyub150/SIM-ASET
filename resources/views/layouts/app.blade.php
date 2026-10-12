@@ -709,6 +709,13 @@
                 }
             });
         });
+
+        // BFCache Protection: Prevent stale authenticated DOM restoration after logout
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation')[0]?.type === 'back_forward')) {
+                window.location.reload();
+            }
+        });
     </script>
 
     @stack('scripts')

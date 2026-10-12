@@ -54,6 +54,13 @@ class SecurityHeadersMiddleware
 
         $response->headers->set('Content-Security-Policy', $csp);
 
+        // 8. Anti-Cache Headers for Authenticated / Private Requests (Prevent BFCache & History Data Leakage)
+        if ($request->user() || $request->is('dashboard*', 'items*', 'loans*', 'borrowers*', 'stocks*', 'reports*', 'users*', 'superadmin*', 'settings*', 'profile*')) {
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+        }
+
         // Remove server exposure headers
         header_remove('X-Powered-By');
         $response->headers->remove('X-Powered-By');
