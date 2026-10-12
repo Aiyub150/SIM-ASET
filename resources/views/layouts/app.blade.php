@@ -11,6 +11,23 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script>
+        (function() {
+            try {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if (tz) {
+                    const cookieMatch = document.cookie.match(/(^|;)\s*user_timezone\s*=\s*([^;]+)/);
+                    const currentTz = cookieMatch ? decodeURIComponent(cookieMatch[2]) : null;
+                    if (currentTz !== tz) {
+                        document.cookie = "user_timezone=" + encodeURIComponent(tz) + "; path=/; max-age=31536000; SameSite=Lax";
+                        if (!currentTz) {
+                            window.location.reload();
+                        }
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         :root {
             --sidebar-width: 250px;
@@ -553,7 +570,10 @@
                     </svg>
                 </button>
                 @endhasanyrole
-                <span class="text-muted fw-medium" style="font-size:.85rem;">{{ now()->translatedFormat('d F Y') }}</span>
+                <span class="text-muted fw-medium" style="font-size:.85rem;">{{ \App\Services\TimezoneHelper::formatTranslated(now(), 'd F Y') }}</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1" style="font-size: 0.72rem;" title="Zona Waktu Perangkat Anda">
+                    {{ \App\Services\TimezoneHelper::getTimezoneLabel() }}
+                </span>
             </div>
         </div>
 
