@@ -50,7 +50,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // Do not clear rate limiter on successful login to prevent reset attempts
     }
 
     /**

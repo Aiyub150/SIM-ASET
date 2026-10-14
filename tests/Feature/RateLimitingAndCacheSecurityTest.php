@@ -87,4 +87,26 @@ class RateLimitingAndCacheSecurityTest extends TestCase
         $response = $this->actingAs($admin)->get('/reports/export-pdf');
         $response->assertStatus(429);
     }
+
+    public function test_global_per_ip_rate_limiter_enforces_limit_and_cannot_be_bypassed(): void
+    {
+        $testIp = '198.51.100.42';
+
+        // Perform requests from the specific IP up to limit (120 per minute)
+        for ($i = 0; $i < 120; $i++) {
+            $response = $this->withServerVariables(['REMOTE_ADDR' => $testIp])
+                ->get('/login');
+            $this->assertEquals(200, $response->getStatusCode());
+        }
+
+        // 121st request from same IP must be rejected with 429
+        $blockedResponse = $this->withServerVariables(['REMOTE_ADDR' => $testIp])
+            ->get('/login');
+        $blockedResponse->assertStatus(429);
+
+        // A different IP is still allowed and unaffected
+        $otherIpResponse = $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.88'])
+            ->get('/login');
+        $this->assertEquals(200, $otherIpResponse->getStatusCode());
+    }
 }

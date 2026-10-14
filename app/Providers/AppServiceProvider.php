@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Services\TimezoneHelper;
 use Carbon\Carbon;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -57,6 +60,11 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('userDateTime', function ($expression) {
             return "<?php echo \App\Services\TimezoneHelper::format($expression); ?>";
+        });
+
+        // Global Rate Limiter per IP (120 requests/minute, cannot be bypassed or reset)
+        RateLimiter::for('global-ip', function (Request $request) {
+            return Limit::perMinute(120)->by($request->ip());
         });
     }
 }

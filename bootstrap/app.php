@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            'throttle:global-ip',
             \App\Http\Middleware\XssSanitizer::class,
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\SetUserTimezoneMiddleware::class,
