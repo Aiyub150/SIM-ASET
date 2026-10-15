@@ -19,31 +19,34 @@ class RoleAndAdminSeeder extends Seeder
         $roleStaff      = Role::firstOrCreate(['name' => 'Staff Logistik']);
 
         // 2. Super Admin — akses penuh termasuk user management
+        $superAdminPassword = env('SEEDER_SUPERADMIN_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
         $superAdmin = User::firstOrCreate(
             ['email' => 'superadmin@simaset.com'],
             [
                 'name'     => 'Seeder Super Admin',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make($superAdminPassword),
             ]
         );
         $superAdmin->syncRoles($roleSuperAdmin);
 
         // 3. Admin — akses semua fitur operasional, kecuali user management
+        $adminPassword = env('SEEDER_ADMIN_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
         $admin = User::firstOrCreate(
             ['email' => 'admin@simaset.com'],
             [
                 'name'     => 'Seeder Admin',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make($adminPassword),
             ]
         );
         $admin->syncRoles($roleAdmin);
 
         // 4. Staff Logistik — hanya bisa input & lihat peminjaman miliknya sendiri
+        $staffPassword = env('SEEDER_STAFF_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
         $staff = User::firstOrCreate(
             ['email' => 'staff@simaset.com'],
             [
                 'name'     => 'Seeder Staff',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make($staffPassword),
             ]
         );
         $staff->syncRoles($roleStaff);
