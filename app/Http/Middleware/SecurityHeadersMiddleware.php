@@ -17,33 +17,38 @@ class SecurityHeadersMiddleware
     {
         $response = $next($request);
 
-        // 1. Clickjacking Protection
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        // 1. Clickjacking Protection (set only if not already present from reverse proxy)
+        if (! $response->headers->has('X-Frame-Options')) {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        }
 
         // 2. MIME Type Sniffing Prevention
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        if (! $response->headers->has('X-Content-Type-Options')) {
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+        }
 
         // 3. Referrer Policy
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        if (! $response->headers->has('Referrer-Policy')) {
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        }
 
         // 4. Permissions / Feature Policy
-        $response->headers->set(
-            'Permissions-Policy',
-            'camera=(self), microphone=(), geolocation=(), payment=()'
-        );
+        if (! $response->headers->has('Permissions-Policy')) {
+            $response->headers->set(
+                'Permissions-Policy',
+                'camera=(self), microphone=(), geolocation=(), payment=()'
+            );
+        }
 
-        // 5. Cross-Site Scripting Filter Protection (Legacy browsers)
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
-
-        // 6. Strict Transport Security (HSTS) when on HTTPS
-        if ($request->isSecure()) {
+        // 5. Strict Transport Security (HSTS) when on HTTPS
+        if ($request->isSecure() && ! $response->headers->has('Strict-Transport-Security')) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }
 
-        // 7. Content Security Policy (CSP)
-        // Allow self and trusted CDNs (jsdelivr, unpkg, leaflet tiles, inline scripts/styles needed for Bootstrap/Blade)
+        // 6. Content Security Policy (CSP)
+        // Hardened: remove 'unsafe-eval' to eliminate runtime eval() risks while preserving required CDNs
         $csp = "default-src 'self'; "
-            . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; "
+            . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
             . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
             . "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com; "
             . "font-src 'self' data: https://cdn.jsdelivr.net; "

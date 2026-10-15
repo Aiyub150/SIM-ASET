@@ -20,8 +20,9 @@ class SecurityHeadersTest extends TestCase
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->assertHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(), payment=()');
-        $response->assertHeader('X-XSS-Protection', '1; mode=block');
         $this->assertTrue($response->headers->has('Content-Security-Policy'));
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        $this->assertStringNotContainsString('unsafe-eval', $csp);
         $this->assertFalse($response->headers->has('X-Powered-By'));
     }
 
