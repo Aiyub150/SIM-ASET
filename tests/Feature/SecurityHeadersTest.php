@@ -23,6 +23,8 @@ class SecurityHeadersTest extends TestCase
         $this->assertTrue($response->headers->has('Content-Security-Policy'));
         $csp = (string) $response->headers->get('Content-Security-Policy');
         $this->assertStringNotContainsString('unsafe-eval', $csp);
+        $this->assertStringContainsString('https://cdnjs.cloudflare.com', $csp);
+        $this->assertStringContainsString('https://fonts.bunny.net', $csp);
         $this->assertFalse($response->headers->has('X-Powered-By'));
     }
 

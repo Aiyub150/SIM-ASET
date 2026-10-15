@@ -46,12 +46,12 @@ class SecurityHeadersMiddleware
         }
 
         // 6. Content Security Policy (CSP)
-        // Hardened: remove 'unsafe-eval' to eliminate runtime eval() risks while preserving required CDNs
+        // Hardened: allow self, cdnjs (FontAwesome icons), fonts.bunny.net (Inter font), jsdelivr, unpkg, and osm tiles
         $csp = "default-src 'self'; "
-            . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
-            . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+            . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; "
+            . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://fonts.bunny.net; "
             . "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com; "
-            . "font-src 'self' data: https://cdn.jsdelivr.net; "
+            . "font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.bunny.net; "
             . "connect-src 'self' blob:; "
             . "frame-ancestors 'self'; "
             . "base-uri 'self'; "
