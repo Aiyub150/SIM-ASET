@@ -84,7 +84,6 @@ class RbacSecurityMatrixTest extends TestCase
     {
         $endpoints = [
             '/users',
-            '/superadmin/log-server',
             '/superadmin/log-history',
             '/categories',
             '/stocks',
@@ -126,7 +125,6 @@ class RbacSecurityMatrixTest extends TestCase
         // Akses dilarang (403 Forbidden)
         $forbiddenEndpoints = [
             '/users',
-            '/superadmin/log-server',
             '/superadmin/log-history',
         ];
 
@@ -154,7 +152,6 @@ class RbacSecurityMatrixTest extends TestCase
         // Akses dilarang untuk Staff (403 Forbidden)
         $forbiddenEndpoints = [
             '/users',
-            '/superadmin/log-server',
             '/superadmin/log-history',
             '/categories',
             '/stocks',

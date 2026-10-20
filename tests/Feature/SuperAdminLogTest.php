@@ -36,14 +36,6 @@ class SuperAdminLogTest extends TestCase
         $this->staff->assignRole($roleStaff);
     }
 
-    public function test_superadmin_can_access_log_server_page(): void
-    {
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.log-server'));
-        $response->assertStatus(200);
-        $response->assertSee('Log Server');
-        $response->assertSee('storage/logs/laravel.log');
-    }
-
     public function test_superadmin_can_access_log_history_page(): void
     {
         ActivityLog::create([
@@ -67,16 +59,10 @@ class SuperAdminLogTest extends TestCase
     public function test_non_superadmin_roles_are_forbidden_from_log_pages(): void
     {
         // Admin
-        $response = $this->actingAs($this->admin)->get(route('superadmin.log-server'));
-        $response->assertStatus(403);
-
         $response = $this->actingAs($this->admin)->get(route('superadmin.log-history'));
         $response->assertStatus(403);
 
         // Staff
-        $response = $this->actingAs($this->staff)->get(route('superadmin.log-server'));
-        $response->assertStatus(403);
-
         $response = $this->actingAs($this->staff)->get(route('superadmin.log-history'));
         $response->assertStatus(403);
     }
@@ -113,12 +99,5 @@ class SuperAdminLogTest extends TestCase
         $response->assertSee('page-item');
         $response->assertSee('page-link');
         $response->assertDontSee('w-5 h-5'); // Tailwind unconstrained svg classes must not be present
-    }
-
-    public function test_superadmin_can_clear_log_server(): void
-    {
-        $response = $this->actingAs($this->superAdmin)->post(route('superadmin.log-server.clear'));
-        $response->assertRedirect(route('superadmin.log-server'));
-        $response->assertSessionHas('success', 'Log server berhasil dibersihkan.');
     }
 }

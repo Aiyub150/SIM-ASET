@@ -483,14 +483,6 @@
 
             <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
             @role('Super Admin')
-            <a href="{{ route('superadmin.log-server') }}"
-               class="sidebar-link {{ request()->routeIs('superadmin.log-server*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 14.5 0h-13zM1 1.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-13z"/>
-                    <path d="M4.854 4.146a.5.5 0 0 1 0 .708L3.707 6l1.147 1.146a.5.5 0 0 1-.708.708l-1.5-1.5a.5.5 0 0 1 0-.708l1.5-1.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L12.293 6l-1.147 1.146a.5.5 0 0 0 .708.708l1.5-1.5a.5.5 0 0 0 0-.708l-1.5-1.5a.5.5 0 0 0-.708 0zM7 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
-                </svg>
-                Log Server
-            </a>
             <a href="{{ route('superadmin.log-history') }}"
                class="sidebar-link {{ request()->routeIs('superadmin.log-history*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
