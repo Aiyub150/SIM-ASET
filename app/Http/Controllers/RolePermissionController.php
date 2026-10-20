@@ -128,6 +128,29 @@ class RolePermissionController extends Controller
     }
 
     /**
+     * Halaman Khusus Form Pengaturan Hak Akses Per Role
+     */
+    public function editRolePermissions(Role $role): View
+    {
+        $role->load('permissions');
+        $permissions = Permission::orderBy('name')->get();
+
+        // Kelompokkan permission berdasarkan modul
+        $groupedPermissions = [];
+        foreach ($permissions as $perm) {
+            $parts = explode('.', $perm->name);
+            $module = ucfirst($parts[0] ?? 'Lainnya');
+            $groupedPermissions[$module][] = $perm;
+        }
+
+        return view('administration.roles.permissions', [
+            'role'               => $role,
+            'groupedPermissions' => $groupedPermissions,
+            'systemRoles'        => $this->systemRoles,
+        ]);
+    }
+
+    /**
      * Halaman Matriks Hak Akses (Role & User Override)
      */
     public function indexPermissions(Request $request): View

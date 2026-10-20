@@ -102,10 +102,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/log-history', [\App\Http\Controllers\SuperAdminController::class, 'logHistory'])->name('log-history');
 
         // 2. Manajemen Role
-        Route::get('/roles',             [\App\Http\Controllers\RolePermissionController::class, 'indexRoles'])->name('roles.index');
-        Route::post('/roles',            [\App\Http\Controllers\RolePermissionController::class, 'storeRole'])->middleware('throttle:30,1')->name('roles.store');
-        Route::put('/roles/{role}',      [\App\Http\Controllers\RolePermissionController::class, 'updateRole'])->middleware('throttle:30,1')->name('roles.update');
-        Route::delete('/roles/{role}',   [\App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->middleware('throttle:30,1')->name('roles.destroy');
+        Route::get('/roles',                             [\App\Http\Controllers\RolePermissionController::class, 'indexRoles'])->name('roles.index');
+        Route::post('/roles',                            [\App\Http\Controllers\RolePermissionController::class, 'storeRole'])->middleware('throttle:30,1')->name('roles.store');
+        Route::get('/roles/{role}/permissions',          [\App\Http\Controllers\RolePermissionController::class, 'editRolePermissions'])->name('roles.permissions.edit');
+        Route::put('/roles/{role}/permissions',          [\App\Http\Controllers\RolePermissionController::class, 'updateRolePermissions'])->middleware('throttle:30,1')->name('roles.permissions.update');
+        Route::put('/roles/{role}',                      [\App\Http\Controllers\RolePermissionController::class, 'updateRole'])->middleware('throttle:30,1')->name('roles.update');
+        Route::delete('/roles/{role}',                   [\App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->middleware('throttle:30,1')->name('roles.destroy');
 
         // 3. Manajemen Hak Akses (Permissions)
         Route::get('/permissions',                   [\App\Http\Controllers\RolePermissionController::class, 'indexPermissions'])->name('permissions.index');

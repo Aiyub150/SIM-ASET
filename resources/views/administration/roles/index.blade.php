@@ -67,9 +67,9 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('admin-settings.permissions.index', ['role_id' => $role->id]) }}" 
+                                    <a href="{{ route('admin-settings.roles.permissions.edit', $role) }}" 
                                        class="btn btn-sm btn-outline-primary rounded-3" 
-                                       title="Atur Hak Akses">
+                                       title="Atur Hak Akses Peran Ini">
                                         <i class="fa-solid fa-key me-1"></i> Atur Izin
                                     </a>
                                     @if(!in_array($role->name, $systemRoles))
