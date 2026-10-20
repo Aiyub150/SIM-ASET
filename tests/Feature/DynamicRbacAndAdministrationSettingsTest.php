@@ -144,4 +144,50 @@ class DynamicRbacAndAdministrationSettingsTest extends TestCase
         $adminResponse = $this->actingAs($this->admin)->get(route('admin-settings.code-formats.index'));
         $adminResponse->assertForbidden();
     }
+
+    public function test_superadmin_can_update_code_format_and_sync_legacy_records(): void
+    {
+        // 1. Buat kategori & item lama
+        $category = \App\Models\Category::firstOrCreate(['name' => 'Elektronik'], ['sku_prefix' => 'ELEK']);
+        $location = \App\Models\Location::firstOrCreate(['name' => 'Gudang Utama']);
+        $item = \App\Models\Item::firstOrCreate(
+            ['sku' => 'OLD-SKU-999'],
+            [
+                'category_id'   => $category->id,
+                'location_id'   => $location->id,
+                'name'          => 'Laptop Uji',
+                'total_qty'     => 10,
+                'available_qty' => 10,
+            ]
+        );
+
+        $setting = CodeFormatSetting::where('entity', 'item_sku')->first();
+        if (!$setting) {
+            $setting = CodeFormatSetting::create([
+                'entity'      => 'item_sku',
+                'name'        => 'Format Kode SKU Barang Inventaris',
+                'prefix'      => 'ASET',
+                'date_format' => null,
+                'suffix_type' => 'INCREMENT_4_DIGIT',
+                'separator'   => '-',
+            ]);
+        }
+
+        $response = $this->actingAs($this->superAdmin)->put(route('admin-settings.code-formats.update', $setting), [
+            'prefix'            => 'BARANG',
+            'separator'         => '-',
+            'date_format'       => 'NONE',
+            'suffix_type'       => 'INCREMENT_4_DIGIT',
+            'sync_legacy_data'  => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('code_format_settings', [
+            'entity' => 'item_sku',
+            'prefix' => 'BARANG',
+        ]);
+
+        $item->refresh();
+        $this->assertStringStartsWith('BARANG-', $item->sku);
+    }
 }
