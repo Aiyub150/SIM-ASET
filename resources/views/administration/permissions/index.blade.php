@@ -4,12 +4,40 @@
 @section('page-title', 'Manajemen Hak Akses & Permissions')
 
 @section('content')
+<style>
+    .matrix-wrapper {
+        position: relative;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+    }
+    .matrix-table {
+        min-width: 800px;
+        margin-bottom: 0;
+    }
+    .matrix-sticky-col {
+        position: sticky;
+        left: 0;
+        background-color: #ffffff;
+        z-index: 5;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.04);
+    }
+    .matrix-table thead th.matrix-sticky-col {
+        background-color: #f8fafc;
+        z-index: 6;
+    }
+    .matrix-role-col {
+        min-width: 140px;
+        max-width: 180px;
+    }
+</style>
+
 <div class="row g-4">
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <div>
                 <h5 class="fw-bold mb-1 text-dark">Matriks Hak Akses & Izin Pengguna</h5>
-                <p class="text-muted small mb-0">Kelola dan tinjau hak akses fungsional sistem, baik ringkasan per peran maupun pemberian izin khusus langsung kepada pengguna tertentu.</p>
+                <p class="text-secondary small mb-0">Kelola dan tinjau hak akses fungsional sistem secara transparan, baik perbandingan antar peran maupun izin khusus pengguna.</p>
             </div>
             <a href="{{ route('admin-settings.roles.index') }}" class="btn btn-outline-secondary btn-sm rounded-3">
                 <i class="fa-solid fa-shield-halved me-1"></i> Kelola Daftar Peran
@@ -41,47 +69,59 @@
             <!-- TAB 1: RINGKASAN MATRIKS ROLE -->
             <div class="tab-pane fade {{ empty($selectedUser) ? 'show active' : '' }}" id="pills-role" role="tabpanel">
                 <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                    <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-white py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div>
-                            <h6 class="mb-0 fw-bold text-dark">Matriks Hak Akses Antar Peran</h6>
-                            <small class="text-muted">Tinjau seluruh izin modul yang aktif untuk tiap tingkatan peran dalam sistem.</small>
+                            <h6 class="mb-0 fw-bold text-dark">Perbandingan Hak Akses Antar Peran</h6>
+                            <small class="text-secondary">Tabel horizontal responsif dengan kolom nama izin terkunci (sticky) agar tetap mudah dibaca meskipun terdapat banyak peran.</small>
                         </div>
+                        <span class="badge bg-light text-dark border px-3 py-2 font-monospace" style="font-size: 0.75rem;">
+                            {{ $roles->count() }} Peran Terdaftar
+                        </span>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                            <thead class="table-light">
+
+                    <div class="matrix-wrapper">
+                        <table class="table table-hover align-middle matrix-table" style="font-size: 0.85rem;">
+                            <thead class="table-light border-bottom">
                                 <tr>
-                                    <th class="ps-4" style="min-width: 260px;">Modul & Nama Hak Akses</th>
+                                    <th class="ps-4 matrix-sticky-col" style="min-width: 320px;">
+                                        <div class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Modul & Aksi Fungsional</div>
+                                    </th>
                                     @foreach($roles as $r)
-                                    <th class="text-center" style="min-width: 140px;">
-                                        <div class="fw-bold">{{ $r->name }}</div>
-                                        <a href="{{ route('admin-settings.roles.permissions.edit', $r) }}" class="badge bg-primary-subtle text-primary text-decoration-none border mt-1">
-                                            <i class="fa-solid fa-key me-1"></i> Edit Izin
+                                    <th class="text-center matrix-role-col px-3 py-3">
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 160px;" title="{{ $r->name }}">{{ $r->name }}</div>
+                                        <a href="{{ route('admin-settings.roles.permissions.edit', $r) }}" 
+                                           class="btn btn-xs btn-outline-primary py-0 px-2 rounded-2 mt-1 text-decoration-none" 
+                                           style="font-size: 0.72rem;">
+                                            <i class="fa-solid fa-sliders me-1"></i> Atur Izin
                                         </a>
                                     </th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($groupedPermissions as $moduleName => $perms)
-                                <tr class="table-light fw-bold">
-                                    <td colspan="{{ count($roles) + 1 }}" class="ps-4 text-primary text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                                        <i class="fa-solid fa-folder me-1"></i> Modul {{ $moduleName }}
+                                @foreach($permissionDefs as $moduleName => $perms)
+                                <tr class="table-secondary bg-opacity-25">
+                                    <td colspan="{{ count($roles) + 1 }}" class="ps-4 py-2 text-dark fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; background-color: #f1f5f9;">
+                                        <i class="fa-solid fa-folder-closed text-primary me-2"></i> Modul {{ $moduleName }}
                                     </td>
                                 </tr>
-                                @foreach($perms as $perm)
+                                @foreach($perms as $permName => $meta)
                                 <tr>
-                                    <td class="ps-4">
-                                        <code>{{ $perm->name }}</code>
+                                    <td class="ps-4 py-2 matrix-sticky-col">
+                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $meta['label'] }}</div>
+                                        <div class="text-secondary small" style="font-size: 0.75rem; line-height: 1.2;">{{ $meta['desc'] }}</div>
+                                        <span class="badge bg-light text-dark font-monospace border mt-1" style="font-size: 0.65rem;">
+                                            {{ $permName }}
+                                        </span>
                                     </td>
                                     @foreach($roles as $r)
-                                    <td class="text-center">
-                                        @if($r->name === 'Super Admin' || $r->hasPermissionTo($perm->name))
-                                            <span class="badge bg-success-subtle text-success p-1 px-2 rounded-circle" title="Aktif">
-                                                <i class="fa-solid fa-check"></i>
+                                    <td class="text-center py-2">
+                                        @if($r->name === 'Super Admin' || $r->hasPermissionTo($permName))
+                                            <span class="badge bg-success-subtle text-success p-2 rounded-circle" title="Diizinkan">
+                                                <i class="fa-solid fa-check fs-6"></i>
                                             </span>
                                         @else
-                                            <span class="text-muted opacity-25">&bull;</span>
+                                            <span class="text-secondary opacity-50">&bull;</span>
                                         @endif
                                     </td>
                                     @endforeach
@@ -100,7 +140,7 @@
                     <div class="card-body p-4">
                         <div class="mb-4">
                             <h6 class="fw-bold text-dark mb-1">Pilih Pengguna untuk Mengatur Hak Akses Khusus</h6>
-                            <p class="text-muted small mb-3">Cari nama atau email pengguna. Anda dapat memberikan hak akses tambahan langsung (*Direct Permission*) khusus untuk akun yang dipilih.</p>
+                            <p class="text-secondary small mb-3">Cari nama atau email pengguna. Anda dapat memberikan hak akses tambahan langsung (*Direct Permission*) khusus untuk akun yang dipilih tanpa harus mengubah peran dasarnya.</p>
                             
                             <form method="GET" action="{{ route('admin-settings.permissions.index') }}" id="formSelectUser" class="row g-2 align-items-center">
                                 <div class="col-md-7 col-lg-5">
@@ -131,12 +171,12 @@
                                 </div>
                                 <div>
                                     <h6 class="mb-0 fw-bold text-dark">{{ $selectedUser->name }}</h6>
-                                    <small class="text-muted">{{ $selectedUser->email }} &bull; Peran: <span class="badge bg-primary-subtle text-primary">{{ $selectedUser->roles->pluck('name')->first() ?? 'User' }}</span></small>
+                                    <small class="text-secondary">{{ $selectedUser->email }} &bull; Peran: <span class="badge bg-primary-subtle text-primary border">{{ $selectedUser->roles->pluck('name')->first() ?? 'User' }}</span></small>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-secondary-subtle text-secondary border">
-                                    <i class="fa-solid fa-lock me-1"></i> Izin Peran Bawaan Terkunci
+                                    <i class="fa-solid fa-lock me-1"></i> Izin Bawaan Peran
                                 </span>
                                 <span class="badge bg-success-subtle text-success border">
                                     <i class="fa-solid fa-key me-1"></i> Izin Khusus Langsung
@@ -149,38 +189,47 @@
                             @method('PUT')
                             
                             <div class="row g-4">
-                                @foreach($groupedPermissions as $moduleName => $perms)
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card h-100 border rounded-4 shadow-none bg-light-subtle">
-                                        <div class="card-header bg-transparent py-2 px-3 border-bottom">
-                                            <span class="fw-bold text-primary small text-uppercase">
-                                                <i class="fa-solid fa-folder me-1"></i> Modul {{ $moduleName }}
+                                @foreach($permissionDefs as $moduleName => $perms)
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="card h-100 border rounded-4 shadow-none" style="background-color: #f8fafc; border-color: #cbd5e1 !important;">
+                                        <div class="card-header bg-white py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                                                <i class="fa-solid fa-folder-closed text-primary me-2"></i> Modul {{ $moduleName }}
                                             </span>
                                         </div>
-                                        <div class="card-body p-3 d-flex flex-column gap-2">
-                                            @foreach($perms as $perm)
+                                        <div class="card-body p-3 d-flex flex-column gap-3">
+                                            @foreach($perms as $permName => $meta)
                                             @php
-                                                $hasViaRole = $selectedUser->hasPermissionTo($perm->name) && !$selectedUser->hasDirectPermission($perm->name);
-                                                $hasDirect  = $selectedUser->hasDirectPermission($perm->name);
+                                                $hasViaRole = $selectedUser->hasPermissionTo($permName) && !$selectedUser->hasDirectPermission($permName);
+                                                $hasDirect  = $selectedUser->hasDirectPermission($permName);
                                             @endphp
-                                            <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0 mb-1">
-                                                <div>
-                                                    <label class="form-check-label small mb-0 text-dark" for="user_{{ $selectedUser->id }}_{{ str_replace('.', '_', $perm->name) }}">
-                                                        <code>{{ $perm->name }}</code>
-                                                    </label>
-                                                    @if($hasViaRole)
-                                                        <span class="badge bg-secondary-subtle text-secondary ms-1" style="font-size:0.62rem;">dari Peran</span>
-                                                    @elseif($hasDirect)
-                                                        <span class="badge bg-success-subtle text-success ms-1" style="font-size:0.62rem;">Khusus</span>
-                                                    @endif
+                                            <div class="p-2 rounded-3 bg-white border d-flex justify-content-between align-items-center" style="border-color: #e2e8f0 !important;">
+                                                <div class="pe-3">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        <span class="fw-bold text-dark" style="font-size: 0.88rem;">{{ $meta['label'] }}</span>
+                                                        @if($hasViaRole)
+                                                            <span class="badge bg-secondary-subtle text-secondary border" style="font-size:0.65rem;">Bawaan Peran</span>
+                                                        @elseif($hasDirect)
+                                                            <span class="badge bg-success-subtle text-success border" style="font-size:0.65rem;">Izin Khusus</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-secondary small" style="font-size: 0.76rem; line-height: 1.3;">{{ $meta['desc'] }}</div>
+                                                    <div class="mt-1">
+                                                        <span class="badge bg-light text-dark font-monospace border" style="font-size: 0.68rem; font-weight: 500;">
+                                                            {{ $permName }}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <input class="form-check-input ms-auto mt-0" 
-                                                       type="checkbox" 
-                                                       name="permissions[]" 
-                                                       value="{{ $perm->name }}" 
-                                                       id="user_{{ $selectedUser->id }}_{{ str_replace('.', '_', $perm->name) }}" 
-                                                       {{ $hasDirect || $hasViaRole ? 'checked' : '' }}
-                                                       {{ $hasViaRole ? 'disabled' : '' }}>
+                                                <div class="form-check form-switch m-0">
+                                                    <input class="form-check-input cursor-pointer" 
+                                                           type="checkbox" 
+                                                           name="permissions[]" 
+                                                           value="{{ $permName }}" 
+                                                           id="user_{{ $selectedUser->id }}_{{ str_replace('.', '_', $permName) }}" 
+                                                           style="width: 2.5em; height: 1.35em;"
+                                                           {{ $hasDirect || $hasViaRole ? 'checked' : '' }}
+                                                           {{ $hasViaRole ? 'disabled' : '' }}>
+                                                </div>
                                             </div>
                                             @endforeach
                                         </div>
@@ -189,8 +238,8 @@
                                 @endforeach
                             </div>
 
-                            <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="text-muted small">Izin yang ditandai <code>dari Peran</code> otomatis berlaku dari role pengguna. Centang izin lainnya untuk memberikan izin khusus tambahan.</span>
+                            <div class="mt-4 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <span class="text-secondary small">Izin dengan tanda <strong>Bawaan Peran</strong> otomatis aktif dari role pengguna. Centang izin lainnya untuk memberikan izin khusus tambahan kepada akun ini.</span>
                                 <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm">
                                     <i class="fa-solid fa-floppy-disk me-1"></i> Simpan Hak Akses {{ $selectedUser->name }}
                                 </button>
@@ -200,7 +249,7 @@
                         <div class="text-center py-5 text-muted border rounded-4 bg-light-subtle">
                             <i class="fa-solid fa-user-shield fs-1 opacity-25 mb-3 d-block"></i>
                             <h6 class="fw-bold text-dark">Belum Ada Pengguna yang Dipilih</h6>
-                            <p class="small text-muted mb-0">Gunakan kotak pencarian di atas untuk memilih akun pengguna yang ingin dikonfigurasikan hak aksesnya.</p>
+                            <p class="small text-secondary mb-0">Gunakan kotak pencarian di atas untuk memilih akun pengguna yang ingin dikonfigurasikan hak aksesnya.</p>
                         </div>
                         @endif
                     </div>

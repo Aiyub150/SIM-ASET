@@ -69,35 +69,48 @@
 
                 <div class="card-body p-4">
                     <div class="row g-4">
-                        @foreach($groupedPermissions as $moduleName => $perms)
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100 border rounded-4 shadow-none bg-light-subtle">
-                                <div class="card-header bg-transparent py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-primary small text-uppercase">
-                                        <i class="fa-solid fa-layer-group me-1"></i> Modul {{ $moduleName }}
+                        @foreach($permissionDefs as $moduleName => $perms)
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card h-100 border rounded-4 shadow-none" style="background-color: #f8fafc; border-color: #cbd5e1 !important;">
+                                <div class="card-header bg-white py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                                        <i class="fa-solid fa-folder-closed text-primary me-2"></i> {{ $moduleName }}
                                     </span>
                                     @if($role->name !== 'Super Admin')
-                                    <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-muted" 
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-2" 
                                             onclick="toggleModuleCheckboxes('module_{{ Str::slug($moduleName) }}')" 
                                             style="font-size: 0.72rem;">
-                                        Toggle
+                                        Pilih Semua Modul Ini
                                     </button>
                                     @endif
                                 </div>
-                                <div class="card-body p-3 d-flex flex-column gap-2" id="module_{{ Str::slug($moduleName) }}">
-                                    @foreach($perms as $perm)
-                                    <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0 mb-1">
-                                        <label class="form-check-label small mb-0 pe-2 text-dark cursor-pointer" for="perm_{{ $perm->id }}">
-                                            <code>{{ $perm->name }}</code>
-                                        </label>
-                                        <input class="form-check-input perm-checkbox ms-auto mt-0" 
-                                               type="checkbox" 
-                                               name="permissions[]" 
-                                               value="{{ $perm->name }}" 
-                                               id="perm_{{ $perm->id }}"
-                                               {{ $role->hasPermissionTo($perm->name) ? 'checked' : '' }}
-                                               {{ $role->name === 'Super Admin' ? 'checked disabled' : '' }}
-                                               onchange="updateCheckedCount()">
+                                <div class="card-body p-3 d-flex flex-column gap-3" id="module_{{ Str::slug($moduleName) }}">
+                                    @foreach($perms as $permName => $meta)
+                                    @php
+                                        $permModel = $permissions->get($permName);
+                                        $permId = $permModel ? $permModel->id : Str::slug($permName);
+                                    @endphp
+                                    <div class="p-2 rounded-3 bg-white border d-flex justify-content-between align-items-center" style="border-color: #e2e8f0 !important;">
+                                        <div class="pe-3">
+                                            <div class="fw-bold text-dark" style="font-size: 0.88rem;">{{ $meta['label'] }}</div>
+                                            <div class="text-secondary small" style="font-size: 0.76rem; line-height: 1.3;">{{ $meta['desc'] }}</div>
+                                            <div class="mt-1">
+                                                <span class="badge bg-light text-dark font-monospace border" style="font-size: 0.68rem; font-weight: 500;">
+                                                    {{ $permName }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input perm-checkbox cursor-pointer" 
+                                                   type="checkbox" 
+                                                   name="permissions[]" 
+                                                   value="{{ $permName }}" 
+                                                   id="perm_{{ $permId }}"
+                                                   style="width: 2.5em; height: 1.35em;"
+                                                   {{ $role->hasPermissionTo($permName) ? 'checked' : '' }}
+                                                   {{ $role->name === 'Super Admin' ? 'checked disabled' : '' }}
+                                                   onchange="updateCheckedCount()">
+                                        </div>
                                     </div>
                                     @endforeach
                                 </div>

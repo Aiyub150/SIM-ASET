@@ -128,25 +128,70 @@ class RolePermissionController extends Controller
     }
 
     /**
+     * Helper: metadata deskripsi ramah dan modul untuk permissions
+     */
+    public static function getPermissionDefinitions(): array
+    {
+        return [
+            'Master Barang' => [
+                'items.view'   => ['label' => 'Lihat Katalog Barang', 'desc' => 'Melihat daftar aset, detail spesifikasi, dan stok barang inventaris'],
+                'items.create' => ['label' => 'Tambah Barang Baru', 'desc' => 'Mendaftarkan aset barang baru ke dalam sistem inventaris'],
+                'items.edit'   => ['label' => 'Ubah Data Barang', 'desc' => 'Mengubah nama, foto, atau informasi barang inventaris'],
+                'items.delete' => ['label' => 'Hapus Barang', 'desc' => 'Menghapus data aset barang dari sistem inventaris'],
+            ],
+            'Data Peminjam / Instansi' => [
+                'borrowers.view'   => ['label' => 'Lihat Data Peminjam', 'desc' => 'Melihat direktori instansi dan data kontak pihak peminjam'],
+                'borrowers.create' => ['label' => 'Tambah Peminjam Baru', 'desc' => 'Mendaftarkan nama instansi atau pihak peminjam baru'],
+                'borrowers.edit'   => ['label' => 'Ubah Data Peminjam', 'desc' => 'Memperbarui informasi instansi peminjam'],
+                'borrowers.delete' => ['label' => 'Hapus Data Peminjam', 'desc' => 'Menghapus instansi peminjam dari sistem'],
+            ],
+            'Transaksi Peminjaman' => [
+                'loans.view'   => ['label' => 'Lihat Riwayat Pinjam', 'desc' => 'Melihat catatan transaksi peminjaman barang'],
+                'loans.create' => ['label' => 'Catat Peminjaman Baru', 'desc' => 'Membuat transaksi peminjaman aset dan mengurangi stok barang'],
+                'loans.return' => ['label' => 'Proses Pengembalian', 'desc' => 'Mencatat pengembalian aset dari peminjam dan memulihkan stok'],
+            ],
+            'Mutasi Stok & Kartu Stok' => [
+                'stocks.view'   => ['label' => 'Lihat Buku Besar Stok', 'desc' => 'Melihat pergerakan mutasi fisik barang masuk, keluar, atau rusak'],
+                'stocks.adjust' => ['label' => 'Input Mutasi Fisik', 'desc' => 'Menambah atau mengurangi stok barang secara langsung'],
+            ],
+            'Kategori Barang' => [
+                'categories.view'   => ['label' => 'Lihat Kategori', 'desc' => 'Melihat daftar klasifikasi kategori barang'],
+                'categories.create' => ['label' => 'Tambah Kategori', 'desc' => 'Menambahkan kategori inventaris baru'],
+                'categories.edit'   => ['label' => 'Ubah Kategori', 'desc' => 'Memperbarui nama dan kode awalan (prefix) kategori'],
+                'categories.toggle' => ['label' => 'Nonaktifkan / Aktifkan', 'desc' => 'Mengubah status aktif kategori barang'],
+            ],
+            'Laporan & Rekapitulasi' => [
+                'reports.view'   => ['label' => 'Lihat Rekapitulasi', 'desc' => 'Melihat ringkasan transaksi peminjaman dan mutasi bulanan'],
+                'reports.export' => ['label' => 'Ekspor Dokumen PDF', 'desc' => 'Mengunduh rekapitulasi inventaris ke dalam format PDF resmi'],
+            ],
+            'Manajemen Pengguna' => [
+                'users.view'   => ['label' => 'Lihat Daftar Pengguna', 'desc' => 'Melihat seluruh akun staf dan hak aksesnya'],
+                'users.create' => ['label' => 'Tambah Akun Pengguna', 'desc' => 'Mendaftarkan akun staf atau operator baru'],
+                'users.edit'   => ['label' => 'Ubah Profil & Sandi', 'desc' => 'Memperbarui informasi atau mengatur ulang sandi staf'],
+            ],
+            'Administrasi & Audit' => [
+                'roles.manage'       => ['label' => 'Kelola Peran (Role)', 'desc' => 'Menambah, mengubah, dan menghapus peran pengguna'],
+                'permissions.manage' => ['label' => 'Atur Matriks Hak Akses', 'desc' => 'Mengatur perizinan modul untuk setiap peran atau user'],
+                'audit.view'         => ['label' => 'Lihat Log Audit Trail', 'desc' => 'Melihat rekaman aktivitas dan riwayat keamanan sistem'],
+                'sku.manage'         => ['label' => 'Pola Format Kode SKU', 'desc' => 'Mengonfigurasi pola penomoran SKU, Peminjaman, dan BAST'],
+            ],
+        ];
+    }
+
+    /**
      * Halaman Khusus Form Pengaturan Hak Akses Per Role
      */
     public function editRolePermissions(Role $role): View
     {
         $role->load('permissions');
-        $permissions = Permission::orderBy('name')->get();
-
-        // Kelompokkan permission berdasarkan modul
-        $groupedPermissions = [];
-        foreach ($permissions as $perm) {
-            $parts = explode('.', $perm->name);
-            $module = ucfirst($parts[0] ?? 'Lainnya');
-            $groupedPermissions[$module][] = $perm;
-        }
+        $permissionDefs = self::getPermissionDefinitions();
+        $permissions = Permission::all()->keyBy('name');
 
         return view('administration.roles.permissions', [
-            'role'               => $role,
-            'groupedPermissions' => $groupedPermissions,
-            'systemRoles'        => $this->systemRoles,
+            'role'           => $role,
+            'permissionDefs' => $permissionDefs,
+            'permissions'    => $permissions,
+            'systemRoles'    => $this->systemRoles,
         ]);
     }
 
@@ -156,15 +201,8 @@ class RolePermissionController extends Controller
     public function indexPermissions(Request $request): View
     {
         $roles = Role::with('permissions')->orderBy('id')->get();
-        $permissions = Permission::orderBy('name')->get();
-
-        // Kelompokkan permission berdasarkan modul
-        $groupedPermissions = [];
-        foreach ($permissions as $perm) {
-            $parts = explode('.', $perm->name);
-            $module = ucfirst($parts[0] ?? 'Lainnya');
-            $groupedPermissions[$module][] = $perm;
-        }
+        $permissionDefs = self::getPermissionDefinitions();
+        $permissions = Permission::all()->keyBy('name');
 
         // Ambil daftar pengguna untuk User Override
         $selectedUserId = $request->get('user_id');
@@ -172,11 +210,12 @@ class RolePermissionController extends Controller
         $users = User::with('roles')->orderBy('name')->get();
 
         return view('administration.permissions.index', [
-            'roles'              => $roles,
-            'groupedPermissions'=> $groupedPermissions,
-            'users'              => $users,
-            'selectedUser'       => $selectedUser,
-            'systemRoles'        => $this->systemRoles,
+            'roles'          => $roles,
+            'permissionDefs' => $permissionDefs,
+            'permissions'    => $permissions,
+            'users'          => $users,
+            'selectedUser'   => $selectedUser,
+            'systemRoles'    => $this->systemRoles,
         ]);
     }
 
