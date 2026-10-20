@@ -258,14 +258,15 @@
         <div class="d-flex flex-wrap gap-2">
             <a href="#pengenalan" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">1. Filosofi & Tampilan UI/UX</a>
             <a href="#format-kode" class="btn btn-sm btn-outline-primary py-1 fw-bold" style="font-size: 0.78rem;"><i class="fa-solid fa-barcode me-1"></i> 2. Standarisasi Format Kode SKU & Dokumen</a>
-            <a href="#peran-pengguna" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">3. Hak Akses (Dynamic RBAC)</a>
-            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">4. Alur Peminjaman Aset</a>
-            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">5. Alur Pengembalian Aset</a>
-            <a href="#master-barang" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">6. Master Barang & Label</a>
-            <a href="#kartu-stok" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">7. Kartu Stok & Buku Besar</a>
-            <a href="#laporan-bast" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">8. Laporan & Cetak BAST</a>
-            <a href="#tips-scanner" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">9. Penggunaan Scanner & Kamera</a>
-            <a href="#faq" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">10. Tanya Jawab (FAQ)</a>
+            <a href="#administrasi-sistem" class="btn btn-sm btn-outline-primary py-1 fw-bold" style="font-size: 0.78rem;"><i class="fa-solid fa-sliders me-1"></i> 3. Pengaturan Administrasi Sistem & Audit Trail</a>
+            <a href="#peran-pengguna" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">4. Hak Akses (Dynamic RBAC)</a>
+            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">5. Alur Peminjaman Aset</a>
+            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">6. Alur Pengembalian Aset</a>
+            <a href="#master-barang" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">7. Master Barang & Label</a>
+            <a href="#kartu-stok" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">8. Kartu Stok & Buku Besar</a>
+            <a href="#laporan-bast" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">9. Laporan & Cetak BAST</a>
+            <a href="#tips-scanner" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">10. Penggunaan Scanner & Kamera</a>
+            <a href="#faq" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">11. Tanya Jawab (FAQ)</a>
         </div>
     </div>
 
@@ -401,12 +402,74 @@
         </div>
 
         <div class="alert alert-primary-subtle border border-primary-subtle rounded-3 small mt-3 mb-0">
-            <i class="fa-solid fa-sliders me-1"></i> <strong>Kustomisasi Format Kode:</strong> Super Admin dapat mengubah struktur prefix, separator, format tanggal, dan akhiran kode ini secara dinamis melalui menu <strong>Administration Settings &rarr; Manajemen Kode SKU</strong> dengan fitur <em>Live Preview</em> seketika.
+            <i class="fa-solid fa-sliders me-1"></i> <strong>Kustomisasi Format Kode:</strong> Super Admin dapat mengubah struktur prefix, separator, format tanggal, dan akhiran kode ini secara dinamis melalui menu <strong>Administration Settings &rarr; Manajemen Kode SKU</strong> dengan fitur <em>Live Preview</em> seketika, serta opsi sinkronisasi riwayat data lama.
         </div>
     </div>
 
     {{-- ══════════════════════════════════════════════════════ --}}
-    {{-- BAGIAN 3: HAK AKSES PERAN PENGGUNA                   --}}
+    {{-- BAGIAN 3: PENGATURAN ADMINISTRASI SISTEM & AUDIT LOG   --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    <div class="guide-section-card" id="administrasi-sistem">
+        <div class="section-heading">
+            <div class="section-icon-box" style="background: rgba(15, 23, 42, 0.08); color: #0f172a;">
+                <i class="fa-solid fa-sliders fs-5"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">3. Pengaturan Administrasi Sistem & Audit Trail (Rilis 1.2.0)</h4>
+                <small class="text-muted">Tata kelola peran dinamis, matriks hak akses, kustomisasi nomor dokumen, dan riwayat audit perbandingan</small>
+            </div>
+        </div>
+
+        <p class="text-muted" style="line-height: 1.7;">
+            Pembaruan versi 1.2.0 memperkenalkan modul <strong>Administration Settings</strong> yang diperuntukkan bagi Super Admin untuk mengelola sistem secara fleksibel tanpa memerlukan modifikasi kode program (<em>zero code configuration</em>).
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <div class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-user-shield text-primary me-1"></i> Peran Fleksibel (Dynamic Roles)
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Super Admin dapat menambah jabatan/peran kustom baru (misalnya <em>Auditor Inspektorat</em>, <em>Kepala Gudang</em>, atau <em>Petugas Lapangan</em>) lengkap dengan deskripsi tugasnya.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <div class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-table-cells text-success me-1"></i> Matriks 26 Granular Hak Akses
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Dilengkapi <em>Sticky Column</em> dan label Bahasa Indonesia ramah awam. Izin dikelompokkan ke 6 modul dengan tombol <em>Check All</em> dan filter peran interaktif.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <div class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-rotate text-warning me-1"></i> Sinkronisasi Riwayat Data Massal
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Ketika format kode SKU atau nomor transaksi diubah, Super Admin dapat mencentang opsi <strong>Terapkan ke Seluruh Data Riwayat</strong> untuk memperbarui seluruh data masa lalu secara seragam.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="ui-element-card w-100">
+                    <div class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-clock-rotate-left text-danger me-1"></i> Audit Trail Before vs After
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Setiap perubahan data penting (Barang, Format Kode, Kategori, Pengguna) dicatat dalam log detail dengan tampilan perbandingan dua kolom: <strong>Sebelum (Merah)</strong> vs <strong>Sesudah (Hijau)</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- BAGIAN 4: HAK AKSES PERAN PENGGUNA                   --}}
     {{-- ══════════════════════════════════════════════════════ --}}
     <div class="guide-section-card" id="peran-pengguna">
         <div class="section-heading">
@@ -417,7 +480,7 @@
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">3. Pembagian Peran Pengguna (Dynamic RBAC & Override)</h4>
+                <h4 class="mb-0 fw-bold">4. Pembagian Peran Pengguna (Dynamic RBAC & Override)</h4>
                 <small class="text-muted">Menjamin integritas data, keamanan operasional, dan pemisahan tugas kedinasan</small>
             </div>
         </div>
@@ -485,12 +548,12 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0-2a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7zm0-2a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
+                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">3. Panduan Alur Transaksi Peminjaman Barang</h4>
-                <small class="text-muted">Prosedur resmi peminjaman aset dari input instansi hingga serah terima fisik</small>
+                <h4 class="mb-0 fw-bold">5. Panduan Alur Transaksi Peminjaman Barang</h4>
+                <small class="text-muted">Prosedur resmi pengeluaran barang inventaris untuk pihak eksternal/internal</small>
             </div>
         </div>
 
@@ -587,8 +650,8 @@
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">4. Panduan Alur Pengembalian Barang (Penuh & Parsial)</h4>
-                <small class="text-muted">Mendukung pengembalian bertahap maupun langsung tuntas dengan sekali klik</small>
+                <h4 class="mb-0 fw-bold">6. Panduan Alur Pengembalian Barang (Penuh & Parsial)</h4>
+                <small class="text-muted">Prosedur pengecekan fisik, verifikasi unit kembali, dan pembaruan sisa pinjaman</small>
             </div>
         </div>
 
@@ -639,12 +702,12 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.922l6.5 2.6z"/>
+                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">5. Master Data Barang & Pencetakan Label Aset</h4>
-                <small class="text-muted">Standardisasi SKU barang milik daerah dan opsi cetak label Barcode 1D / QR Code 2D</small>
+                <h4 class="mb-0 fw-bold">7. Master Data Barang & Pencetakan Label Aset</h4>
+                <small class="text-muted">Katalogisasi aset, format label QR Code 2D eksklusif, dan penelusuran lokasi</small>
             </div>
         </div>
 
@@ -699,12 +762,12 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3z"/>
+                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">6. Kartu Stok & Buku Besar Mutasi Fisik</h4>
-                <small class="text-muted">Pencatatan riwayat penambahan atau pengurangan fisik barang non-peminjaman</small>
+                <h4 class="mb-0 fw-bold">8. Kartu Stok & Buku Besar Mutasi Fisik</h4>
+                <small class="text-muted">Pencatatan penambahan, mutasi masuk, rusak, dan hilang di luar sirkulasi peminjaman</small>
             </div>
         </div>
 
@@ -753,12 +816,12 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                    <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">7. Laporan Rekapitulasi & Cetak Dokumen BAST</h4>
-                <small class="text-muted">Pelaporan bulanan, filter kalender interaktif, dan lembar legalitas pertanggungjawaban</small>
+                <h4 class="mb-0 fw-bold">9. Laporan Rekapitulasi & Cetak Dokumen BAST</h4>
+                <small class="text-muted">Ekspor data per periode dan pencetakan dokumen pertanggungjawaban hukum</small>
             </div>
         </div>
 
@@ -801,13 +864,13 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                    <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+                    <path d="M5.5 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">8. Tips Pemindaian Barcode & Penggunaan Kamera</h4>
-                <small class="text-muted">Panduan menggunakan scanner genggam USB maupun kamera smartphone/laptop</small>
+                <h4 class="mb-0 fw-bold">10. Tips Pemindaian Barcode & Penggunaan Kamera</h4>
+                <small class="text-muted">Panduan optimalisasi kamera ponsel dan scanner USB saat operasional sibuk</small>
             </div>
         </div>
 
@@ -846,12 +909,11 @@
         <div class="section-heading">
             <div class="section-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                     <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">9. Pertanyaan yang Sering Diajukan (FAQ)</h4>
+                <h4 class="mb-0 fw-bold">11. Pertanyaan yang Sering Diajukan (FAQ)</h4>
                 <small class="text-muted">Solusi cepat untuk kendala operasional yang kerap dihadapi di lapangan</small>
             </div>
         </div>

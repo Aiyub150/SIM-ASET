@@ -377,7 +377,7 @@
                 <tr>
                     <td style="font-weight: bold; color:#1e3a5f;">Versi Panduan</td>
                     <td>:</td>
-                    <td>Versi 1.1.0 (Panduan Pengguna)</td>
+                    <td>Versi 1.2.0 (Panduan Pengguna &amp; Administrasi Sistem)</td>
                 </tr>
                 <tr>
                     <td style="font-weight: bold; color:#1e3a5f;">Tujuan Dokumen</td>
@@ -430,129 +430,155 @@
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB II. PERAN PENGGUNA &amp; MENU AKSES (ROLE)</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB II. PENGATURAN ADMINISTRASI SISTEM &amp; AUDIT TRAIL</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 4</td>
         </tr>
         <tr>
-            <td class="toc-sub">2.1 Super Admin (Pengendali Sistem &amp; Manajemen Akun)</td>
+            <td class="toc-sub">2.1 Manajemen Peran Dinamis (Dynamic Roles &amp; Permissions)</td>
             <td><div class="toc-dots"></div></td>
             <td class="toc-page">Halaman 4</td>
         </tr>
         <tr>
-            <td class="toc-sub">2.2 Admin Logistik (Master Barang, Label, &amp; Kartu Stok)</td>
+            <td class="toc-sub">2.2 Matriks 26 Granular Hak Akses &amp; Override Pengguna</td>
             <td><div class="toc-dots"></div></td>
             <td class="toc-page">Halaman 4</td>
         </tr>
         <tr>
-            <td class="toc-sub">2.3 Staff Logistik (Pencatat Peminjaman &amp; Pengembalian Barang)</td>
+            <td class="toc-sub">2.3 Standarisasi Format Kode &amp; Sinkronisasi Data Riwayat</td>
+            <td><div class="toc-dots"></div></td>
+            <td class="toc-page">Halaman 4</td>
+        </tr>
+        <tr>
+            <td class="toc-sub">2.4 Audit Trail &amp; Rekam Perbandingan Before-After</td>
             <td><div class="toc-dots"></div></td>
             <td class="toc-page">Halaman 4</td>
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB III. CARA MENCATAT PEMINJAMAN BARANG (MULTI-ITEM)</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB III. PERAN PENGGUNA &amp; MENU AKSES (ROLE)</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 5</td>
         </tr>
         <tr>
-            <td class="toc-sub">3.1 Panduan 5 Langkah Membuat Transaksi Peminjaman</td>
+            <td class="toc-sub">3.1 Super Admin (Pengendali Sistem &amp; Manajemen Akun)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 5</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 5</td>
         </tr>
         <tr>
-            <td class="toc-sub">3.2 Cara Meminjam Banyak Barang Sekaligus (Multi-Item)</td>
+            <td class="toc-sub">3.2 Admin Logistik (Master Barang, Label, &amp; Kartu Stok)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 5</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 5</td>
         </tr>
         <tr>
-            <td class="toc-sub">3.3 Pengecekan Otomatis Sisa Stok Gudang</td>
+            <td class="toc-sub">3.3 Staff Logistik (Pencatat Peminjaman &amp; Pengembalian Barang)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 5</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 5</td>
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB IV. CARA MEMPROSES PENGEMBALIAN BARANG</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB IV. CARA MENCATAT PEMINJAMAN BARANG (MULTI-ITEM)</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 6</td>
         </tr>
         <tr>
-            <td class="toc-sub">4.1 Pengembalian Lengkap Sekaligus (100% Selesai)</td>
+            <td class="toc-sub">4.1 Panduan 5 Langkah Membuat Transaksi Peminjaman</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 6</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 6</td>
         </tr>
         <tr>
-            <td class="toc-sub">4.2 Pengembalian Bertahap (Sebagian Unit Belum Kembali)</td>
+            <td class="toc-sub">4.2 Cara Meminjam Banyak Barang Sekaligus (Multi-Item)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 6</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 6</td>
         </tr>
         <tr>
-            <td class="toc-sub">4.3 Mempercepat Pengembalian dengan Scan Barcode / Kamera</td>
+            <td class="toc-sub">4.3 Pengecekan Otomatis Sisa Stok Gudang</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 6</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 6</td>
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB V. MASTER BARANG &amp; CARA CETAK LABEL STIKER</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB V. CARA MEMPROSES PENGEMBALIAN BARANG</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 7</td>
         </tr>
         <tr>
-            <td class="toc-sub">5.1 Mengenal Kode Unik SKU Otomatis</td>
+            <td class="toc-sub">5.1 Pengembalian Lengkap Sekaligus (100% Selesai)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 7</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 7</td>
         </tr>
         <tr>
-            <td class="toc-sub">5.2 Tiga Pilihan Format Cetak Label (Standar, Barcode, QR Code)</td>
+            <td class="toc-sub">5.2 Pengembalian Bertahap (Sebagian Unit Belum Kembali)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 7</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 7</td>
         </tr>
         <tr>
-            <td class="toc-sub">5.3 Mencetak Banyak Label Sekaligus (Cetak Massal)</td>
+            <td class="toc-sub">5.3 Mempercepat Pengembalian dengan Scan Barcode / Kamera</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 7</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 7</td>
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB VI. KARTU STOK, LAPORAN, &amp; BERITA ACARA (BAST)</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB VI. MASTER BARANG &amp; CARA CETAK LABEL STIKER</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 8</td>
         </tr>
         <tr>
-            <td class="toc-sub">6.1 Menyesuaikan Stok Barang (Barang Masuk, Rusak, Hilang)</td>
+            <td class="toc-sub">6.1 Mengenal Kode Unik SKU Otomatis</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 8</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 8</td>
         </tr>
         <tr>
-            <td class="toc-sub">6.2 Mengunduh Laporan Rekapitulasi Peminjaman</td>
+            <td class="toc-sub">6.2 Tiga Pilihan Format Cetak Label (Standar, Barcode, QR Code)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 8</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 8</td>
         </tr>
         <tr>
-            <td class="toc-sub">6.3 Mencetak Berita Acara Serah Terima (BAST PDF)</td>
+            <td class="toc-sub">6.3 Mencetak Banyak Label Sekaligus (Cetak Massal)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 8</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 8</td>
         </tr>
 
         <tr>
-            <td class="toc-main" style="padding-top: 10px;">BAB VII. PEMECAHAN MASALAH (TROUBLESHOOTING) &amp; FAQ</td>
+            <td class="toc-main" style="padding-top: 10px;">BAB VII. KARTU STOK, LAPORAN, &amp; BERITA ACARA (BAST)</td>
             <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
             <td class="toc-page" style="padding-top: 10px;">Halaman 9</td>
         </tr>
         <tr>
-            <td class="toc-sub">7.1 Solusi Scanner Kamera Tidak Terbaca / Izin Ditolak</td>
+            <td class="toc-sub">7.1 Menyesuaikan Stok Barang (Barang Masuk, Rusak, Hilang)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 9</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 9</td>
         </tr>
         <tr>
-            <td class="toc-sub">7.2 Pemecahan Masalah Scanner Barcode USB</td>
+            <td class="toc-sub">7.2 Mengunduh Laporan Rekapitulasi Peminjaman</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 9</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 9</td>
         </tr>
         <tr>
-            <td class="toc-sub">7.3 Pertanyaan yang Sering Diajukan (FAQ)</td>
+            <td class="toc-sub">7.3 Mencetak Berita Acara Serah Terima (BAST PDF)</td>
             <td><div class="toc-dots"></div></td>
-            <td class="toc-page">Halaman 9</td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 9</td>
+        </tr>
+
+        <tr>
+            <td class="toc-main" style="padding-top: 10px;">BAB VIII. PEMECAHAN MASALAH (TROUBLESHOOTING) &amp; FAQ</td>
+            <td style="padding-top: 10px;"><div class="toc-dots"></div></td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 10</td>
+        </tr>
+        <tr>
+            <td class="toc-sub">8.1 Solusi Scanner Kamera Tidak Terbaca / Izin Ditolak</td>
+            <td><div class="toc-dots"></div></td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 10</td>
+        </tr>
+        <tr>
+            <td class="toc-sub">8.2 Pemecahan Masalah Scanner Barcode USB</td>
+            <td><div class="toc-dots"></div></td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 10</td>
+        </tr>
+        <tr>
+            <td class="toc-sub">8.3 Pertanyaan yang Sering Diajukan (FAQ)</td>
+            <td><div class="toc-dots"></div></td>
+            <td class="toc-page" style="padding-top: 10px;">Halaman 10</td>
         </tr>
     </table>
 
@@ -626,9 +652,39 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 4: BAB II PERAN PENGGUNA & MENU AKSES                    --}}
+    {{-- HALAMAN 4: BAB II PENGATURAN ADMINISTRASI SISTEM & AUDIT TRAIL   --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB II. Peran Pengguna &amp; Menu Akses (Role)</h2>
+    <h2 class="section-title">BAB II. Pengaturan Administrasi Sistem &amp; Audit Trail</h2>
+    <p>
+        Pembaruan versi 1.2.0 menambahkan modul <strong>Administration Settings</strong> yang memberikan kendali penuh kepada Super Admin untuk mengatur sistem secara mandiri:
+    </p>
+
+    <h3 class="subsection-title">2.1 Manajemen Peran Dinamis (Dynamic Roles &amp; Permissions)</h3>
+    <p>
+        Super Admin dapat menambahkan peran/jabatan baru sesuai kebutuhan struktur organisasi pemerintah daerah tanpa perlu merombak basis data. Setiap peran dapat diberikan izin akses secara terperinci.
+    </p>
+
+    <h3 class="subsection-title">2.2 Matriks 26 Granular Hak Akses &amp; Override Pengguna</h3>
+    <p>
+        Sistem menyediakan 26 izin akses yang dikelompokkan ke dalam 6 modul kerja (Master Barang, Peminjaman, Peminjam/Dinas, Kategori, Stok Fisik, dan Administrasi). Matriks hak akses dilengkapi judul Bahasa Indonesia yang ramah bagi pengguna awam, tombol <em>Pilih Semua</em> per modul, dan fasilitas <em>Override</em> izin perorangan melalui pencarian pengguna.
+    </p>
+
+    <h3 class="subsection-title">2.3 Standarisasi Format Kode &amp; Sinkronisasi Data Riwayat</h3>
+    <p>
+        Pola penomoran kode SKU barang, nomor peminjaman, dan nomor BAST dapat disesuaikan strukturnya (awalan/prefix, separator, format tanggal, dan akhiran urutan). Jika pola penomoran diubah, Super Admin dapat mencentang opsi <strong>"Terapkan ke Seluruh Data Riwayat"</strong> agar data lama di sistem ikut diperbarui secara seragam.
+    </p>
+
+    <h3 class="subsection-title">2.4 Audit Trail &amp; Rekam Perbandingan Before-After</h3>
+    <p>
+        Setiap aktivitas perubahan data penting (Barang, Format Kode, Kategori, dan Pengguna) tersimpan secara akuntabel. Menu <em>Log History</em> menyajikan perbandingan visual dua kolom: kolom merah menunjukkan nilai data sebelum diubah, dan kolom hijau menunjukkan data baru hasil pembaruan.
+    </p>
+
+    <div class="page-break"></div>
+
+    {{-- ════════════════════════════════════════════════════════════════ --}}
+    {{-- HALAMAN 5: BAB III PERAN PENGGUNA & MENU AKSES                   --}}
+    {{-- ════════════════════════════════════════════════════════════════ --}}
+    <h2 class="section-title">BAB III. Peran Pengguna &amp; Menu Akses (Role)</h2>
     <p>
         Untuk menjaga kerapian dan keamanan data bersama, hak akses pengguna di dalam SIM-ASET dibagi menjadi 3 tingkatan peran:
     </p>
@@ -679,9 +735,9 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 5: BAB III CARA MENCATAT PEMINJAMAN                      --}}
+    {{-- HALAMAN 6: BAB IV CARA MENCATAT PEMINJAMAN                      --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB III. Cara Mencatat Peminjaman Barang</h2>
+    <h2 class="section-title">BAB IV. Cara Mencatat Peminjaman Barang</h2>
     <p>
         Pencatatan peminjaman barang dilakukan melalui 5 langkah praktis berikut agar barang yang keluar selalu terpantau dengan rapi:
     </p>
@@ -715,9 +771,9 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 6: BAB IV CARA MEMPROSES PENGEMBALIAN                    --}}
+    {{-- HALAMAN 7: BAB V CARA MEMPROSES PENGEMBALIAN                    --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB IV. Cara Memproses Pengembalian Barang</h2>
+    <h2 class="section-title">BAB V. Cara Memproses Pengembalian Barang</h2>
     <p>
         Ketika peminjam membawa barang kembali ke gudang, staf logistik mencatat pengembalian tersebut dengan cara:
     </p>
@@ -752,9 +808,9 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 7: BAB V MASTER BARANG & CETAK LABEL                     --}}
+    {{-- HALAMAN 8: BAB VI MASTER BARANG & CETAK LABEL                    --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB V. Master Data Barang &amp; Cara Cetak Label</h2>
+    <h2 class="section-title">BAB VI. Master Data Barang &amp; Cara Cetak Label</h2>
     <p>
         Data master barang memuat identitas aset, kategori, merek, dan nomor identifikasi unik (SKU).
     </p>
@@ -815,9 +871,9 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 8: BAB VI KARTU STOK, LAPORAN & BAST                     --}}
+    {{-- HALAMAN 9: BAB VII KARTU STOK, LAPORAN & BAST                    --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB VI. Kartu Stok, Laporan, &amp; Berita Acara (BAST)</h2>
+    <h2 class="section-title">BAB VII. Kartu Stok, Laporan, &amp; Berita Acara (BAST)</h2>
     <p>
         Modul ini digunakan untuk memantau sirkulasi barang di luar transaksi peminjaman serta menghasilkan dokumen pertanggungjawaban.
     </p>
@@ -845,9 +901,9 @@
     <div class="page-break"></div>
 
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    {{-- HALAMAN 9: BAB VII PEMECAHAN MASALAH & FAQ                       --}}
+    {{-- HALAMAN 10: BAB VIII PEMECAHAN MASALAH & FAQ                     --}}
     {{-- ════════════════════════════════════════════════════════════════ --}}
-    <h2 class="section-title">BAB VII. Pemecahan Masalah &amp; Tanya Jawab (FAQ)</h2>
+    <h2 class="section-title">BAB VIII. Pemecahan Masalah &amp; Tanya Jawab (FAQ)</h2>
     <p>
         Jika Anda mengalami kesulitan saat mengoperasikan aplikasi, silakan ikuti petunjuk praktis berikut:
     </p>
