@@ -96,7 +96,28 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{user}',      [UserController::class, 'update'])->middleware('throttle:30,1')->name('update');
     });
 
-    // ── MODUL KHUSUS SUPERADMIN: LOG HISTORY ────────────
+    // ── MODUL ADMINISTRATION SETTINGS (Super Admin saja) ────────────
+    Route::middleware(['role:Super Admin'])->prefix('admin-settings')->name('admin-settings.')->group(function () {
+        // 1. Log History
+        Route::get('/log-history', [\App\Http\Controllers\SuperAdminController::class, 'logHistory'])->name('log-history');
+
+        // 2. Manajemen Role
+        Route::get('/roles',             [\App\Http\Controllers\RolePermissionController::class, 'indexRoles'])->name('roles.index');
+        Route::post('/roles',            [\App\Http\Controllers\RolePermissionController::class, 'storeRole'])->middleware('throttle:30,1')->name('roles.store');
+        Route::put('/roles/{role}',      [\App\Http\Controllers\RolePermissionController::class, 'updateRole'])->middleware('throttle:30,1')->name('roles.update');
+        Route::delete('/roles/{role}',   [\App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->middleware('throttle:30,1')->name('roles.destroy');
+
+        // 3. Manajemen Hak Akses (Permissions)
+        Route::get('/permissions',                   [\App\Http\Controllers\RolePermissionController::class, 'indexPermissions'])->name('permissions.index');
+        Route::put('/permissions/roles/{role}',      [\App\Http\Controllers\RolePermissionController::class, 'updateRolePermissions'])->middleware('throttle:30,1')->name('permissions.roles.update');
+        Route::put('/permissions/users/{user}',      [\App\Http\Controllers\RolePermissionController::class, 'updateUserPermissions'])->middleware('throttle:30,1')->name('permissions.users.update');
+
+        // 4. Manajemen Format Kode & SKU
+        Route::get('/code-formats',                  [\App\Http\Controllers\CodeFormatSettingController::class, 'index'])->name('code-formats.index');
+        Route::put('/code-formats/{setting}',        [\App\Http\Controllers\CodeFormatSettingController::class, 'update'])->middleware('throttle:30,1')->name('code-formats.update');
+    });
+
+    // ── ALIAS UNTUK SUPERADMIN PREFIX (Backward Compatibility Route & Test) ──
     Route::middleware(['role:Super Admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/log-history', [\App\Http\Controllers\SuperAdminController::class, 'logHistory'])->name('log-history');
     });

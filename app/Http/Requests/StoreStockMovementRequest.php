@@ -20,7 +20,7 @@ class StoreStockMovementRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/^BAST\/\d{4}\/\d{2}\/\d{3}$/',
+                'regex:/^[a-zA-Z0-9_\-\/]+$/',
                 'unique:stock_movements,reference_code',
             ],
             'item_id'        => ['required', 'integer', 'exists:items,id'],

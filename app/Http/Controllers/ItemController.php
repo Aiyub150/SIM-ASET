@@ -276,20 +276,33 @@ class ItemController extends Controller
     // ── Helper: generate SKU unik — HARUS dipanggil dari dalam DB::transaction() ──
     private function generateSkuInsideTransaction(Category $category): string
     {
-        $prefix = $category->sku_prefix ?: strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $category->name), 0, 4));
+        $setting = \App\Models\CodeFormatSetting::where('entity', 'item_sku')->first();
 
-        $last = Item::where('category_id', $category->id)
-                    ->where('sku', 'like', $prefix . '-%')
+        $prefix = $setting && !empty($setting->prefix) 
+            ? $setting->prefix 
+            : ($category->sku_prefix ?: strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $category->name), 0, 4)));
+
+        $sep = $setting->separator ?? '-';
+
+        $last = Item::where('sku', 'like', $prefix . $sep . '%')
                     ->lockForUpdate()
-                    ->orderByDesc('sku')
+                    ->orderByDesc('id')
                     ->value('sku');
 
         $nextNum = 1;
         if ($last) {
-            $parts   = explode('-', $last);
-            $nextNum = (int) end($parts) + 1;
+            $parts   = explode($sep, $last);
+            $lastPart = end($parts);
+            if (is_numeric($lastPart)) {
+                $nextNum = (int) $lastPart + 1;
+            }
         }
 
-        return $prefix . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+        $padLength = ($setting && $setting->suffix_type === 'INCREMENT_4_DIGIT') ? 4 : 3;
+        $suffix = ($setting && $setting->suffix_type === 'RANDOM_ALPHANUMERIC_5') 
+            ? strtoupper(\Illuminate\Support\Str::random(5)) 
+            : str_pad($nextNum, $padLength, '0', STR_PAD_LEFT);
+
+        return $prefix . $sep . $suffix;
     }
 }

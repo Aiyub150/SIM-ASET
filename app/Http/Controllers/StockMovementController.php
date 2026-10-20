@@ -89,16 +89,37 @@ class StockMovementController extends Controller
         }
     }
 
-    // ── Helper: generate reference code BAST/YYYY/MM/XXX ──────────────
+    // ── Helper: generate reference code dinamis dari CodeFormatSetting ──────────────
     private function generateReferenceCode(): string
     {
+        $setting = \App\Models\CodeFormatSetting::where('entity', 'stock_bast')->first();
+
+        $prefix = ($setting && !empty($setting->prefix)) ? $setting->prefix : 'BAST';
+        $sep = $setting->separator ?? '/';
+
         $year  = now()->format('Y');
         $month = now()->format('m');
+        $datePart = '';
+
+        if ($setting) {
+            if ($setting->date_format === 'YYYYMMDD') $datePart = now()->format('Ymd');
+            elseif ($setting->date_format === 'YYYY-MM') $datePart = now()->format('Y-m');
+            elseif ($setting->date_format === 'YYYY/MM') $datePart = now()->format('Y/m');
+            elseif ($setting->date_format === 'YYYY') $datePart = now()->format('Y');
+        } else {
+            $datePart = $year . $sep . $month;
+        }
 
         $countThisMonth = StockMovement::whereYear('created_at', $year)
                                        ->whereMonth('created_at', $month)
                                        ->count();
 
-        return 'BAST/' . $year . '/' . $month . '/' . str_pad($countThisMonth + 1, 3, '0', STR_PAD_LEFT);
+        $padLength = ($setting && $setting->suffix_type === 'INCREMENT_4_DIGIT') ? 4 : 3;
+        $suffix = ($setting && $setting->suffix_type === 'RANDOM_ALPHANUMERIC_5')
+            ? strtoupper(\Illuminate\Support\Str::random(5))
+            : str_pad($countThisMonth + 1, $padLength, '0', STR_PAD_LEFT);
+
+        $parts = array_filter([$prefix, $datePart, $suffix]);
+        return implode($sep, $parts);
     }
 }

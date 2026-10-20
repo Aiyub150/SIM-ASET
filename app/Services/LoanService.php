@@ -21,10 +21,36 @@ class LoanService
         // DB::transaction akan membatalkan SEMUA perubahan database jika terjadi 1 saja error (Rollback)
         return DB::transaction(function () use ($data, $userId) {
             
-            // 1. Generate Kode Peminjaman Unik (Format: PJM-YYYYMMDD-XXXXX)
-            $datePrefix = now()->format('Ymd');
-            // Menggunakan Str::random(5) untuk mencegah race condition (Bentrok P0)
-            $loanCode = 'PJM-' . $datePrefix . '-' . strtoupper(\Illuminate\Support\Str::random(5));
+            // 1. Generate Kode Peminjaman Unik (Dinamis dari CodeFormatSetting)
+            $setting = \App\Models\CodeFormatSetting::where('entity', 'loan_code')->first();
+            $prefix = ($setting && !empty($setting->prefix)) ? $setting->prefix : 'PJM';
+            $sep = $setting->separator ?? '-';
+
+            $datePart = '';
+            if ($setting) {
+                if ($setting->date_format === 'YYYYMMDD') $datePart = now()->format('Ymd');
+                elseif ($setting->date_format === 'YYYY-MM') $datePart = now()->format('Y-m');
+                elseif ($setting->date_format === 'YYYY/MM') $datePart = now()->format('Y/m');
+                elseif ($setting->date_format === 'YYYY') $datePart = now()->format('Y');
+            } else {
+                $datePart = now()->format('Ymd');
+            }
+
+            $suffix = '';
+            if ($setting && $setting->suffix_type === 'INCREMENT_3_DIGIT') {
+                $count = Loan::whereDate('created_at', now()->today())->count() + 1;
+                $suffix = str_pad($count, 3, '0', STR_PAD_LEFT);
+            } elseif ($setting && $setting->suffix_type === 'INCREMENT_4_DIGIT') {
+                $count = Loan::whereDate('created_at', now()->today())->count() + 1;
+                $suffix = str_pad($count, 4, '0', STR_PAD_LEFT);
+            } elseif ($setting && $setting->suffix_type === 'CUSTOM' && !empty($setting->custom_suffix)) {
+                $suffix = $setting->custom_suffix;
+            } else {
+                $suffix = strtoupper(\Illuminate\Support\Str::random(5));
+            }
+
+            $parts = array_filter([$prefix, $datePart, $suffix]);
+            $loanCode = implode($sep, $parts);
 
             // 2. Insert Data ke Tabel loans (Header)
             $loan = Loan::create([

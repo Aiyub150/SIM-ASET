@@ -26,7 +26,7 @@ class SecurityValidationTest extends TestCase
     public function test_stock_reference_code_must_follow_bast_format(): void
     {
         $validator = Validator::make(
-            ['reference_code' => 'INVALID/2026/09'],
+            ['reference_code' => 'INVALID<script>alert(1)</script>'],
             (new StoreStockMovementRequest())->rules()
         );
 
