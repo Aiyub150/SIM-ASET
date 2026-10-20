@@ -423,6 +423,11 @@
             <td><div class="toc-dots"></div></td>
             <td class="toc-page">Halaman 3</td>
         </tr>
+        <tr>
+            <td class="toc-sub">1.4 Standarisasi Format Kode SKU &amp; Dokumen Transaksi</td>
+            <td><div class="toc-dots"></div></td>
+            <td class="toc-page">Halaman 3</td>
+        </tr>
 
         <tr>
             <td class="toc-main" style="padding-top: 10px;">BAB II. PERAN PENGGUNA &amp; MENU AKSES (ROLE)</td>
@@ -599,6 +604,22 @@
         </li>
         <li>
             <span class="badge-status badge-primary">TERSEDIA</span> : Barang ada di gudang dan siap dipinjamkan jika ada permohonan.
+        </li>
+    </ul>
+
+    <h3 class="subsection-title">1.4 Standarisasi Format Kode SKU &amp; Dokumen Transaksi</h3>
+    <p>
+        Setiap kode di dalam SIM-ASET memiliki arti terstruktur agar memudahkan pelacakan fisik aset dan dokumen:
+    </p>
+    <ul>
+        <li>
+            <strong>Kode Barang (SKU): <code>ELEK-001</code></strong> &mdash; <code>ELEK</code> menandakan inisial kategori barang (Elektronik), diikuti tanda hubung pemisah dan <code>001</code> sebagai nomor urut registrasi barang.
+        </li>
+        <li>
+            <strong>Kode Peminjaman: <code>PJM-20261020-RRBQA</code></strong> &mdash; <code>PJM</code> singkatan dokumen peminjaman, <code>20261020</code> menunjukkan tanggal pencatatan (YYYYMMDD), dan <code>RRBQA</code> merupakan 5 digit acak pengaman bentrok data.
+        </li>
+        <li>
+            <strong>Nomor BAST Mutasi: <code>BAST/2026/10/001</code></strong> &mdash; <code>BAST</code> adalah klasifikasi Berita Acara, <code>2026/10</code> menunjukkan tahun dan bulan mutasi, dan <code>001</code> nomor urut transaksi pada bulan tersebut.
         </li>
     </ul>
 

@@ -257,14 +257,15 @@
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="#pengenalan" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">1. Filosofi & Tampilan UI/UX</a>
-            <a href="#peran-pengguna" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">2. Hak Akses (Role)</a>
-            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">3. Alur Peminjaman Aset</a>
-            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">4. Alur Pengembalian Aset</a>
-            <a href="#master-barang" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">5. Master Barang & Label</a>
-            <a href="#kartu-stok" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">6. Kartu Stok & Buku Besar</a>
-            <a href="#laporan-bast" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">7. Laporan & Cetak BAST</a>
-            <a href="#tips-scanner" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">8. Penggunaan Scanner & Kamera</a>
-            <a href="#faq" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">9. Tanya Jawab (FAQ)</a>
+            <a href="#format-kode" class="btn btn-sm btn-outline-primary py-1 fw-bold" style="font-size: 0.78rem;"><i class="fa-solid fa-barcode me-1"></i> 2. Standarisasi Format Kode SKU & Dokumen</a>
+            <a href="#peran-pengguna" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">3. Hak Akses (Dynamic RBAC)</a>
+            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">4. Alur Peminjaman Aset</a>
+            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">5. Alur Pengembalian Aset</a>
+            <a href="#master-barang" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">6. Master Barang & Label</a>
+            <a href="#kartu-stok" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">7. Kartu Stok & Buku Besar</a>
+            <a href="#laporan-bast" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">8. Laporan & Cetak BAST</a>
+            <a href="#tips-scanner" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">9. Penggunaan Scanner & Kamera</a>
+            <a href="#faq" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">10. Tanya Jawab (FAQ)</a>
         </div>
     </div>
 
@@ -336,7 +337,76 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════ --}}
-    {{-- BAGIAN 2: HAK AKSES PERAN PENGGUNA                   --}}
+    {{-- BAGIAN 2: STANDARISASI FORMAT KODE SKU & DOKUMEN       --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    <div class="guide-section-card" id="format-kode">
+        <div class="section-heading">
+            <div class="section-icon-box" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">2. Cara Membaca & Memahami Format Kode Sistem</h4>
+                <small class="text-muted">Panduan membaca struktur kode SKU Barang, Nomor Transaksi Peminjaman, dan Nomor Berita Acara (BAST)</small>
+            </div>
+        </div>
+
+        <p class="text-muted" style="line-height: 1.7;">
+            Di dalam SIM-ASET, setiap kode referensi dibuat secara terstruktur, unik, dan memiliki arti fungsional. Hal ini bertujuan agar staf logistik maupun pimpinan dapat langsung mengidentifikasi asal-usul, tanggal transaksi, serta nomor urut aset tanpa perlu membuka dokumen fisik secara manual.
+        </p>
+
+        <div class="row g-4 mt-2">
+            <!-- 1. SKU Barang -->
+            <div class="col-md-4">
+                <div class="border rounded-4 p-3 bg-light h-100">
+                    <span class="badge bg-primary mb-2">Kode Barang (SKU)</span>
+                    <h6 class="fw-bold font-monospace text-dark mb-2">ELEK-001</h6>
+                    <p class="text-muted small mb-3">Format identitas unik yang tertera pada label stiker fisik QR Code setiap barang.</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li class="mb-2"><strong>1. Awalan (Prefix):</strong> <code>ELEK</code> menandakan inisial kategori barang (contoh: <em>Elektronik</em> atau <em>Mebel</em>).</li>
+                        <li class="mb-2"><strong>2. Pemisah (Separator):</strong> Tanda hubung <code>-</code> memisahkan kategori dengan nomor urut.</li>
+                        <li><strong>3. Akhiran (Suffix):</strong> <code>001</code> adalah nomor registrasi urut barang dalam kategori tersebut.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2. Kode Peminjaman -->
+            <div class="col-md-4">
+                <div class="border rounded-4 p-3 bg-light h-100">
+                    <span class="badge bg-success mb-2">Kode Peminjaman</span>
+                    <h6 class="fw-bold font-monospace text-dark mb-2">PJM-20261020-RRBQA</h6>
+                    <p class="text-muted small mb-3">Format nomor registrasi transaksi peminjaman aset untuk mencegah bentrok data.</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li class="mb-2"><strong>1. Awalan (Prefix):</strong> <code>PJM</code> singkatan dari dokumen Peminjaman.</li>
+                        <li class="mb-2"><strong>2. Format Tanggal:</strong> <code>20261020</code> menunjukkan tanggal transaksi dibuat (Tahun 2026, Bulan 10, Hari 20).</li>
+                        <li><strong>3. Akhiran Unik:</strong> <code>RRBQA</code> adalah 5 karakter acak unik anti-tabrakan data (atau nomor urut dinamis).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. Nomor BAST Mutasi Stok -->
+            <div class="col-md-4">
+                <div class="border rounded-4 p-3 bg-light h-100">
+                    <span class="badge bg-info text-dark mb-2">Nomor Berita Acara (BAST)</span>
+                    <h6 class="fw-bold font-monospace text-dark mb-2">BAST/2026/10/001</h6>
+                    <p class="text-muted small mb-3">Format penomoran surat resmi Berita Acara Serah Terima untuk mutasi stok.</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li class="mb-2"><strong>1. Awalan (Prefix):</strong> <code>BAST</code> adalah klasifikasi dokumen Berita Acara.</li>
+                        <li class="mb-2"><strong>2. Periode Waktu:</strong> <code>2026/10</code> menandakan tahun dan bulan penerbitan mutasi.</li>
+                        <li><strong>3. Nomor Urut Buku:</strong> <code>001</code> merupakan nomor urut berkas transaksi mutasi pada bulan berjalan.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-primary-subtle border border-primary-subtle rounded-3 small mt-3 mb-0">
+            <i class="fa-solid fa-sliders me-1"></i> <strong>Kustomisasi Format Kode:</strong> Super Admin dapat mengubah struktur prefix, separator, format tanggal, dan akhiran kode ini secara dinamis melalui menu <strong>Administration Settings &rarr; Manajemen Kode SKU</strong> dengan fitur <em>Live Preview</em> seketika.
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- BAGIAN 3: HAK AKSES PERAN PENGGUNA                   --}}
     {{-- ══════════════════════════════════════════════════════ --}}
     <div class="guide-section-card" id="peran-pengguna">
         <div class="section-heading">
@@ -347,7 +417,7 @@
                 </svg>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">2. Pembagian Peran Pengguna (Role & Hak Akses)</h4>
+                <h4 class="mb-0 fw-bold">3. Pembagian Peran Pengguna (Dynamic RBAC & Override)</h4>
                 <small class="text-muted">Menjamin integritas data, keamanan operasional, dan pemisahan tugas kedinasan</small>
             </div>
         </div>
