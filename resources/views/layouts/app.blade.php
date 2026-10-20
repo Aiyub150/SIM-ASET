@@ -469,46 +469,70 @@
             </a>
             @endhasanyrole
 
-            <div class="nav-section-label" style="margin-top:.5rem;">Administration Settings</div>
             @role('Super Admin')
-            <a href="{{ route('admin-settings.log-history') }}"
-               class="sidebar-link {{ request()->routeIs('admin-settings.log-history*') || request()->routeIs('superadmin.log-history*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.376.862c.324.23.633.486.924.764l.698-.716a8.01 8.01 0 0 0-1.07-1.025l-.552.977zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                </svg>
-                Log History
-            </a>
-            <a href="{{ route('admin-settings.roles.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin-settings.roles.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56z"/>
-                </svg>
-                Manajemen Role
-            </a>
-            <a href="{{ route('admin-settings.permissions.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin-settings.permissions.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1.337-.337A3.5 3.5 0 0 1 3.5 11.5zM3 6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
-                </svg>
-                Manajemen Hak Akses
-            </a>
-            <a href="{{ route('users.index') }}"
-               class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                    <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
-                    <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
-                </svg>
-                Kelola Pengguna
-            </a>
-            <a href="{{ route('admin-settings.code-formats.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin-settings.code-formats.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
-                </svg>
-                Manajemen Kode SKU
-            </a>
+            @php
+                $isAdminSettingsActive = request()->routeIs('admin-settings.*') || request()->routeIs('superadmin.log-history*') || request()->routeIs('users.*');
+            @endphp
+            <div class="nav-item">
+                <a class="sidebar-link d-flex justify-content-between align-items-center {{ $isAdminSettingsActive ? 'active' : '' }}" 
+                   data-bs-toggle="collapse" 
+                   href="#adminSettingsCollapse" 
+                   role="button" 
+                   aria-expanded="{{ $isAdminSettingsActive ? 'true' : 'false' }}" 
+                   aria-controls="adminSettingsCollapse">
+                    <div class="d-flex align-items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.185 1.184l-.16.291a1.873 1.873 0 0 0 1.115 2.693l.319.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.16a1.873 1.873 0 0 0-2.693 1.115l-.094.319c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.693-1.115l-.291.16c-.764.415-1.6-.42-1.185-1.184l.16-.291a1.873 1.873 0 0 0-1.115-2.693l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.693l-.16-.291c-.415-.764.42-1.6 1.185-1.184l.291.16a1.873 1.873 0 0 0 2.693-1.115l.094-.319z"/>
+                        </svg>
+                        <span>Administration Settings</span>
+                    </div>
+                    <svg class="sidebar-chevron transition-transform" style="transition: transform .2s; {{ $isAdminSettingsActive ? 'transform: rotate(180deg);' : '' }}" xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </a>
+                
+                <div class="collapse {{ $isAdminSettingsActive ? 'show' : '' }} ps-3 mt-1" id="adminSettingsCollapse">
+                    <a href="{{ route('admin-settings.log-history') }}"
+                       class="sidebar-link {{ request()->routeIs('admin-settings.log-history*') || request()->routeIs('superadmin.log-history*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.376.862c.324.23.633.486.924.764l.698-.716a8.01 8.01 0 0 0-1.07-1.025l-.552.977zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        Log History
+                    </a>
+                    <a href="{{ route('admin-settings.roles.index') }}"
+                       class="sidebar-link {{ request()->routeIs('admin-settings.roles.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56z"/>
+                        </svg>
+                        Manajemen Role
+                    </a>
+                    <a href="{{ route('admin-settings.permissions.index') }}"
+                       class="sidebar-link {{ request()->routeIs('admin-settings.permissions.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1.337-.337A3.5 3.5 0 0 1 3.5 11.5zM3 6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                        </svg>
+                        Manajemen Hak Akses
+                    </a>
+                    <a href="{{ route('users.index') }}"
+                       class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                            <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                        </svg>
+                        Kelola Pengguna
+                    </a>
+                    <a href="{{ route('admin-settings.code-formats.index') }}"
+                       class="sidebar-link {{ request()->routeIs('admin-settings.code-formats.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
+                        </svg>
+                        Manajemen Kode SKU
+                    </a>
+                </div>
+            </div>
             @endrole
 
             <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
@@ -672,6 +696,21 @@
             const isOpen   = sidebar.classList.toggle('open');
             overlay.style.display = isOpen ? 'block' : 'none';
         }
+
+        // Listen collapse state to rotate chevron
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminCollapse = document.getElementById('adminSettingsCollapse');
+            if (adminCollapse) {
+                adminCollapse.addEventListener('show.bs.collapse', function () {
+                    const chevron = document.querySelector('a[href="#adminSettingsCollapse"] .sidebar-chevron');
+                    if (chevron) chevron.style.transform = 'rotate(180deg)';
+                });
+                adminCollapse.addEventListener('hide.bs.collapse', function () {
+                    const chevron = document.querySelector('a[href="#adminSettingsCollapse"] .sidebar-chevron');
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                });
+            }
+        });
 
         window.alert = function (message) {
             Swal.fire({
