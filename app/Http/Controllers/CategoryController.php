@@ -47,17 +47,33 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        $beforeData = [
+            'name'        => $category->name,
+            'sku_prefix'  => $category->sku_prefix,
+            'description' => $category->description,
+        ];
+
         $category->update([
             'name' => $request->name,
             'sku_prefix' => strtoupper($request->sku_prefix),
             'description' => $request->description,
         ]);
 
+        $afterData = [
+            'name'        => $category->name,
+            'sku_prefix'  => $category->sku_prefix,
+            'description' => $category->description,
+        ];
+
         \App\Services\ActivityLogger::log(
             'UPDATE',
             'Kategori',
             "Memperbarui kategori: {$category->name}",
-            ['category_id' => $category->id, 'name' => $request->name],
+            [
+                'category_id' => $category->id,
+                'before'      => $beforeData,
+                'after'       => $afterData,
+            ],
             $request
         );
 

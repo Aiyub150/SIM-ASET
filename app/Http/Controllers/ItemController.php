@@ -217,15 +217,13 @@ class ItemController extends Controller
             $dataToUpdate['image'] = $request->file('image')->store('images/items', 'public');
         }
 
-        $item->update($dataToUpdate);
+        $oldData = [
+            'name'          => $item->name,
+            'total_qty'     => $item->total_qty,
+            'available_qty' => $item->available_qty,
+        ];
 
-        \App\Services\ActivityLogger::log(
-            'UPDATE',
-            'Barang',
-            "Memperbarui informasi barang: {$item->name} (SKU: {$item->sku})",
-            ['item_id' => $item->id, 'sku' => $item->sku, 'name' => $item->name],
-            $request
-        );
+        $item->update($dataToUpdate);
 
         if ($request->filled('total_qty')) {
             $newTotal = (int) $request->total_qty;
@@ -244,6 +242,23 @@ class ItemController extends Controller
                 'available_qty' => $newTotal - $onLoan,
             ]);
         }
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Barang',
+            "Memperbarui informasi barang: {$item->name} (SKU: {$item->sku})",
+            [
+                'item_id' => $item->id,
+                'sku'     => $item->sku,
+                'before'  => $oldData,
+                'after'   => [
+                    'name'          => $item->name,
+                    'total_qty'     => $item->total_qty,
+                    'available_qty' => $item->available_qty,
+                ],
+            ],
+            $request
+        );
 
         return redirect()
             ->route('items.index')

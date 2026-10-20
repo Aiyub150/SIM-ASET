@@ -96,6 +96,12 @@ class UserController extends Controller
             $dataToUpdate['avatar'] = $request->file('avatar')->store('images/users', 'public');
         }
 
+        $beforeUser = [
+            'name'  => $user->name,
+            'email' => $user->email,
+            'role'  => $user->roles->pluck('name')->first() ?? 'User',
+        ];
+
         $user->update($dataToUpdate);
 
         if ($request->filled('password')) {
@@ -104,11 +110,22 @@ class UserController extends Controller
 
         $user->syncRoles($data['role']);
 
+        $afterUser = [
+            'name'  => $user->name,
+            'email' => $user->email,
+            'role'  => $data['role'],
+            'password_changed' => $request->filled('password') ? 'Ya (Kata sandi baru)' : 'Tidak berubah',
+        ];
+
         \App\Services\ActivityLogger::log(
             'UPDATE',
             'Pengguna',
             "Memperbarui data pengguna: {$user->name} ({$user->email})",
-            ['user_id' => $user->id, 'role' => $data['role']],
+            [
+                'user_id' => $user->id,
+                'before'  => $beforeUser,
+                'after'   => $afterUser,
+            ],
             $request
         );
 

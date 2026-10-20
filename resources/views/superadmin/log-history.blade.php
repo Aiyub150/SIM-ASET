@@ -186,14 +186,82 @@
 @push('scripts')
 <script>
 function showPayloadDetails(properties, description) {
-    const formattedJson = JSON.stringify(properties, null, 2);
+    let contentHtml = `<div class="text-start mb-3 small text-secondary"><strong>Aktivitas:</strong> <span class="text-dark">${description}</span></div>`;
+
+    if (properties && properties.before && properties.after) {
+        // Tampilkan tabel komparasi Before vs After yang ramah awam
+        const beforeKeys = Object.keys(properties.before);
+        const afterKeys = Object.keys(properties.after);
+        const allKeys = Array.from(new Set([...beforeKeys, ...afterKeys]));
+
+        contentHtml += `
+            <div class="table-responsive border rounded-3 mb-3 text-start">
+                <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 0.8rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 30%;">Atribut / Data</th>
+                            <th class="text-danger" style="width: 35%;">Sebelum (Lama)</th>
+                            <th class="text-success" style="width: 35%;">Sesudah (Baru)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        allKeys.forEach(key => {
+            const valBefore = properties.before[key] !== undefined && properties.before[key] !== null ? properties.before[key] : '-';
+            const valAfter  = properties.after[key]  !== undefined && properties.after[key]  !== null ? properties.after[key]  : '-';
+            const isChanged = JSON.stringify(valBefore) !== JSON.stringify(valAfter);
+            const rowClass  = isChanged ? 'table-warning bg-opacity-25' : '';
+
+            contentHtml += `
+                <tr class="${rowClass}">
+                    <td class="fw-semibold text-secondary">${key}</td>
+                    <td class="text-danger font-monospace" style="word-break: break-all;">${typeof valBefore === 'object' ? JSON.stringify(valBefore) : valBefore}</td>
+                    <td class="text-success font-monospace fw-bold" style="word-break: break-all;">${typeof valAfter === 'object' ? JSON.stringify(valAfter) : valAfter}</td>
+                </tr>
+            `;
+        });
+
+        contentHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } else {
+        // Tampilkan key-value payload terformat ramah
+        contentHtml += `
+            <div class="table-responsive border rounded-3 mb-3 text-start">
+                <table class="table table-sm table-striped align-middle mb-0" style="font-size: 0.82rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 35%;">Parameter</th>
+                            <th style="width: 65%;">Nilai / Payload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        for (const [key, val] of Object.entries(properties || {})) {
+            contentHtml += `
+                <tr>
+                    <td class="fw-semibold text-secondary font-monospace">${key}</td>
+                    <td class="text-dark font-monospace" style="word-break: break-all;">${typeof val === 'object' ? JSON.stringify(val) : val}</td>
+                </tr>
+            `;
+        }
+
+        contentHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
     Swal.fire({
-        title: 'Detail Keterangan & Payload',
-        html: `
-            <div class="text-start mb-2 small text-secondary"><strong>Aktivitas:</strong> ${description}</div>
-            <pre class="text-start p-3 bg-light border rounded font-monospace" style="max-height: 250px; overflow-y: auto; font-size: 0.8rem; color: #1e293b;">${formattedJson}</pre>
-        `,
+        title: 'Detail Catatan Audit Trail',
+        html: contentHtml,
         icon: 'info',
+        width: '650px',
         confirmButtonText: 'Tutup',
         confirmButtonColor: '#2563eb',
         customClass: {
