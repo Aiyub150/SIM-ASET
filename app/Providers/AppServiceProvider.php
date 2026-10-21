@@ -84,10 +84,10 @@ class AppServiceProvider extends ServiceProvider
             $email = strtolower((string) $request->input('email', ''));
 
             return [
-                Limit::perMinute(5)->by($deviceKey)->response(function () {
-                    return back()->withInput()->with('error', 'Terlalu banyak percobaan login dari perangkat ini. Silakan tunggu 1 menit.');
+                Limit::perMinute(5)->by($deviceKey)->response(function (Request $request, array $headers) {
+                    return response('Terlalu banyak percobaan login dari perangkat ini. Silakan tunggu 1 menit.', 429, $headers);
                 }),
-                Limit::perMinute(10)->by($request->ip()),
+                Limit::perMinute(5)->by($request->ip()),
                 Limit::perMinute(5)->by($email . '|' . $request->ip()),
             ];
         });
@@ -97,10 +97,10 @@ class AppServiceProvider extends ServiceProvider
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
 
             return [
-                Limit::perMinutes(15, 3)->by($deviceKey)->response(function () {
-                    return back()->with('error', 'Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.');
+                Limit::perMinute(5)->by($deviceKey)->response(function (Request $request, array $headers) {
+                    return response('Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.', 429, $headers);
                 }),
-                Limit::perMinutes(15, 5)->by($request->ip()),
+                Limit::perMinute(5)->by($request->ip()),
             ];
         });
 
@@ -110,8 +110,8 @@ class AppServiceProvider extends ServiceProvider
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
 
             return [
-                Limit::perMinute(10)->by($userKey . '|' . $deviceKey)->response(function () {
-                    return back()->with('error', 'Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.');
+                Limit::perMinute(10)->by($userKey . '|' . $deviceKey)->response(function (Request $request, array $headers) {
+                    return response('Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.', 429, $headers);
                 }),
                 Limit::perMinute(15)->by($request->ip()),
             ];
