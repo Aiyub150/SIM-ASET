@@ -7,15 +7,35 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
-        if ($user && !$user->can('categories.view') && !$user->hasAnyRole(['Super Admin', 'Admin'])) {
+        if ($user && !$user->can('categories.view') && !$user->hasAnyRole(['Super Admin', 'Superadmin', 'Admin'])) {
             abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat manajemen kategori.');
         }
 
-        $categories = Category::withCount('items')->latest()->get();
-        return view('categories.index', compact('categories'));
+        $search = trim((string) $request->input('search', ''));
+        $status = trim((string) $request->input('status', ''));
+
+        $query = Category::withCount('items');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku_prefix', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $categories = $query->latest()->paginate(15)->withQueryString();
+
+        return view('categories.index', compact('categories', 'search', 'status'));
     }
 
     public function store(Request $request)
