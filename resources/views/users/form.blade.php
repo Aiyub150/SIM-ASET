@@ -20,7 +20,7 @@
                 {{ isset($user) ? 'Form Edit Pengguna' : 'Form Pengguna Baru' }}
             </div>
             <div class="card-body p-4">
-                <form action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}"
+                <form id="userForm" action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}"
                       method="POST" enctype="multipart/form-data">
                     @csrf
                     @if(isset($user)) @method('PUT') @endif
@@ -51,13 +51,19 @@
 
                     {{-- Role --}}
                     <div class="mb-3">
-                        <label class="form-label">Role / Hak Akses <span class="text-danger">*</span></label>
-                        <select name="role" class="form-select @error('role') is-invalid @enderror" required>
-                            <option value="">— Pilih Role —</option>
+                        <label class="form-label fw-semibold">Role / Hak Akses <span class="text-danger">*</span></label>
+                        <select name="role" id="role_select" class="form-select @error('role') is-invalid @enderror" required>
+                            <option value="">— Cari dan Pilih Role —</option>
                             @foreach($roles as $role)
-                                <option value="{{ $role }}"
-                                    {{ old('role', isset($user) ? $user->roles->first()?->name : '') === $role ? 'selected' : '' }}>
-                                    {{ $role }}
+                                @php
+                                    $roleName = is_string($role) ? $role : $role->name;
+                                    $roleColor = is_string($role) ? '#2563eb' : ($role->color ?? '#2563eb');
+                                    $isSelected = old('role', isset($user) ? $user->roles->first()?->name : '') === $roleName;
+                                @endphp
+                                <option value="{{ $roleName }}" 
+                                        data-color="{{ $roleColor }}"
+                                        {{ $isSelected ? 'selected' : '' }}>
+                                    {{ $roleName }}
                                 </option>
                             @endforeach
                         </select>
@@ -65,7 +71,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <div class="form-text text-muted" style="font-size:.78rem;">
-                            Catatan : Super Admin Mendapatakan akses penuh dan user management | Admin mendapatakan akses operasional | Staff Logistik mendapatakan akses hanya untuk peminjaman miliknya.
+                            Ketik nama peran untuk mencari secara cepat. Setiap peran membawa hak akses spesifik sesuai matriks izin.
                         </div>
                     </div>
 
@@ -129,5 +135,76 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const roleSelect = document.getElementById('role_select');
+        if (roleSelect && typeof TomSelect !== 'undefined') {
+            new TomSelect(roleSelect, {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: '— Cari & Pilih Role —',
+                render: {
+                    option: function(data, escape) {
+                        const color = data.$option ? data.$option.getAttribute('data-color') : '#2563eb';
+                        return `<div>
+                            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: ${escape(color)};"></span>
+                            <span class="fw-semibold">${escape(data.text)}</span>
+                        </div>`;
+                    },
+                    item: function(data, escape) {
+                        const color = data.$option ? data.$option.getAttribute('data-color') : '#2563eb';
+                        return `<div>
+                            <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: ${escape(color)};"></span>
+                            ${escape(data.text)}
+                        </div>`;
+                    },
+                    no_results: function(data, escape) {
+                        return '<div class="no-results" style="padding: 10px; color: #6c757d;">Tidak ada role yang cocok.</div>';
+                    }
+                }
+            });
+        }
+
+        const userForm = document.getElementById('userForm');
+        if (userForm) {
+            userForm.addEventListener('submit', function (e) {
+                if (userForm.dataset.confirmed === 'true') {
+                    return;
+                }
+                e.preventDefault();
+
+                if (!userForm.checkValidity()) {
+                    userForm.reportValidity();
+                    return;
+                }
+
+                const isEdit = {{ isset($user) ? 'true' : 'false' }};
+                Swal.fire({
+                    title: isEdit ? 'Simpan Perubahan Akun?' : 'Buat Pengguna Baru?',
+                    text: isEdit 
+                        ? 'Pastikan data dan role pengguna sudah sesuai sebelum disimpan.' 
+                        : 'Akun baru akan dibuat dan dapat langsung digunakan untuk masuk sistem.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: isEdit ? 'Ya, Simpan' : 'Ya, Buat Pengguna',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        userForm.dataset.confirmed = 'true';
+                        userForm.submit();
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endpush
 
 @endsection
