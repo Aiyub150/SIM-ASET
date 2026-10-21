@@ -51,23 +51,36 @@
         .ts-wrapper.form-select-sm {
             padding: 0 !important;
             border: none !important;
-            background-image: none !important;
+            background: transparent !important;
             box-shadow: none !important;
         }
         .ts-control {
+            border: 1px solid #ced4da !important;
             border-radius: 0.5rem !important;
-            border-color: #dee2e6 !important;
-            padding: 0.45rem 0.75rem !important;
+            padding: 0.45rem 2.25rem 0.45rem 0.75rem !important;
             font-size: 0.875rem !important;
             box-shadow: none !important;
             background-color: #fff !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.75rem center !important;
+            background-size: 16px 12px !important;
             min-height: 38px !important;
             display: flex !important;
             align-items: center !important;
+            cursor: pointer !important;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out !important;
         }
+        .ts-control:hover {
+            border-color: #94a3b8 !important;
+        }
+        .ts-wrapper.focus .ts-control,
         .ts-control.focus {
             border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15) !important;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2) !important;
+        }
+        .ts-wrapper.single .ts-control::after {
+            display: none !important;
         }
         .ts-dropdown {
             border-radius: 0.75rem !important;
@@ -104,10 +117,12 @@
             color: #1d4ed8 !important;
         }
         .ts-wrapper.form-select-sm .ts-control {
-            padding: 0.28rem 0.6rem !important;
+            padding: 0.28rem 1.8rem 0.28rem 0.6rem !important;
             font-size: 0.8125rem !important;
             border-radius: 0.375rem !important;
             min-height: 31px !important;
+            background-size: 12px 10px !important;
+            background-position: right 0.5rem center !important;
         }
         .ts-wrapper .ts-control > input {
             font-size: inherit !important;

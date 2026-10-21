@@ -41,18 +41,21 @@
         gap: .5rem;
         height: 38px;
         padding: .45rem .75rem;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 0.5rem;
         background: #fff;
         cursor: pointer;
         font-size: .875rem;
-        transition: border-color .2s, box-shadow .2s;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
         user-select: none;
+    }
+    .item-picker-display:hover {
+        border-color: #94a3b8;
     }
     .item-picker-display:focus-within,
     .item-picker-display.open {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2);
     }
     .item-picker-display .placeholder { color: #94a3b8; }
     .item-picker-display .selected-text { color: #1e293b; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
