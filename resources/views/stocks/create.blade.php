@@ -80,8 +80,8 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-8">
                             <label class="form-label">Tipe Mutasi</label>
-                            <select name="type" class="form-select @error('type') is-invalid @enderror" required>
-                                <option value="">— Pilih Tipe —</option>
+                            <select name="type" id="stock_mutation_type" class="form-select @error('type') is-invalid @enderror" required>
+                                <option value="">— Pilih Tipe Mutasi —</option>
                                 <option value="in"     {{ old('type') == 'in'     ? 'selected' : '' }}>➕ Barang Masuk / Pengadaan</option>
                                 <option value="out"    {{ old('type') == 'out'    ? 'selected' : '' }}>➖ Barang Keluar / Hibah</option>
                                 <option value="broken" {{ old('type') == 'broken' ? 'selected' : '' }}>🔴 Barang Rusak Total</option>
@@ -146,6 +146,15 @@
                     return '<div class="no-results" style="padding: 10px; color: #6c757d;">Barang tidak ditemukan.</div>';
                 }
             }
+        });
+    }
+
+    const mutationTypeSelect = document.getElementById('stock_mutation_type');
+    if (mutationTypeSelect) {
+        new TomSelect(mutationTypeSelect, {
+            create: false,
+            controlInput: null,
+            placeholder: '— Pilih Tipe Mutasi —'
         });
     }
 })();

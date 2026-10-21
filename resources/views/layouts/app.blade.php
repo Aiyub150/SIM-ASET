@@ -46,6 +46,41 @@
 
         * { box-sizing: border-box; }
 
+        /* Custom TomSelect Enhancements */
+        .ts-control {
+            border-radius: 0.5rem !important;
+            border-color: #dee2e6 !important;
+            padding: 0.45rem 0.75rem !important;
+            font-size: 0.875rem !important;
+            box-shadow: none !important;
+        }
+        .ts-control.focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15) !important;
+        }
+        .ts-dropdown {
+            border-radius: 0.75rem !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            padding: 0.35rem !important;
+            margin-top: 4px !important;
+            z-index: 1060 !important;
+        }
+        .ts-dropdown .option {
+            border-radius: 0.4rem !important;
+            padding: 0.45rem 0.75rem !important;
+            font-size: 0.85rem !important;
+        }
+        .ts-dropdown .active {
+            background-color: #eff6ff !important;
+            color: #1d4ed8 !important;
+        }
+        .ts-wrapper.form-select-sm .ts-control {
+            padding: 0.3rem 0.6rem !important;
+            font-size: 0.8125rem !important;
+            border-radius: 0.375rem !important;
+        }
+
         /* ── COLLAPSE & ACCORDION FIX ─────────────── */
         .collapse.show,
         .accordion-collapse.collapse.show,

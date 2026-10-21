@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <select name="module" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <select name="module" id="log_module_filter" class="form-select form-select-sm">
                         <option value="">Semua Modul</option>
                         @foreach($modules as $m)
                             <option value="{{ $m }}" {{ request('module') === $m ? 'selected' : '' }}>{{ $m }}</option>
@@ -48,7 +48,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select name="action" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <select name="action" id="log_action_filter" class="form-select form-select-sm">
                         <option value="">Semua Aksi</option>
                         @foreach($actions as $act)
                             <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>{{ $act }}</option>
@@ -269,6 +269,32 @@ function showPayloadDetails(properties, description) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const moduleFilter = document.getElementById('log_module_filter');
+    if (moduleFilter && typeof TomSelect !== 'undefined') {
+        new TomSelect(moduleFilter, {
+            create: false,
+            placeholder: 'Semua Modul',
+            allowEmptyOption: true,
+            onChange: function() {
+                moduleFilter.closest('form').submit();
+            }
+        });
+    }
+
+    const actionFilter = document.getElementById('log_action_filter');
+    if (actionFilter && typeof TomSelect !== 'undefined') {
+        new TomSelect(actionFilter, {
+            create: false,
+            placeholder: 'Semua Aksi',
+            allowEmptyOption: true,
+            onChange: function() {
+                actionFilter.closest('form').submit();
+            }
+        });
+    }
+});
 </script>
 @endpush
 @endsection

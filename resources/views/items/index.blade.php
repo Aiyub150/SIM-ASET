@@ -27,7 +27,7 @@
                 <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari nama atau SKU..." value="{{ request('search') }}">
             </div>
             <div class="col-md-4">
-                <select name="category_id" class="form-select form-select-sm">
+                <select name="category_id" id="item_category_filter" class="form-select form-select-sm">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -193,6 +193,18 @@
             selected.forEach(id => url.searchParams.append('items[]', id));
             window.open(url.toString(), '_blank');
         });
+
+        const categoryFilter = document.getElementById('item_category_filter');
+        if (categoryFilter && typeof TomSelect !== 'undefined') {
+            new TomSelect(categoryFilter, {
+                create: false,
+                placeholder: 'Semua Kategori',
+                allowEmptyOption: true,
+                onChange: function() {
+                    categoryFilter.closest('form').submit();
+                }
+            });
+        }
     });
 </script>
 

@@ -33,17 +33,17 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <select name="role" class="form-select" onchange="this.form.submit()">
+                <select name="role" id="user_role_filter" class="form-select">
                     <option value="">Semua Peran / Role</option>
                     @foreach($roles as $r)
-                        <option value="{{ $r->name }}" {{ ($roleFilter ?? '') === $r->name ? 'selected' : '' }}>
+                        <option value="{{ $r->name }}" data-color="{{ $r->color ?? '#2563eb' }}" {{ ($roleFilter ?? '') === $r->name ? 'selected' : '' }}>
                             {{ $r->name }}
                         </option>
                     @endforeach
                 </select>
             </div>
             <div class="col-6 col-md-2">
-                <select name="status" class="form-select" onchange="this.form.submit()">
+                <select name="status" id="user_status_filter" class="form-select">
                     <option value="">Semua Status</option>
                     <option value="active" {{ ($statusFilter ?? '') === 'active' ? 'selected' : '' }}>Sedang Aktif</option>
                     <option value="inactive" {{ ($statusFilter ?? '') === 'inactive' ? 'selected' : '' }}>Offline</option>
@@ -181,5 +181,58 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const roleFilter = document.getElementById('user_role_filter');
+        if (roleFilter && typeof TomSelect !== 'undefined') {
+            new TomSelect(roleFilter, {
+                create: false,
+                placeholder: 'Semua Peran / Role',
+                allowEmptyOption: true,
+                onChange: function() {
+                    roleFilter.closest('form').submit();
+                },
+                render: {
+                    option: function(data, escape) {
+                        const color = data.$option ? data.$option.getAttribute('data-color') : '#2563eb';
+                        if (!data.value) {
+                            return `<div>${escape(data.text)}</div>`;
+                        }
+                        return `<div>
+                            <span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background-color: ${escape(color)};"></span>
+                            ${escape(data.text)}
+                        </div>`;
+                    },
+                    item: function(data, escape) {
+                        const color = data.$option ? data.$option.getAttribute('data-color') : '#2563eb';
+                        if (!data.value) {
+                            return `<div>${escape(data.text)}</div>`;
+                        }
+                        return `<div>
+                            <span class="d-inline-block rounded-circle me-1" style="width: 7px; height: 7px; background-color: ${escape(color)};"></span>
+                            ${escape(data.text)}
+                        </div>`;
+                    }
+                }
+            });
+        }
+
+        const statusFilter = document.getElementById('user_status_filter');
+        if (statusFilter && typeof TomSelect !== 'undefined') {
+            new TomSelect(statusFilter, {
+                create: false,
+                controlInput: null,
+                placeholder: 'Semua Status',
+                allowEmptyOption: true,
+                onChange: function() {
+                    statusFilter.closest('form').submit();
+                }
+            });
+        }
+    });
+</script>
+@endpush
 
 @endsection

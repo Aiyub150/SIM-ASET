@@ -35,7 +35,7 @@
                 <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari kode, peminjam, barang, pencatat..." value="{{ request('search') }}">
             </div>
             <div class="col-md-4">
-                <select name="status" class="form-select form-select-sm">
+                <select name="status" id="loan_status_filter" class="form-select form-select-sm">
                     <option value="">Semua Status</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
@@ -118,5 +118,24 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loanStatusFilter = document.getElementById('loan_status_filter');
+        if (loanStatusFilter && typeof TomSelect !== 'undefined') {
+            new TomSelect(loanStatusFilter, {
+                create: false,
+                controlInput: null,
+                placeholder: 'Semua Status',
+                allowEmptyOption: true,
+                onChange: function() {
+                    loanStatusFilter.closest('form').submit();
+                }
+            });
+        }
+    });
+</script>
+@endpush
 
 @endsection

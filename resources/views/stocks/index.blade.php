@@ -27,7 +27,7 @@
                 <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari ref/nama/SKU..." value="{{ request('search') }}">
             </div>
             <div class="col-md-4">
-                <select name="type" class="form-select form-select-sm">
+                <select name="type" id="stock_type_filter" class="form-select form-select-sm">
                     <option value="">Semua Tipe Mutasi</option>
                     <option value="in" {{ request('type') === 'in' ? 'selected' : '' }}>Masuk (Penambahan)</option>
                     <option value="out" {{ request('type') === 'out' ? 'selected' : '' }}>Keluar (Pengurangan)</option>
@@ -108,5 +108,24 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stockTypeFilter = document.getElementById('stock_type_filter');
+        if (stockTypeFilter && typeof TomSelect !== 'undefined') {
+            new TomSelect(stockTypeFilter, {
+                create: false,
+                controlInput: null,
+                placeholder: 'Semua Tipe Mutasi',
+                allowEmptyOption: true,
+                onChange: function() {
+                    stockTypeFilter.closest('form').submit();
+                }
+            });
+        }
+    });
+</script>
+@endpush
 
 @endsection
