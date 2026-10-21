@@ -21,6 +21,8 @@ class User extends Authenticatable
         'avatar',
         'password',
         'last_login_at',
+        'failed_login_count',
+        'locked_until',
     ];
 
     protected $hidden = [
@@ -33,6 +35,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'last_login_at'     => 'datetime',
+            'locked_until'      => 'datetime',
+            'failed_login_count'=> 'integer',
             'password'          => 'hashed',
         ];
     }

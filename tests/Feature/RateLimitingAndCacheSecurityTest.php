@@ -177,12 +177,12 @@ class RateLimitingAndCacheSecurityTest extends TestCase
             ->get('/login');
         $device2Login->assertSee('id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="display:none;"', false);
 
-        // Device 2 attempts login with wrong password (1st attempt)
+        // Device 2 attempts login with wrong password for a different user account (1st attempt)
         // Must show remaining 4 attempts, NOT lockout!
         $device2Attempt1 = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
             ->withCookies(['simaset_did' => $device2Token])
             ->post('/login', [
-                'email' => 'superadmin@simaset.com',
+                'email' => 'staff@simaset.com',
                 'password' => 'wrongpass',
             ]);
         $device2Attempt1->assertSessionHasErrors('email');

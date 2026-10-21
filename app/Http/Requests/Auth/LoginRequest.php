@@ -43,32 +43,47 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        $email = strtolower((string) $this->input('email', ''));
+        $user = \App\Models\User::where('email', $email)->first();
+
+        // 1. Cek apakah user sedang terkunci di database (FR-AUTH-11 / konsep karbon-ikn)
+        if ($user && $user->locked_until && $user->locked_until->isFuture()) {
+            $seconds = (int) now()->diffInSeconds($user->locked_until);
+            $seconds = $seconds > 0 ? $seconds : self::LOCKOUT_SECONDS;
+            session()->flash('lockout_seconds', $seconds);
+            $minutes = ceil($seconds / 60);
+
+            throw ValidationException::withMessages([
+                'email' => "Terlalu banyak percobaan login yang gagal. Akun Anda dikunci sementara selama {$minutes} menit demi keamanan.",
+            ]);
+        }
+
+        // 2. Cek rate limiter
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey(), self::LOCKOUT_SECONDS);
-            RateLimiter::hit($this->ipThrottleKey(), self::LOCKOUT_SECONDS);
             RateLimiter::hit($this->deviceKey(), self::LOCKOUT_SECONDS);
 
-            $attempts = max(
-                RateLimiter::attempts($this->throttleKey()),
-                RateLimiter::attempts($this->ipThrottleKey()),
-                RateLimiter::attempts($this->deviceKey())
-            );
+            $attempts = 0;
+            if ($user) {
+                $user->increment('failed_login_count');
+                $attempts = $user->failed_login_count;
+                if ($attempts >= self::MAX_ATTEMPTS) {
+                    $user->update(['locked_until' => now()->addSeconds(self::LOCKOUT_SECONDS)]);
+                }
+            } else {
+                $attempts = RateLimiter::attempts($this->throttleKey());
+            }
 
-            // User diberikan 5 kesempatan (percobaan 1 s.d. 4 menampilkan sisa kesempatan)
-            // Setelah 5 kali gagal, sistem mengunci selama 15 menit sehingga percobaan ke-6 terkunci penuh
+            // User diberikan 5 kesempatan (percobaan 1 s.d. 4 sisa kesempatan)
+            // Baru setelah 5 kali gagal penuh, sistem mengunci akun selama 15 menit sehingga percobaan ke-6 terkunci
             if ($attempts >= self::MAX_ATTEMPTS) {
-                $seconds = max(
-                    RateLimiter::availableIn($this->throttleKey()),
-                    RateLimiter::availableIn($this->ipThrottleKey()),
-                    RateLimiter::availableIn($this->deviceKey())
-                );
-                $lockSec = $seconds > 0 ? $seconds : self::LOCKOUT_SECONDS;
-                session()->flash('lockout_seconds', $lockSec);
+                $seconds = self::LOCKOUT_SECONDS;
+                session()->flash('lockout_seconds', $seconds);
 
                 throw ValidationException::withMessages([
-                    'email' => "Terlalu banyak percobaan login yang gagal. Akun dan perangkat Anda dikunci sementara selama 15 menit demi keamanan.",
+                    'email' => "Terlalu banyak percobaan login yang gagal. Akun Anda dikunci sementara selama 15 menit demi keamanan.",
                 ]);
             }
 
@@ -76,6 +91,14 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => "Email atau kata sandi yang Anda masukkan salah. Sisa kesempatan login: {$remaining} kali sebelum akun dikunci.",
+            ]);
+        }
+
+        // Login sukses -> Reset hitungan gagal (persis seperti karbon-ikn)
+        if ($user) {
+            $user->update([
+                'failed_login_count' => 0,
+                'locked_until'       => null,
             ]);
         }
 
@@ -92,13 +115,8 @@ class LoginRequest extends FormRequest
     public function ensureIsNotRateLimited(): void
     {
         $primaryKey = $this->throttleKey();
-        $ipKey = $this->ipThrottleKey();
-        $devKey = $this->deviceKey();
 
-        // Kunci HANYA jika gagal sudah mencapai atau melebihi MAX_ATTEMPTS (5 kali)
-        $isLimited = RateLimiter::tooManyAttempts($primaryKey, self::MAX_ATTEMPTS)
-                  || RateLimiter::tooManyAttempts($ipKey, self::MAX_ATTEMPTS)
-                  || RateLimiter::tooManyAttempts($devKey, self::MAX_ATTEMPTS);
+        $isLimited = RateLimiter::tooManyAttempts($primaryKey, self::MAX_ATTEMPTS);
 
         if (! $isLimited) {
             return;
@@ -106,12 +124,7 @@ class LoginRequest extends FormRequest
 
         event(new Lockout($this));
 
-        $seconds = max(
-            RateLimiter::availableIn($primaryKey),
-            RateLimiter::availableIn($ipKey),
-            RateLimiter::availableIn($devKey)
-        );
-
+        $seconds = RateLimiter::availableIn($primaryKey);
         if ($seconds <= 0) {
             $seconds = self::LOCKOUT_SECONDS;
         }
@@ -120,7 +133,7 @@ class LoginRequest extends FormRequest
         $minutes = ceil($seconds / 60);
 
         throw ValidationException::withMessages([
-            'email' => "Terlalu banyak percobaan login yang gagal. Akun dan perangkat Anda dikunci sementara selama {$minutes} menit demi keamanan.",
+            'email' => "Terlalu banyak percobaan login yang gagal. Akun Anda dikunci sementara selama {$minutes} menit demi keamanan.",
         ]);
     }
 
@@ -137,16 +150,11 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request (Email + Scope).
+     * Get the rate limiting throttle key for the email account (seperti konsep karbon-ikn).
      */
     public function throttleKey(): string
     {
-        $clientIp = \App\Services\ActivityLogger::resolveClientIp($this);
-        $scope = \App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp) 
-            ? $this->deviceKey() 
-            : $clientIp . '|' . $this->deviceKey();
-
-        return Str::transliterate(Str::lower($this->string('email')) . '|' . $scope);
+        return 'login_acc|' . Str::lower($this->string('email'));
     }
 
     /**
@@ -155,10 +163,6 @@ class LoginRequest extends FormRequest
     public function ipThrottleKey(): string
     {
         $clientIp = \App\Services\ActivityLogger::resolveClientIp($this);
-        if (\App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp)) {
-            return 'login_dev|' . $this->deviceKey();
-        }
-
         return 'login_ip|' . $clientIp;
     }
 }

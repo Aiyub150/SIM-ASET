@@ -16,32 +16,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
-        $clientIp = \App\Services\ActivityLogger::resolveClientIp($request);
-        $deviceId = $request->cookie('simaset_did') 
-            ?? $request->header('X-Device-Id') 
-            ?? sha1($request->header('User-Agent') ?? 'unknown-device');
-        $deviceKey = 'dev_' . substr(sha1($deviceId), 0, 16);
-
-        // Lockout timer HANYA aktif jika device ini telah melampaui batas percobaan
-        $isLocked = false;
         $lockoutSeconds = 0;
-
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($deviceKey, LoginRequest::MAX_ATTEMPTS)) {
-            $isLocked = true;
-            $lockoutSeconds = (int) \Illuminate\Support\Facades\RateLimiter::availableIn($deviceKey);
-        } elseif (!\App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp)) {
-            $ipKey = 'login_ip|' . $clientIp;
-            if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, LoginRequest::MAX_ATTEMPTS)) {
-                $isLocked = true;
-                $lockoutSeconds = (int) \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey);
-            }
-        }
-
-        if ($isLocked) {
-            if ($lockoutSeconds <= 0) {
-                $lockoutSeconds = LoginRequest::LOCKOUT_SECONDS;
-            }
-        } elseif (session()->has('lockout_seconds')) {
+        if (session()->has('lockout_seconds')) {
             $lockoutSeconds = (int) session('lockout_seconds');
         }
 
