@@ -755,7 +755,7 @@
         <li>
             <span class="step-number">Langkah 4 (Pilih Barang):</span> Masukkan barang yang dipinjam dengan salah satu cara berikut:
             <ul>
-                <li><strong>Gunakan Pemindai (Scan):</strong> Arahkan scanner laser atau kamera ke label barcode/QR code pada bodi barang. Barang akan otomatis masuk ke tabel.</li>
+                <li><strong>Gunakan Pemindai (Scan):</strong> Arahkan scanner atau kamera ke label barcode kotak (QR Code) pada bodi barang. Barang akan otomatis masuk ke tabel.</li>
                 <li><strong>Pilih Manual:</strong> Pilih nama barang dari menu dropdown, lalu isi berapa unit yang dipinjam. Jika meminjam beberapa jenis barang yang berbeda, klik tombol <em>+ Tambah Baris</em>.</li>
             </ul>
         </li>
@@ -820,45 +820,27 @@
         Aplikasi secara otomatis membuatkan kode SKU unik saat barang baru didaftarkan, berdasarkan singkatan kategori barang (contoh: Kategori Elektronik disingkat <code>ELEC-001</code>, <code>ELEC-002</code>, dst). Dengan adanya kode ini, setiap fisik barang memiliki nomor pengenal tersendiri yang tidak tertukar.
     </p>
 
-    <h3 class="subsection-title">5.2 Tiga Pilihan Format Cetak Label Stiker</h3>
+    <h3 class="subsection-title">5.2 Standar Format Cetak Label Aset (Barcode Kotak 2D)</h3>
     <p>
-        Pada halaman Master Barang, Anda dapat mencetak stiker label aset dengan 3 varian:
+        SIM-ASET secara eksklusif menggunakan standar resmi <strong>Barcode Kotak (QR Code 2D)</strong> untuk seluruh label fisik barang inventaris milik daerah. Format ini memuat identitas SKU, nama barang, dan kode QR matriks presisi tinggi yang dapat dipindai cepat dari segala sudut.
     </p>
 
     <table class="table-data">
         <thead>
             <tr>
-                <th style="width: 25%;">Varian Label</th>
-                <th style="width: 45%;">Tampilan Label</th>
-                <th style="width: 30%;">Saran Penggunaan</th>
+                <th style="width: 30%;">Format Label</th>
+                <th style="width: 40%;">Komponen Label</th>
+                <th style="width: 30%;">Keunggulan</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><strong>Standar (Lengkap)</strong></td>
+                <td><strong>Barcode Kotak (QR Code 2D)</strong></td>
                 <td>
-                    Menampilkan garis Barcode 1D di sebelah kiri dan kode QR 2D di sebelah kanan, disertai nama barang dan nomor SKU.
+                    Kode QR matriks 2D di bagian tengah/bawah, disertai kode SKU unik dan nama barang di atasnya.
                 </td>
                 <td>
-                    Paling disarankan untuk bodi laptop, PC, proyektor, dan printer.
-                </td>
-            </tr>
-            <tr>
-                <td><strong>Barcode 1D Saja</strong></td>
-                <td>
-                    Menampilkan garis barcode memanjang ke samping dengan nomor SKU di bawahnya.
-                </td>
-                <td>
-                    Cocok untuk kardus kemasan, rak barang, atau map berkas.
-                </td>
-            </tr>
-            <tr>
-                <td><strong>QR Code 2D Saja</strong></td>
-                <td>
-                    Menampilkan kode kotak matriks yang praktis dipindai dari kamera ponsel.
-                </td>
-                <td>
-                    Sangat cocok untuk barang berukuran kecil seperti kamera, handy-talkie, atau modem.
+                    Presisi tinggi, tahan terhadap lipatan atau lecet fisik ringan, serta dapat dipindai instan melalui kamera ponsel maupun pemindai barcode USB.
                 </td>
             </tr>
         </tbody>
@@ -920,7 +902,7 @@
         </li>
         <li>
             <strong>Alat Scanner USB Tidak Mengetik:</strong>
-            <br>Pastikan kursor mouse Anda sudah diklik di dalam kotak input SKU sebelum menekan pelatuk scanner laser.
+            <br>Pastikan kursor mouse Anda sudah diklik di dalam kotak input SKU/Barcode sebelum menekan pelatuk scanner.
         </li>
     </ul>
 

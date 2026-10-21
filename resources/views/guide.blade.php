@@ -512,7 +512,7 @@
                     <div class="card-body p-3">
                         <p class="small text-muted mb-2">Ditujukan untuk Pengurus Barang Pengguna atau Penatausahaan Barang.</p>
                         <ul class="small text-muted ps-3 mb-0" style="line-height: 1.7;">
-                            <li><strong>Master Inventaris:</strong> Menambah & mengedit barang, mengunggah foto fisik, dan mencetak label barcode (1D/2D).</li>
+                            <li><strong>Master Inventaris:</strong> Menambah & mengedit barang, mengunggah foto fisik, dan mencetak label barcode kotak (QR Code 2D).</li>
                             <li><strong>Mutasi Fisik:</strong> Mencatat stok masuk (pengadaan) dan stok keluar (rusak/hilang/afkir) di Kartu Stok.</li>
                             <li><strong>Peminjaman & Laporan:</strong> Melihat seluruh transaksi peminjaman dan mengekspor rekapitulasi PDF dinas.</li>
                             <li><em>Tidak memiliki akses ke menu Kelola Pengguna.</em></li>
@@ -719,20 +719,14 @@
                         Setiap barang yang didaftarkan akan secara otomatis mendapatkan nomor <strong>SKU (Stock Keeping Unit)</strong> berdasarkan awalan kategori. Contoh: kategori <em>Elektronik</em> (awalan <code>ELEC</code>) akan menghasilkan <code>ELEC-001</code>, <code>ELEC-002</code>, dan seterusnya secara berurutan dan terkunci.
                     </p>
 
-                    <h6 class="fw-bold text-dark mb-2">Pilihan Format Cetak Label</h6>
-                    <p class="text-muted small mb-2">Pada menu <em>Master Barang</em>, Anda dapat mencetak stiker label aset dengan 3 pilihan format:</p>
+                    <h6 class="fw-bold text-dark mb-2">Standar Format Cetak Label Aset</h6>
+                    <p class="text-muted small mb-2">
+                        SIM-ASET secara eksklusif menggunakan standar <strong>Barcode Kotak (QR Code 2D)</strong> untuk label fisik inventaris resmi:
+                    </p>
                     <div class="list-group list-group-flush mb-0">
                         <div class="list-group-item px-0 py-2 border-0">
-                            <span class="badge bg-primary me-2">Barcode Kotak (QR Code 2D) — Standar Utama</span>
-                            <small class="text-muted">Format kotak matriks 2D beresolusi tinggi, bebas redundansi, dan sangat responsif dipindai melalui scanner USB maupun kamera HP.</small>
-                        </div>
-                        <div class="list-group-item px-0 py-2 border-0">
-                            <span class="badge bg-secondary me-2">Barcode 1D Saja</span>
-                            <small class="text-muted">Format garis lurus tradisional, cocok untuk dipindai menggunakan pemindai barcode laser konvensional.</small>
-                        </div>
-                        <div class="list-group-item px-0 py-2 border-0">
-                            <span class="badge bg-info text-white me-2">Garis 1D + Kotak QR 2D</span>
-                            <small class="text-muted">Format kombinasi barcode garis di atas dan QR Code di samping/bawah untuk fleksibilitas arsip ganda.</small>
+                            <span class="badge bg-primary me-2">Barcode Kotak (QR Code 2D) — Standar Tunggal</span>
+                            <small class="text-muted">Format matriks kotak 2D presisi tinggi dengan label SKU dan nama barang. Sangat responsif dipindai melalui barcode scanner 2D USB/Bluetooth maupun kamera HP.</small>
                         </div>
                     </div>
                 </div>
