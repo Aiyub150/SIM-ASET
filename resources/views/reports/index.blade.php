@@ -11,15 +11,24 @@
         <p class="text-muted mb-0" style="font-size:.82rem;">Pratinjau dan ekspor laporan inventaris per periode</p>
     </div>
     @can('reports.export')
-    <a href="{{ route('reports.export-pdf', ['month' => $month, 'year' => $year]) }}"
-       target="_blank"
-       class="btn btn-outline-danger d-flex align-items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-            <path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .471.236c.09.112.145.256.145.41 0 .23-.05.474-.15.727-.2.505-.5.986-.816 1.402a10.85 10.85 0 0 1 1.77 1.34 8.794 8.794 0 0 1 2.296.883c.311.191.564.444.69.75.122.295.12.593-.01.884-.13.284-.363.504-.633.63a.85.85 0 0 1-.448.067c-.23-.028-.507-.156-.816-.382z"/>
-        </svg>
-        Ekspor PDF
-    </a>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="{{ route('reports.export-pdf', ['month' => $month, 'year' => $year]) }}"
+           target="_blank"
+           class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 shadow-sm px-3">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>Ekspor PDF</span>
+        </a>
+        <a href="{{ route('reports.export-excel', ['month' => $month, 'year' => $year]) }}"
+           class="btn btn-sm btn-outline-success d-flex align-items-center gap-1 shadow-sm px-3">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>Ekspor Excel</span>
+        </a>
+        <a href="{{ route('reports.export-csv', ['month' => $month, 'year' => $year]) }}"
+           class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 shadow-sm px-3">
+            <i class="fa-solid fa-file-csv"></i>
+            <span>Ekspor CSV</span>
+        </a>
+    </div>
     @endcan
 </div>
 

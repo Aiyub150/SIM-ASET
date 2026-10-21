@@ -15,13 +15,13 @@ Route::middleware('guest')->group(function () {
     Route::redirect('register', 'login');
     Route::match(['get', 'post'], 'forgot-password', function () {
         return redirect()->route('login');
-    })->middleware('throttle:5,1');
+    })->middleware('throttle:auth.forgot-password');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:5,1');
+        ->middleware('throttle:auth.login');
 });
 
 Route::middleware('auth')->group(function () {

@@ -22,7 +22,7 @@ Route::get('/guide/pdf', function () {
     ])->loadView('guide_pdf');
     $pdf->setPaper('A4', 'portrait');
     return $pdf->stream('Buku_Panduan_SIM-ASET_2026.pdf');
-})->middleware('throttle:10,1')->name('guide.pdf');
+})->middleware('throttle:reports.export')->name('guide.pdf');
 
 // Lapisan Pertahanan 1: Wajib Login
 Route::middleware(['auth'])->group(function () {
@@ -95,8 +95,10 @@ Route::middleware(['auth'])->group(function () {
 
     // MODUL LAPORAN (Accessible by Staff, Admin, Super Admin)
     Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/',            [ReportController::class, 'index'])->name('index');
-        Route::get('/export-pdf',  [ReportController::class, 'exportPdf'])->middleware('throttle:10,1')->name('export-pdf');
+        Route::get('/',             [ReportController::class, 'index'])->name('index');
+        Route::get('/export-pdf',   [ReportController::class, 'exportPdf'])->middleware('throttle:reports.export')->name('export-pdf');
+        Route::get('/export-excel', [ReportController::class, 'exportExcel'])->middleware('throttle:reports.export')->name('export-excel');
+        Route::get('/export-csv',   [ReportController::class, 'exportCsv'])->middleware('throttle:reports.export')->name('export-csv');
     });
 
     // ── MODUL USER MANAGEMENT (Super Admin & Izin users.view) ────────

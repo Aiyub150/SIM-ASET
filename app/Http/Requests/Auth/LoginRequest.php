@@ -77,10 +77,11 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Get the rate limiting throttle key for the request (Email + IP + Device Fingerprint).
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $device = sha1($this->header('User-Agent') ?? 'unknown-device');
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip() . '|' . $device);
     }
 }

@@ -76,5 +76,45 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('global-ip', function (Request $request) {
             return Limit::perMinute(120)->by($request->ip());
         });
+
+        // ── RATE LIMITERS: IP & DEVICE FINGERPRINTING ─────────────────────
+        // 1. Login Protection (IP & Device)
+        RateLimiter::for('auth.login', function (Request $request) {
+            $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+            $email = strtolower((string) $request->input('email', ''));
+
+            return [
+                Limit::perMinute(5)->by($deviceKey)->response(function () {
+                    return back()->withInput()->with('error', 'Terlalu banyak percobaan login dari perangkat ini. Silakan tunggu 1 menit.');
+                }),
+                Limit::perMinute(10)->by($request->ip()),
+                Limit::perMinute(5)->by($email . '|' . $request->ip()),
+            ];
+        });
+
+        // 2. Forgot Password Protection (IP & Device)
+        RateLimiter::for('auth.forgot-password', function (Request $request) {
+            $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+
+            return [
+                Limit::perMinutes(15, 3)->by($deviceKey)->response(function () {
+                    return back()->with('error', 'Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.');
+                }),
+                Limit::perMinutes(15, 5)->by($request->ip()),
+            ];
+        });
+
+        // 3. Document Exports Protection (PDF, Excel, CSV) - IP & Device
+        RateLimiter::for('reports.export', function (Request $request) {
+            $userKey = $request->user()?->id ?? 'guest';
+            $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+
+            return [
+                Limit::perMinute(10)->by($userKey . '|' . $deviceKey)->response(function () {
+                    return back()->with('error', 'Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.');
+                }),
+                Limit::perMinute(15)->by($request->ip()),
+            ];
+        });
     }
 }
