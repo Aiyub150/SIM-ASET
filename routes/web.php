@@ -78,6 +78,12 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
+    // GEOCODING PROXY (Internal OpenStreetMap Nominatim with caching & rate limit protection)
+    Route::prefix('api/geocoding')->name('geocoding.')->group(function () {
+        Route::get('/search',  [\App\Http\Controllers\GeocodingController::class, 'search'])->name('search');
+        Route::get('/reverse', [\App\Http\Controllers\GeocodingController::class, 'reverse'])->name('reverse');
+    });
+
     // MODUL MUTASI STOK / LEDGER
     Route::prefix('stocks')->name('stocks.')->group(function () {
         Route::get('/',        [StockMovementController::class, 'index'])->middleware(['role_or_permission:Super Admin|Admin|stocks.view'])->name('index');

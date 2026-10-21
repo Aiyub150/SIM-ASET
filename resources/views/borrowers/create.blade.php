@@ -104,10 +104,10 @@
 
         async function reverseGeocode(lat, lng) {
             try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
-                const data = await response.json();
-                if (data && data.display_name) {
-                    addressInput.value = data.display_name;
+                const response = await fetch(`{{ route('geocoding.reverse') }}?lat=${lat}&lng=${lng}`);
+                const res = await response.json();
+                if (res && res.success && res.display_name) {
+                    addressInput.value = res.display_name;
                 }
             } catch (error) {
                 console.error("Reverse geocoding error:", error);
@@ -116,23 +116,25 @@
 
         async function forwardGeocode(query) {
             if(!query.trim()) return;
-            btnMapSearch.textContent = 'Mencari...';
+            btnMapSearch.disabled = true;
+            btnMapSearch.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari...';
             try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=1`);
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lng = parseFloat(data[0].lon);
+                const response = await fetch(`{{ route('geocoding.search') }}?q=${encodeURIComponent(query)}`);
+                const res = await response.json();
+                if (res && res.success && res.data && res.data.length > 0) {
+                    const first = res.data[0];
+                    const lat = parseFloat(first.lat);
+                    const lng = parseFloat(first.lon);
                     map.setView([lat, lng], 16);
                     marker.setLatLng([lat, lng]);
                     document.getElementById('latitude').value = lat;
                     document.getElementById('longitude').value = lng;
-                    addressInput.value = data[0].display_name;
+                    addressInput.value = first.display_name;
                 } else {
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Tidak Ditemukan',
-                        text: 'Lokasi tidak ditemukan.',
+                        title: 'Lokasi Tidak Ditemukan',
+                        text: `Tidak dapat menemukan lokasi untuk "${query}". Coba kata kunci kota atau alamat yang lebih spesifik.`,
                         confirmButtonColor: '#2563eb'
                     });
                 }
@@ -140,12 +142,14 @@
                 console.error("Geocoding error:", error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Kesalahan',
-                    text: 'Terjadi kesalahan saat mencari lokasi.',
+                    title: 'Kesalahan Pencarian',
+                    text: 'Terjadi gangguan saat menghubungi server pencarian lokasi.',
                     confirmButtonColor: '#2563eb'
                 });
+            } finally {
+                btnMapSearch.disabled = false;
+                btnMapSearch.innerHTML = 'Cari';
             }
-            btnMapSearch.textContent = 'Cari';
         }
 
         // Jika map diklik, pindahkan marker
