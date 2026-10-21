@@ -31,34 +31,27 @@
             <div class="card-body p-4">
                 <form action="{{ route('stocks.store') }}" 
                       method="POST"
+                      enctype="multipart/form-data"
                       data-confirm="Apakah Anda yakin ingin memproses transaksi mutasi stok ini?"
                       data-confirm-title="Simpan Mutasi Stok?">
                     @csrf
 
                     <div class="mb-3">
-                        <label class="form-label">
-                            Nomor Referensi
-                            <span class="badge ms-1" style="background:#eff6ff; color:#2563eb; font-size:.7rem; font-weight:500;">
-                                Auto-generate
+                        <label class="form-label d-flex justify-content-between align-items-center">
+                            <span>Nomor Referensi (BAST)</span>
+                            <span class="badge" style="background:#eff6ff; color:#2563eb; font-size:.7rem; font-weight:500;">
+                                Auto-generate (Format Aktif)
                             </span>
                         </label>
-                        <div class="input-group">
-                            <input type="text" name="reference_code"
-                                   id="reference_code"
-                                   class="form-control @error('reference_code') is-invalid @enderror"
-                                   value="{{ old('reference_code', $suggestedCode) }}"
-                                   required
-                                   style="font-family:monospace;">
-                            <button type="button" class="btn btn-outline-secondary" id="btn-reset-ref" title="Reset ke kode otomatis">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                                </svg>
-                            </button>
-                        </div>
+                        <input type="text" name="reference_code"
+                               id="reference_code"
+                               class="form-control @error('reference_code') is-invalid @enderror"
+                               value="{{ old('reference_code', $suggestedCode) }}"
+                               readonly
+                               style="font-family:monospace; background:#f8fafc; color:#1e293b; font-weight:600; cursor:default;">
                         <div class="form-text text-muted" style="font-size:.78rem;">
-                            Dibuat otomatis dengan format <code>BAST/YYYY/MM/NNN</code>.
-                            Anda dapat mengedit jika nomor surat berbeda.
+                            Nomor referensi mutasi di-generate otomatis oleh sistem mengikuti pola aktif <code>stock_bast</code>.
+                            Jika ingin mengubah format, atur di menu <strong>Pengaturan Format Kode</strong>.
                         </div>
                         @error('reference_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
@@ -101,6 +94,23 @@
                                    class="form-control @error('qty') is-invalid @enderror"
                                    min="1" value="{{ old('qty') }}" required placeholder="0">
                             @error('qty') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Foto Bukti Fisik / Dokumen BAST
+                            <span class="text-muted" style="font-weight:400;">(opsional)</span>
+                        </label>
+                        <input type="file" name="image" id="stock_image_input" 
+                               class="form-control @error('image') is-invalid @enderror" 
+                               accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted" style="font-size:.78rem;">
+                            Lampirkan foto fisik barang, serah terima, atau scan surat BAST. Format: JPG, PNG, WEBP. Maks 2MB.
+                        </div>
+                        @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div id="image_preview_wrapper" class="mt-2" style="display:none;">
+                            <img id="image_preview_el" src="" alt="Pratinjau Bukti" class="rounded border shadow-sm" style="max-height: 120px; object-fit: cover;">
                         </div>
                     </div>
 
@@ -218,6 +228,26 @@
             create: false,
             controlInput: null,
             placeholder: '— Pilih Tipe Mutasi —'
+        });
+    }
+
+    const imageInput = document.getElementById('stock_image_input');
+    const imagePreviewWrapper = document.getElementById('image_preview_wrapper');
+    const imagePreviewEl = document.getElementById('image_preview_el');
+    if (imageInput && imagePreviewWrapper && imagePreviewEl) {
+        imageInput.addEventListener('change', function () {
+            const file = this.files && this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreviewEl.src = e.target.result;
+                    imagePreviewWrapper.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreviewWrapper.style.display = 'none';
+                imagePreviewEl.src = '';
+            }
         });
     }
 })();

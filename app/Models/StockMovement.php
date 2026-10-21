@@ -16,7 +16,8 @@ class StockMovement extends Model
         'qty',
         'balance_before',
         'balance_after',
-        'notes'
+        'notes',
+        'image'
     ];
 
     public function item(): BelongsTo

@@ -27,6 +27,7 @@ class StoreStockMovementRequest extends FormRequest
             'type'           => ['required', 'in:in,out,broken,lost'],
             'qty'            => ['required', 'integer', 'min:1'],
             'notes'          => ['nullable', 'string', 'max:1000', 'regex:/^(?!.*(?:<|>|%3[CcEe]|on[a-z]+\s*=|javascript:|script|alert\(|SELECT\s|INSERT\s+INTO|UPDATE\s+.*SET|DELETE\s+FROM|DROP\s+TABLE)).*$/u'],
+            'image'          => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 

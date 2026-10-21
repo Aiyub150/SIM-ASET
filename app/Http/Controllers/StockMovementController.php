@@ -65,16 +65,21 @@ class StockMovementController extends Controller
     {
         try {
             $userId = auth()->id();
+            $data = $request->validated();
 
-            $movement = $this->stockService->adjustStock($request->validated(), $userId);
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('images/stock_movements', 'public');
+            }
+
+            $movement = $this->stockService->adjustStock($data, $userId);
 
             $action = $movement->type === 'in' ? 'Penambahan' : 'Pengurangan';
 
             \App\Services\ActivityLogger::log(
                 'STOCK_ADJUST',
                 'Mutasi Stok',
-                "Mencatat mutasi stok ({$action}) dengan kode referensi {$movement->reference_code}",
-                ['movement_id' => $movement->id, 'type' => $movement->type, 'ref' => $movement->reference_code],
+                "Mencatat mutasi stok ({$action}) dengan kode referensi {$movement->reference_code}" . ($movement->image ? ' disertai bukti dokumentasi' : ''),
+                ['movement_id' => $movement->id, 'type' => $movement->type, 'ref' => $movement->reference_code, 'image' => $movement->image],
                 $request
             );
 
@@ -92,6 +97,47 @@ class StockMovementController extends Controller
                 ->withInput()
                 ->with('error', $userMessage);
         }
+    }
+
+    /**
+     * Upload bukti dokumentasi susulan untuk mutasi stok yang sudah ada
+     */
+    public function uploadProof(\Illuminate\Http\Request $request, StockMovement $movement): RedirectResponse
+    {
+        $user = auth()->user();
+        if ($user && !$user->can('stocks.adjust') && !$user->hasAnyRole(['Super Admin', 'Admin'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk mengunggah bukti mutasi stok.');
+        }
+
+        $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'image.required' => 'File gambar bukti dokumentasi wajib dipilih.',
+            'image.image'    => 'File harus berupa gambar.',
+            'image.mimes'    => 'Format gambar yang diperbolehkan: JPG, JPEG, PNG, WEBP.',
+            'image.max'      => 'Ukuran gambar maksimal 2MB.',
+        ]);
+
+        if ($movement->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($movement->image)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($movement->image);
+        }
+
+        $imagePath = $request->file('image')->store('images/stock_movements', 'public');
+        $movement->update(['image' => $imagePath]);
+
+        \App\Services\ActivityLogger::log(
+            'UPLOAD_PROOF',
+            'Mutasi Stok',
+            "Mengunggah bukti dokumentasi susulan untuk mutasi stok Ref: {$movement->reference_code}",
+            [
+                'movement_id'    => $movement->id,
+                'reference_code' => $movement->reference_code,
+                'image'          => $imagePath
+            ],
+            $request
+        );
+
+        return back()->with('success', "Bukti dokumentasi untuk Ref: {$movement->reference_code} berhasil diunggah.");
     }
 
     // ── Helper: generate reference code dinamis dari CodeFormatSetting ──────────────

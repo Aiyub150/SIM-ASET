@@ -68,6 +68,12 @@
                             <span style="font-family:monospace; font-size:.82rem; font-weight:600;">
                                 {{ $movement->reference_code }}
                             </span>
+                            @if($movement->image)
+                                <br>
+                                <a href="{{ asset('storage/' . $movement->image) }}" target="_blank" class="badge bg-primary-subtle text-primary border text-decoration-none mt-1" style="font-size: .68rem;">
+                                    <i class="fa-solid fa-paperclip me-1"></i>Bukti Ada
+                                </a>
+                            @endif
                         </td>
                         <td>
                             <span style="font-weight:500;">{{ $movement->item->name }}</span><br>
@@ -113,6 +119,8 @@
                                     data-user="{{ $movement->user->name ?? '-' }}"
                                     data-time="{{ $movement->created_at->userTzDate('d M Y') }} {{ $movement->created_at->userTzTime('H:i') }}"
                                     data-notes="{{ $movement->notes ?? '' }}"
+                                    data-image="{{ $movement->image ? asset('storage/' . $movement->image) : '' }}"
+                                    data-proof-url="{{ route('stocks.proof', $movement) }}"
                                     title="Lihat Detail & Catatan Mutasi">
                                 <i class="fa-solid fa-eye me-1"></i>Detail
                             </button>
@@ -200,6 +208,50 @@
                     <div class="p-3 border rounded bg-light-subtle text-dark" style="min-height: 75px; white-space: pre-wrap; font-size: .88rem;" id="detail-notes">-</div>
                 </div>
 
+                {{-- Bukti Dokumentasi Fisik / BAST --}}
+                <div class="mb-3 pt-2 border-top">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="text-muted small fw-medium">
+                            <i class="fa-solid fa-camera me-1 text-secondary"></i>Bukti Fisik / Dokumen BAST:
+                        </div>
+                        <span id="detail-image-status" class="badge" style="font-size: .7rem;">-</span>
+                    </div>
+
+                    {{-- Kontainer Gambar Jika Ada --}}
+                    <div id="detail-image-box" class="text-center p-2 border rounded bg-light mb-2" style="display:none;">
+                        <a id="detail-image-link" href="#" target="_blank" title="Klik untuk memperbesar">
+                            <img id="detail-image-img" src="" alt="Bukti Mutasi" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                        </a>
+                        <div class="mt-1">
+                            <a id="detail-image-btn" href="#" target="_blank" class="btn btn-sm btn-link text-decoration-none py-0" style="font-size:.78rem;">
+                                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Buka Gambar Penuh
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Form Unggah Bukti Susulan --}}
+                    @can('stocks.adjust')
+                    <div class="p-3 border rounded bg-light-subtle">
+                        <div class="small fw-semibold mb-1 text-dark" id="proof-form-title">
+                            <i class="fa-solid fa-upload me-1 text-primary"></i>Unggah Bukti Dokumentasi Susulan
+                        </div>
+                        <p class="text-muted mb-2" style="font-size:.74rem;">
+                            Lupa melampirkan foto saat input mutasi? Unggah bukti di sini. Saldo stok dan mutasi fisik tetap terkunci secara permanen.
+                        </p>
+                        <form id="form-upload-proof" method="POST" enctype="multipart/form-data" action="">
+                            @csrf
+                            <div class="input-group input-group-sm">
+                                <input type="file" name="image" id="proof_image_file" class="form-control" accept="image/jpeg,image/png,image/webp" required>
+                                <button class="btn btn-primary px-3" type="submit">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i>Unggah
+                                </button>
+                            </div>
+                            <div class="form-text text-muted" style="font-size:.72rem;">Format: JPG, PNG, WEBP. Maks 2MB.</div>
+                        </form>
+                    </div>
+                    @endcan
+                </div>
+
                 <div class="text-muted small pt-2 border-top d-flex align-items-center justify-content-between">
                     <span>Dicatat oleh:</span>
                     <strong class="text-dark" id="detail-user">-</strong>
@@ -218,6 +270,13 @@
         // Modal detail mutasi
         const detailModalEl = document.getElementById('modalDetailMovement');
         const detailModal = detailModalEl ? new bootstrap.Modal(detailModalEl) : null;
+        const detailImageBox = document.getElementById('detail-image-box');
+        const detailImageImg = document.getElementById('detail-image-img');
+        const detailImageLink = document.getElementById('detail-image-link');
+        const detailImageBtn = document.getElementById('detail-image-btn');
+        const detailImageStatus = document.getElementById('detail-image-status');
+        const proofForm = document.getElementById('form-upload-proof');
+        const proofFormTitle = document.getElementById('proof-form-title');
 
         document.querySelectorAll('.btn-detail-movement').forEach(btn => {
             btn.addEventListener('click', function () {
@@ -237,9 +296,63 @@
                 badge.textContent = this.dataset.typeLabel;
                 badge.className = 'badge mt-1 ' + (this.dataset.type === 'in' ? 'bg-success' : (this.dataset.type === 'out' ? 'bg-secondary' : 'bg-danger'));
 
+                const imageUrl = (this.dataset.image || '').trim();
+                const proofUrl = this.dataset.proofUrl || '';
+
+                if (imageUrl) {
+                    detailImageStatus.textContent = 'Terlampir';
+                    detailImageStatus.className = 'badge bg-success-subtle text-success border';
+                    detailImageImg.src = imageUrl;
+                    detailImageLink.href = imageUrl;
+                    detailImageBtn.href = imageUrl;
+                    detailImageBox.style.display = 'block';
+                    if (proofFormTitle) proofFormTitle.innerHTML = '<i class="fa-solid fa-arrows-rotate me-1 text-primary"></i>Ganti / Perbarui Foto Bukti';
+                } else {
+                    detailImageStatus.textContent = 'Belum Ada Bukti';
+                    detailImageStatus.className = 'badge bg-warning-subtle text-warning border';
+                    detailImageImg.src = '';
+                    detailImageBox.style.display = 'none';
+                    if (proofFormTitle) proofFormTitle.innerHTML = '<i class="fa-solid fa-upload me-1 text-primary"></i>Unggah Bukti Dokumentasi Susulan';
+                }
+
+                if (proofForm) {
+                    proofForm.action = proofUrl;
+                    const fileInput = document.getElementById('proof_image_file');
+                    if (fileInput) fileInput.value = '';
+                }
+
                 if (detailModal) detailModal.show();
             });
         });
+
+        if (proofForm) {
+            proofForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                const fileInput = document.getElementById('proof_image_file');
+                if (!fileInput || !fileInput.files.length) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilih Berkas',
+                        text: 'Silakan pilih gambar bukti dokumentasi terlebih dahulu.'
+                    });
+                    return;
+                }
+                Swal.fire({
+                    title: 'Unggah Bukti Mutasi?',
+                    text: 'Foto bukti fisik / BAST akan disimpan pada transaksi ini. Saldo stok dan mutasi fisik tetap terkunci secara permanen.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Unggah Bukti',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#2563eb'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
         const stockTypeFilter = document.getElementById('stock_type_filter');
         if (stockTypeFilter && typeof TomSelect !== 'undefined') {
             let typeInit = false;

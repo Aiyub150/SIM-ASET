@@ -73,6 +73,7 @@ class StockService
                 'balance_before' => $balanceBefore,
                 'balance_after'  => $balanceAfter,
                 'notes'          => $data['notes'] ?? null,
+                'image'          => $data['image'] ?? null,
             ]);
         });
     }

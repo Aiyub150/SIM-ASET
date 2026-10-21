@@ -88,8 +88,9 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('stocks')->name('stocks.')->group(function () {
         Route::get('/',        [StockMovementController::class, 'index'])->middleware(['role_or_permission:Super Admin|Admin|stocks.view'])->name('index');
         Route::middleware(['role_or_permission:Super Admin|Admin|stocks.adjust'])->group(function () {
-            Route::get('/create',  [StockMovementController::class, 'create'])->name('create');
-            Route::post('/',       [StockMovementController::class, 'store'])->middleware('throttle:30,1')->name('store');
+            Route::get('/create',            [StockMovementController::class, 'create'])->name('create');
+            Route::post('/',                 [StockMovementController::class, 'store'])->middleware('throttle:30,1')->name('store');
+            Route::post('/{movement}/proof', [StockMovementController::class, 'uploadProof'])->middleware('throttle:30,1')->name('proof');
         });
     });
 
