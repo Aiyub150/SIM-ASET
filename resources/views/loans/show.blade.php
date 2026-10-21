@@ -124,7 +124,7 @@
 </div>
 
 {{-- Form Pengembalian --}}
-@if($loan->status !== 'completed' && $pendingItems->count() > 0)
+@if($loan->status !== 'completed' && $pendingItems->count() > 0 && auth()->user()->can('loans.return'))
 <div class="card mb-4" style="border-color:#2563eb;">
     <div class="card-header" style="background:#eff6ff; color:#1e40af; border-color:#2563eb;">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="me-1" viewBox="0 0 16 16" style="margin-top:-2px;">
@@ -236,6 +236,7 @@
 
 @endsection
 
+@if($loan->status !== 'completed' && $pendingItems->count() > 0 && auth()->user()->can('loans.return'))
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
@@ -481,3 +482,4 @@
     });
 </script>
 @endpush
+@endif

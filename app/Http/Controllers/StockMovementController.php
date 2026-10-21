@@ -20,6 +20,11 @@ class StockMovementController extends Controller
      */
     public function index(\Illuminate\Http\Request $request): View
     {
+        $user = auth()->user();
+        if ($user && !$user->can('stocks.view') && !$user->hasAnyRole(['Super Admin', 'Admin'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat kartu stok barang.');
+        }
+
         $search = $request->query('search');
         $type = $request->query('type');
 

@@ -10,14 +10,14 @@
         <h5 class="fw-bold mb-0">Master Data Barang</h5>
         <p class="text-muted mb-0" style="font-size:.82rem;">Daftar seluruh inventaris aset yang terdaftar</p>
     </div>
-    @hasanyrole('Super Admin|Admin')
+    @can('items.create')
     <a href="{{ route('items.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Tambah Barang
     </a>
-    @endhasanyrole
+    @endcan
 </div>
 
 <div class="card">

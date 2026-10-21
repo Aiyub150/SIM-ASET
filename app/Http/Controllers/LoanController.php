@@ -21,9 +21,14 @@ class LoanController extends Controller
 
     public function printPdf(Loan $loan)
     {
-        // Staff hanya bisa cetak miliknya sendiri
-        if (Auth::user()->hasRole('Staff Logistik') && $loan->user_id !== Auth::id()) {
-            abort(403);
+        $user = Auth::user();
+        if (!$user->can('loans.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang.');
+        }
+
+        $canViewAllLoans = $user->hasRole('Super Admin') || $user->hasRole('Admin') || (rescue(fn() => $user->can('reports.view'), false) && !$user->hasRole('Staff Logistik'));
+        if (!$canViewAllLoans && $loan->user_id !== $user->id) {
+            abort(403, 'Akses dilarang.');
         }
 
         $loan->load(['borrower', 'user', 'loanItems.item']);
@@ -40,12 +45,17 @@ class LoanController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $user  = Auth::user();
+        if (!$user->can('loans.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat riwayat peminjaman.');
+        }
+
         $search = $request->query('search');
         $status = $request->query('status');
 
         $query = Loan::with(['borrower', 'user', 'loanItems.item'])->orderBy('created_at', 'desc');
 
-        if ($user->hasRole('Staff Logistik')) {
+        $canViewAllLoans = $user->hasRole('Super Admin') || $user->hasRole('Admin') || (rescue(fn() => $user->can('reports.view'), false) && !$user->hasRole('Staff Logistik'));
+        if (!$canViewAllLoans) {
             $query->where('user_id', $user->id);
         }
 
@@ -153,6 +163,11 @@ class LoanController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+        if (!$user->can('loans.create') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk mencatat peminjaman baru.');
+        }
+
         $borrowers = Borrower::orderBy('institution_name', 'asc')->get();
         $items     = Item::where('available_qty', '>', 0)->orderBy('name', 'asc')->get();
 
@@ -164,8 +179,14 @@ class LoanController extends Controller
      */
     public function show(Loan $loan)
     {
-        if (Auth::user()->hasRole('Staff Logistik') && $loan->user_id !== Auth::id()) {
-            abort(403);
+        $user = Auth::user();
+        if (!$user->can('loans.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang.');
+        }
+
+        $canViewAllLoans = $user->hasRole('Super Admin') || $user->hasRole('Admin') || (rescue(fn() => $user->can('reports.view'), false) && !$user->hasRole('Staff Logistik'));
+        if (!$canViewAllLoans && $loan->user_id !== $user->id) {
+            abort(403, 'Akses dilarang.');
         }
 
         $loan->load(['borrower', 'user', 'loanItems.item']);

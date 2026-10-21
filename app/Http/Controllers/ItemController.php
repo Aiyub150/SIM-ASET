@@ -23,6 +23,11 @@ class ItemController extends Controller
 
     public function index(Request $request): View
     {
+        $user = auth()->user();
+        if ($user && !$user->can('items.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat katalog barang.');
+        }
+
         $search = $request->query('search');
         $categoryId = $request->query('category_id');
 

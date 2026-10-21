@@ -18,7 +18,7 @@
         <div class="card">
             <div class="card-header">Pembaruan Informasi Instansi</div>
             <div class="card-body p-4">
-                <form action="{{ route('borrowers.update', $borrower->id) }}" method="POST">
+                <form id="formEditBorrower" action="{{ route('borrowers.update', $borrower->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 

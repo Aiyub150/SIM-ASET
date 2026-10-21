@@ -18,7 +18,7 @@
         <div class="card">
             <div class="card-header">Formulir Data Instansi</div>
             <div class="card-body p-4">
-                <form action="{{ route('borrowers.store') }}" method="POST">
+                <form id="formCreateBorrower" action="{{ route('borrowers.store') }}" method="POST">
                     @csrf
 
                     <div class="mb-3">

@@ -8,9 +8,11 @@
 <div class="card mb-4">
     <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
         <span>Daftar Kategori Barang</span>
+        @can('categories.create')
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
             + Tambah Kategori
         </button>
+        @endcan
     </div>
     <div class="card-body p-0 table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -20,7 +22,9 @@
                     <th>Prefix SKU</th>
                     <th>Total Barang</th>
                     <th>Status</th>
+                    @if(auth()->user()->can('categories.edit') || auth()->user()->can('categories.toggle'))
                     <th class="pe-4 text-end">Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -47,10 +51,14 @@
                             <span class="badge bg-danger">Inaktif</span>
                         @endif
                     </td>
+                    @if(auth()->user()->can('categories.edit') || auth()->user()->can('categories.toggle'))
                     <td class="pe-4 text-end">
+                        @can('categories.edit')
                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $category->id }}">
                             Edit
                         </button>
+                        @endcan
+                        @can('categories.toggle')
                         <form action="{{ route('categories.toggle', $category->id) }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin {{ $category->is_active ? 'menonaktifkan' : 'mengaktifkan' }} kategori ini?">
                             @csrf
                             @method('PATCH')
@@ -58,10 +66,13 @@
                                 {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                             </button>
                         </form>
+                        @endcan
                     </td>
+                    @endif
                 </tr>
 
                 {{-- Edit Modal --}}
+                @can('categories.edit')
                 <div class="modal fade" id="editModal{{ $category->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -95,9 +106,10 @@
                         </div>
                     </div>
                 </div>
+                @endcan
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-muted">Belum ada data kategori.</td>
+                    <td colspan="{{ (auth()->user()->can('categories.edit') || auth()->user()->can('categories.toggle')) ? 5 : 4 }}" class="text-center py-4 text-muted">Belum ada data kategori.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -106,6 +118,7 @@
 </div>
 
 {{-- Create Modal --}}
+@can('categories.create')
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -138,5 +151,6 @@
         </div>
     </div>
 </div>
+@endcan
 
 @endsection

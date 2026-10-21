@@ -16,6 +16,25 @@ class UserController extends Controller
     public function index(): View
     {
         $users = User::with('roles')->orderBy('name')->paginate(15);
+
+        // Ambil data sesi pengguna dari database sessions untuk status aktif & terakhir kali aktif
+        $userIds = $users->pluck('id');
+        $sessionStats = \Illuminate\Support\Facades\DB::table('sessions')
+            ->whereIn('user_id', $userIds)
+            ->select('user_id', \Illuminate\Support\Facades\DB::raw('MAX(last_activity) as last_active'))
+            ->groupBy('user_id')
+            ->pluck('last_active', 'user_id');
+
+        $sessionLifetimeMinutes = (int) config('session.lifetime', 120);
+        $validSessionThreshold = now()->subMinutes($sessionLifetimeMinutes)->timestamp;
+
+        $users->getCollection()->transform(function ($user) use ($sessionStats, $validSessionThreshold) {
+            $user->last_activity = $sessionStats->get($user->id);
+            // Sesi berstatus aktif jika rekaman sesi berada dalam batas masa berlaku session lifetime
+            $user->is_session_active = $user->last_activity && ($user->last_activity >= $validSessionThreshold);
+            return $user;
+        });
+
         return view('users.index', compact('users'));
     }
 

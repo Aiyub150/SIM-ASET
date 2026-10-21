@@ -10,6 +10,7 @@
         <h5 class="fw-bold mb-0">Laporan Rekapitulasi Bulanan</h5>
         <p class="text-muted mb-0" style="font-size:.82rem;">Pratinjau dan ekspor laporan inventaris per periode</p>
     </div>
+    @can('reports.export')
     <a href="{{ route('reports.export-pdf', ['month' => $month, 'year' => $year]) }}"
        target="_blank"
        class="btn btn-outline-danger d-flex align-items-center gap-2">
@@ -19,6 +20,7 @@
         </svg>
         Ekspor PDF
     </a>
+    @endcan
 </div>
 
 {{-- Filter Panel --}}

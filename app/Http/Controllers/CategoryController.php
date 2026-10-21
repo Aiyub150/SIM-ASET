@@ -9,6 +9,11 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        if ($user && !$user->can('categories.view') && !$user->hasAnyRole(['Super Admin', 'Admin'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat manajemen kategori.');
+        }
+
         $categories = Category::withCount('items')->latest()->get();
         return view('categories.index', compact('categories'));
     }

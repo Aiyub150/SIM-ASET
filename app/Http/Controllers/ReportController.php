@@ -15,11 +15,15 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        if ($user && !$user->can('reports.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk melihat laporan.');
+        }
+
         // Terima format baru: ?period=YYYY-MM (dari <input type="month">)
         // Juga tetap kompatibel dengan format lama: ?month=MM&year=YYYY
         [$month, $year] = $this->parsePeriod($request);
 
-        $user = auth()->user();
         $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
 
         $loanQuery = Loan::with(['borrower'])
@@ -50,9 +54,13 @@ class ReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
+        $user = auth()->user();
+        if ($user && !$user->can('reports.export') && !$user->can('reports.view') && !$user->hasAnyRole(['Super Admin', 'Admin', 'Staff Logistik', 'Staff'])) {
+            abort(403, 'Akses dilarang. Anda tidak memiliki izin untuk mengekspor laporan.');
+        }
+
         [$month, $year] = $this->parsePeriod($request);
 
-        $user = auth()->user();
         $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
 
         $loanQuery = Loan::with(['borrower'])->whereMonth('borrow_date', $month)->whereYear('borrow_date', $year);
