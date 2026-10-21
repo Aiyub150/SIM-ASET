@@ -51,7 +51,7 @@
                 </div>
                 <h4 class="fw-bold text-dark mb-2">Akses Dibatasi Sementara</h4>
                 <p class="text-muted small mb-4" style="line-height: 1.5;">
-                    Sistem mendeteksi terlalu banyak permintaan atau percobaan login berturut-turut dari alamat IP atau perangkat ini. Demi perlindungan data aset daerah, akses dikunci sementara selama 15 menit.
+                    {{ $message ?? 'Sistem mendeteksi terlalu banyak permintaan atau percobaan login berturut-turut dari alamat IP atau perangkat ini. Demi perlindungan data aset daerah, akses dikunci sementara selama 15 menit.' }}
                 </p>
             </div>
             <div class="d-flex flex-column gap-2">

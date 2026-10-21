@@ -111,11 +111,21 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('auth.forgot-password', function (Request $request) {
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
 
+            $forgotPasswordResponse = function (Request $request, array $headers) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.',
+                    ], 429, $headers);
+                }
+
+                return response()->view('errors.429', [
+                    'message' => 'Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.',
+                ], 429, $headers);
+            };
+
             return [
-                Limit::perMinute(5)->by($deviceKey)->response(function (Request $request, array $headers) {
-                    return response('Terlalu banyak permintaan reset password dari perangkat Anda. Silakan coba lagi nanti.', 429, $headers);
-                }),
-                Limit::perMinute(5)->by($request->ip()),
+                Limit::perMinute(5)->by($deviceKey)->response($forgotPasswordResponse),
+                Limit::perMinute(5)->by($request->ip())->response($forgotPasswordResponse),
             ];
         });
 
@@ -124,11 +134,21 @@ class AppServiceProvider extends ServiceProvider
             $userKey = $request->user()?->id ?? 'guest';
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
 
+            $exportResponse = function (Request $request, array $headers) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.',
+                    ], 429, $headers);
+                }
+
+                return response()->view('errors.429', [
+                    'message' => 'Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.',
+                ], 429, $headers);
+            };
+
             return [
-                Limit::perMinute(10)->by($userKey . '|' . $deviceKey)->response(function (Request $request, array $headers) {
-                    return response('Batas ekspor dokumen tercapai (maksimal 10 ekspor/menit). Silakan tunggu sejenak sebelum mengunduh kembali.', 429, $headers);
-                }),
-                Limit::perMinute(15)->by($request->ip()),
+                Limit::perMinute(10)->by($userKey . '|' . $deviceKey)->response($exportResponse),
+                Limit::perMinute(15)->by($request->ip())->response($exportResponse),
             ];
         });
     }
