@@ -37,7 +37,7 @@ class DashboardController extends Controller
         
         $recentMovements = $canViewStocks ? StockMovement::with(['item', 'user'])->latest()->take(5)->get() : collect();
         $recentLoans = (clone $loanQuery)->with(['borrower', 'user'])->latest()->take(5)->get();
-        $lowStockItems = $canViewItems ? Item::where('available_qty', '<', 5)->take(5)->get() : collect();
+        $lowStockItems = $canViewItems ? Item::where('available_qty', '<', 5)->take(6)->get() : collect();
 
         // Chart Data Filter (hari, bulan, tahun)
         $period = $request->query('period', 'bulan'); // default 'bulan'

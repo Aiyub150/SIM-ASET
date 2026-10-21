@@ -226,11 +226,17 @@
     document.addEventListener('DOMContentLoaded', function () {
         const statusFilter = document.getElementById('category_status_filter');
         if (statusFilter && typeof TomSelect !== 'undefined') {
+            let statusInit = false;
             new TomSelect(statusFilter, {
                 create: false,
                 controlInput: null,
                 placeholder: 'Semua Status',
+                allowEmptyOption: true,
+                onInitialize: function() {
+                    statusInit = true;
+                },
                 onChange: function() {
+                    if (!statusInit) return;
                     statusFilter.closest('form').submit();
                 }
             });

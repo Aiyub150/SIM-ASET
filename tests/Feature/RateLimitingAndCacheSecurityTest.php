@@ -109,4 +109,37 @@ class RateLimitingAndCacheSecurityTest extends TestCase
             ->get('/login');
         $this->assertEquals(200, $otherIpResponse->getStatusCode());
     }
+
+    public function test_login_lockout_enforces_15_minute_lock_and_flashes_countdown(): void
+    {
+        $attackerIp = '198.51.100.99';
+
+        for ($i = 1; $i <= 4; $i++) {
+            $response = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
+                ->post('/login', [
+                    'email' => 'victim@test.com',
+                    'password' => 'wrong-pass',
+                ]);
+            $response->assertSessionHasErrors('email');
+            $this->assertNull(session('lockout_seconds'));
+        }
+
+        // Percobaan ke-5 gagal -> langsung dikunci 15 menit (900 detik)
+        $response5 = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
+            ->post('/login', [
+                'email' => 'victim@test.com',
+                'password' => 'wrong-pass',
+            ]);
+
+        $response5->assertSessionHas('lockout_seconds');
+        $lockSec = session('lockout_seconds');
+        $this->assertGreaterThan(850, $lockSec);
+        $this->assertLessThanOrEqual(900, $lockSec);
+
+        // Percobaan ke-6 dari IP terkunci
+        $response6 = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
+            ->get('/login');
+        $response6->assertSee('lockout-countdown');
+        $response6->assertSee('Akun / IP Terkunci Sementara');
+    }
 }

@@ -459,4 +459,64 @@ class SimAsetCoreTest extends TestCase
         $response->assertHeader('content-type', 'application/pdf');
         $this->assertStringStartsWith('%PDF', $response->getContent());
     }
+
+    /**
+     * Test 16: Dashboard recent loans (5), recent movements (5), and low stock items (6) limits
+     */
+    public function test_dashboard_card_limits_enforced(): void
+    {
+        // Buat 8 item dengan stok menipis (< 5)
+        for ($i = 1; $i <= 8; $i++) {
+            Item::create([
+                'name' => "Barang Habis {$i}",
+                'sku' => "SKU-LOW-{$i}",
+                'category_id' => $this->category->id,
+                'location_id' => $this->location->id,
+                'unit' => 'Unit',
+                'total_qty' => 3,
+                'available_qty' => 3,
+                'minimum_stock' => 5,
+            ]);
+        }
+
+        // Buat 8 mutasi stok
+        for ($i = 1; $i <= 8; $i++) {
+            \App\Models\StockMovement::create([
+                'reference_code' => "BAST/2026/10/TEST-{$i}",
+                'item_id' => $this->item1->id,
+                'user_id' => $this->admin->id,
+                'type' => 'in',
+                'qty' => 1,
+                'balance_before' => 10,
+                'balance_after' => 11,
+            ]);
+        }
+
+        // Buat 8 peminjaman
+        for ($i = 1; $i <= 8; $i++) {
+            \App\Models\Loan::create([
+                'loan_code' => "PINJAM-2026-{$i}",
+                'user_id' => $this->admin->id,
+                'borrower_id' => $this->borrower->id,
+                'borrow_date' => now()->toDateString(),
+                'due_date' => now()->addDays(3)->toDateString(),
+                'status' => 'active',
+            ]);
+        }
+
+        $response = $this->actingAs($this->admin)->get('/dashboard');
+        $response->assertOk();
+
+        $response->assertViewHas('recentLoans', function ($loans) {
+            return $loans->count() === 5;
+        });
+
+        $response->assertViewHas('recentMovements', function ($movements) {
+            return $movements->count() === 5;
+        });
+
+        $response->assertViewHas('lowStockItems', function ($lowStock) {
+            return $lowStock->count() === 6;
+        });
+    }
 }

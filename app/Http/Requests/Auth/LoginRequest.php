@@ -12,6 +12,9 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    public const MAX_ATTEMPTS = 5;
+    public const LOCKOUT_SECONDS = 900; // 15 menit (900 detik)
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -43,14 +46,28 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), self::LOCKOUT_SECONDS);
+            RateLimiter::hit($this->ipThrottleKey(), self::LOCKOUT_SECONDS);
+
+            $remaining = RateLimiter::remaining($this->throttleKey(), self::MAX_ATTEMPTS);
+
+            if ($remaining <= 0) {
+                $seconds = RateLimiter::availableIn($this->throttleKey());
+                $lockSec = $seconds > 0 ? $seconds : self::LOCKOUT_SECONDS;
+                session()->flash('lockout_seconds', $lockSec);
+
+                throw ValidationException::withMessages([
+                    'email' => "Terlalu banyak percobaan login yang gagal. Akun dan IP Anda dikunci sementara selama 15 menit demi keamanan.",
+                ]);
+            }
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => "Email atau kata sandi yang Anda masukkan salah. Sisa kesempatan login: {$remaining} kali sebelum akun dikunci.",
             ]);
         }
 
-        // Do not clear rate limiter on successful login to prevent reset attempts
+        RateLimiter::clear($this->throttleKey());
+        RateLimiter::clear($this->ipThrottleKey());
     }
 
     /**
@@ -60,19 +77,32 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        $primaryKey = $this->throttleKey();
+        $ipKey = $this->ipThrottleKey();
+
+        $isLimited = RateLimiter::tooManyAttempts($primaryKey, self::MAX_ATTEMPTS)
+                  || RateLimiter::tooManyAttempts($ipKey, self::MAX_ATTEMPTS);
+
+        if (! $isLimited) {
             return;
         }
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = max(
+            RateLimiter::availableIn($primaryKey),
+            RateLimiter::availableIn($ipKey)
+        );
+
+        if ($seconds <= 0) {
+            $seconds = self::LOCKOUT_SECONDS;
+        }
+
+        session()->flash('lockout_seconds', $seconds);
+        $minutes = ceil($seconds / 60);
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => "Terlalu banyak percobaan login yang gagal. Akun dan IP Anda dikunci sementara selama {$minutes} menit demi keamanan.",
         ]);
     }
 
@@ -83,5 +113,13 @@ class LoginRequest extends FormRequest
     {
         $device = sha1($this->header('User-Agent') ?? 'unknown-device');
         return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip() . '|' . $device);
+    }
+
+    /**
+     * Get the IP-specific throttle key.
+     */
+    public function ipThrottleKey(): string
+    {
+        return 'login_ip|' . $this->ip();
     }
 }

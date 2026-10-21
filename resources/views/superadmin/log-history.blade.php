@@ -56,10 +56,16 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control form-control-sm" placeholder="Dari Tanggal">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light text-muted px-2" style="font-size: .75rem; font-weight: 500;">Dari</span>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control form-control-sm" title="Dari Tanggal">
+                    </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control form-control-sm" placeholder="Sampai Tanggal">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light text-muted px-2" style="font-size: .75rem; font-weight: 500;">Sampai</span>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control form-control-sm" title="Sampai Tanggal">
+                    </div>
                 </div>
                 <div class="col-md-1 d-flex gap-1">
                     <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm">Filter</button>

@@ -14,9 +14,22 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.login');
+        $ipKey = 'login_ip|' . $request->ip();
+        $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+
+        $lockoutSeconds = (int) session('lockout_seconds', 0);
+        if ($lockoutSeconds <= 0) {
+            $lockoutSeconds = max(
+                \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey),
+                \Illuminate\Support\Facades\RateLimiter::availableIn($deviceKey)
+            );
+        }
+
+        return view('auth.login', [
+            'lockoutSeconds' => $lockoutSeconds,
+        ]);
     }
 
     /**

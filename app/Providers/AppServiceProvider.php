@@ -78,17 +78,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ── RATE LIMITERS: IP & DEVICE FINGERPRINTING ─────────────────────
-        // 1. Login Protection (IP & Device)
+        // 1. Login Protection (IP & Device) - 5 attempts per 15 minutes (900s lockdown)
         RateLimiter::for('auth.login', function (Request $request) {
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
             $email = strtolower((string) $request->input('email', ''));
 
             return [
-                Limit::perMinute(5)->by($deviceKey)->response(function (Request $request, array $headers) {
-                    return response('Terlalu banyak percobaan login dari perangkat ini. Silakan tunggu 1 menit.', 429, $headers);
+                Limit::perMinutes(15, 5)->by($deviceKey)->response(function (Request $request, array $headers) {
+                    return response('Terlalu banyak percobaan login dari perangkat ini. Akses dikunci sementara selama 15 menit.', 429, $headers);
                 }),
-                Limit::perMinute(5)->by($request->ip()),
-                Limit::perMinute(5)->by($email . '|' . $request->ip()),
+                Limit::perMinutes(15, 5)->by($request->ip()),
+                Limit::perMinutes(15, 5)->by($email . '|' . $request->ip()),
             ];
         });
 
