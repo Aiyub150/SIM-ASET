@@ -242,16 +242,30 @@ class RolePermissionController extends Controller
 
         // Ambil daftar pengguna untuk User Override
         $selectedUserId = $request->get('user_id');
-        $selectedUser = $selectedUserId ? User::with(['roles', 'permissions'])->find($selectedUserId) : null;
+        $selectedUser = $selectedUserId ? User::with(['roles.permissions', 'permissions'])->find($selectedUserId) : null;
         $users = User::with('roles')->orderBy('name')->get();
 
+        $userRolePermissions = [];
+        $userDirectPermissions = [];
+
+        if ($selectedUser) {
+            if ($selectedUser->hasRole('Super Admin')) {
+                $userRolePermissions = Permission::pluck('name')->toArray();
+            } else {
+                $userRolePermissions = $selectedUser->getPermissionsViaRoles()->pluck('name')->toArray();
+            }
+            $userDirectPermissions = $selectedUser->getDirectPermissions()->pluck('name')->toArray();
+        }
+
         return view('administration.permissions.index', [
-            'roles'          => $roles,
-            'permissionDefs' => $permissionDefs,
-            'permissions'    => $permissions,
-            'users'          => $users,
-            'selectedUser'   => $selectedUser,
-            'systemRoles'    => $this->systemRoles,
+            'roles'                  => $roles,
+            'permissionDefs'         => $permissionDefs,
+            'permissions'            => $permissions,
+            'users'                  => $users,
+            'selectedUser'           => $selectedUser,
+            'userRolePermissions'   => $userRolePermissions,
+            'userDirectPermissions' => $userDirectPermissions,
+            'systemRoles'            => $this->systemRoles,
         ]);
     }
 

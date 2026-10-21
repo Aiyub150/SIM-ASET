@@ -108,6 +108,30 @@ class DynamicRbacAndAdministrationSettingsTest extends TestCase
         $this->assertFalse($anotherStaff->fresh()->hasDirectPermission('audit.view'));
     }
 
+    public function test_user_permissions_view_accurately_reflects_role_inherited_and_direct_permissions(): void
+    {
+        // $this->staff memiliki role Staff Logistik yang mewarisi items.view, loans.view, loans.create, loans.return, reports.view
+        // Berikan direct permission tambahan 'categories.view'
+        $this->staff->givePermissionTo('categories.view');
+
+        $response = $this->actingAs($this->superAdmin)->get(route('admin-settings.permissions.index', [
+            'user_id' => $this->staff->id,
+        ]));
+
+        $response->assertOk();
+        $response->assertViewHas('userRolePermissions', function ($rolePerms) {
+            return in_array('items.view', $rolePerms) && in_array('loans.view', $rolePerms);
+        });
+
+        $response->assertViewHas('userDirectPermissions', function ($directPerms) {
+            return in_array('categories.view', $directPerms) && !in_array('items.view', $directPerms);
+        });
+
+        // Verifikasi visual badge 'Bawaan Peran' dan 'Izin Khusus' dirender di HTML
+        $response->assertSee('Bawaan Peran', false);
+        $response->assertSee('Izin Khusus', false);
+    }
+
     public function test_superadmin_can_configure_and_preview_code_format_settings(): void
     {
         $setting = CodeFormatSetting::where('entity', 'loan_code')->first();
