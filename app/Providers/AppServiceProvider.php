@@ -80,7 +80,11 @@ class AppServiceProvider extends ServiceProvider
         // ── RATE LIMITERS: IP & DEVICE FINGERPRINTING ─────────────────────
         // 1. Login Protection (IP & Device) - 5 attempts per 15 minutes (900s lockdown)
         RateLimiter::for('auth.login', function (Request $request) {
-            $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+            $clientIp = \App\Services\ActivityLogger::resolveClientIp($request);
+            $deviceId = $request->cookie('simaset_did') 
+                ?? $request->header('X-Device-Id') 
+                ?? sha1($request->header('User-Agent') ?? 'unknown-device');
+            $deviceKey = 'dev_' . substr(sha1($deviceId), 0, 16);
             $email = strtolower((string) $request->input('email', ''));
 
             $responseCallback = function (Request $request, array $headers) {
@@ -100,16 +104,28 @@ class AppServiceProvider extends ServiceProvider
                 ], 429, $headers);
             };
 
-            return [
+            $limits = [
                 Limit::perMinutes(15, 5)->by($deviceKey)->response($responseCallback),
-                Limit::perMinutes(15, 5)->by($request->ip())->response($responseCallback),
-                Limit::perMinutes(15, 5)->by($email . '|' . $request->ip())->response($responseCallback),
             ];
+
+            // Hanya kunci IP jika BUKAN internal loopback/server IP
+            if (!\App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp)) {
+                $limits[] = Limit::perMinutes(15, 5)->by($clientIp)->response($responseCallback);
+                $limits[] = Limit::perMinutes(15, 5)->by($email . '|' . $clientIp)->response($responseCallback);
+            } else {
+                $limits[] = Limit::perMinutes(15, 5)->by($email . '|' . $deviceKey)->response($responseCallback);
+            }
+
+            return $limits;
         });
 
         // 2. Forgot Password Protection (IP & Device)
         RateLimiter::for('auth.forgot-password', function (Request $request) {
-            $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+            $clientIp = \App\Services\ActivityLogger::resolveClientIp($request);
+            $deviceId = $request->cookie('simaset_did') 
+                ?? $request->header('X-Device-Id') 
+                ?? sha1($request->header('User-Agent') ?? 'unknown-device');
+            $deviceKey = 'dev_' . substr(sha1($deviceId), 0, 16);
 
             $forgotPasswordResponse = function (Request $request, array $headers) {
                 if ($request->expectsJson()) {
@@ -123,10 +139,15 @@ class AppServiceProvider extends ServiceProvider
                 ], 429, $headers);
             };
 
-            return [
+            $limits = [
                 Limit::perMinute(5)->by($deviceKey)->response($forgotPasswordResponse),
-                Limit::perMinute(5)->by($request->ip())->response($forgotPasswordResponse),
             ];
+
+            if (!\App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp)) {
+                $limits[] = Limit::perMinute(5)->by($clientIp)->response($forgotPasswordResponse);
+            }
+
+            return $limits;
         });
 
         // 3. Document Exports Protection (PDF, Excel, CSV) - IP & Device

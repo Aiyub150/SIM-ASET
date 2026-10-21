@@ -21,10 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->encryptCookies(except: [
             'user_timezone',
+            'simaset_did',
         ]);
 
         $middleware->web(append: [
             'throttle:global-ip',
+            \App\Http\Middleware\DeviceIdentificationMiddleware::class,
             \App\Http\Middleware\XssSanitizer::class,
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\SetUserTimezoneMiddleware::class,

@@ -20,7 +20,25 @@ class ActivityLogger
             return '127.0.0.1';
         }
 
-        // 1. Check HTTP header X-Forwarded-For (can be comma-separated list of client, proxy1, proxy2)
+        // 1. Cloudflare header (prioritas tertinggi: langsung dari edge proxy Cloudflare)
+        $cfIp = $req->header('CF-Connecting-IP');
+        if ($cfIp && filter_var($cfIp, FILTER_VALIDATE_IP)) {
+            return $cfIp;
+        }
+
+        // 2. True-Client-IP header (Akamai / Cloudflare Enterprise)
+        $trueClientIp = $req->header('True-Client-IP');
+        if ($trueClientIp && filter_var($trueClientIp, FILTER_VALIDATE_IP)) {
+            return $trueClientIp;
+        }
+
+        // 3. X-Real-IP header (jika IP publik)
+        $realIp = $req->header('X-Real-IP');
+        if ($realIp && filter_var($realIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return $realIp;
+        }
+
+        // 4. X-Forwarded-For: cari IP publik pertama yang bukan internal proxy
         $forwardedFor = $req->header('X-Forwarded-For');
         if ($forwardedFor) {
             $ips = array_map('trim', explode(',', $forwardedFor));
@@ -28,33 +46,43 @@ class ActivityLogger
                 if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                     return $ip;
                 }
-                // If it's a valid IP (even private subnet like 192.168.x or 10.x in LAN office), return the first one
+            }
+            foreach ($ips as $ip) {
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     return $ip;
                 }
             }
         }
 
-        // 2. Cloudflare / Reverse Proxy headers
-        $cfIp = $req->header('CF-Connecting-IP');
-        if ($cfIp && filter_var($cfIp, FILTER_VALIDATE_IP)) {
-            return $cfIp;
-        }
-
-        // 3. X-Real-IP header
-        $realIp = $req->header('X-Real-IP');
         if ($realIp && filter_var($realIp, FILTER_VALIDATE_IP)) {
             return $realIp;
         }
 
-        // 4. Client-IP header
+        // 5. Client-IP header
         $clientIp = $req->header('Client-IP');
         if ($clientIp && filter_var($clientIp, FILTER_VALIDATE_IP)) {
             return $clientIp;
         }
 
-        // 5. Fallback to standard request getClientIp
+        // 6. Fallback standard getClientIp
         return $req->getClientIp() ?: '127.0.0.1';
+    }
+
+    /**
+     * Mengecek apakah IP adalah internal loopback atau server lokal.
+     */
+    public static function isInternalOrLoopbackIp(string $ip): bool
+    {
+        if (in_array($ip, ['127.0.0.1', '::1', 'localhost'], true)) {
+            return true;
+        }
+
+        $serverAddr = $_SERVER['SERVER_ADDR'] ?? null;
+        if ($serverAddr && $ip === $serverAddr) {
+            return true;
+        }
+
+        return !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }
 
     /**

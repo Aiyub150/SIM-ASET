@@ -147,4 +147,46 @@ class RateLimitingAndCacheSecurityTest extends TestCase
         $response6->assertSee('lockout-countdown');
         $response6->assertSee('Akun / IP Terkunci Sementara');
     }
+
+    public function test_different_devices_are_isolated_and_loopback_ip_does_not_lock_all_devices(): void
+    {
+        $serverLoopbackIp = '127.0.0.1';
+        $device1Token = 'device-token-uuid-111111111111';
+        $device2Token = 'device-token-uuid-222222222222';
+
+        // Device 1 fails 5 times
+        for ($i = 0; $i < 5; $i++) {
+            $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
+                ->withCookies(['simaset_did' => $device1Token])
+                ->post('/login', [
+                    'email' => 'superadmin@simaset.com',
+                    'password' => 'wrongpass',
+                ]);
+        }
+
+        // Device 1 is now locked out
+        $device1Login = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
+            ->withCookies(['simaset_did' => $device1Token])
+            ->get('/login');
+        $device1Login->assertSee('lockout-countdown');
+
+        // Device 2 (different device / browser) opens login on the same server IP
+        // Must NOT be locked out!
+        $device2Login = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
+            ->withCookies(['simaset_did' => $device2Token])
+            ->get('/login');
+        $device2Login->assertSee('id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="display:none;"', false);
+
+        // Device 2 attempts login with wrong password (1st attempt)
+        // Must show remaining 4 attempts, NOT lockout!
+        $device2Attempt1 = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
+            ->withCookies(['simaset_did' => $device2Token])
+            ->post('/login', [
+                'email' => 'superadmin@simaset.com',
+                'password' => 'wrongpass',
+            ]);
+        $device2Attempt1->assertSessionHasErrors('email');
+        $this->assertStringContainsString('Sisa kesempatan login: 4 kali', session('errors')->first('email'));
+        $this->assertNull(session('lockout_seconds'));
+    }
 }
