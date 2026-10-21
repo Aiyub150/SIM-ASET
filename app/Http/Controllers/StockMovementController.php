@@ -53,7 +53,7 @@ class StockMovementController extends Controller
      */
     public function create(): View
     {
-        $items         = Item::orderBy('name', 'asc')->get();
+        $items         = Item::with('category')->orderBy('name', 'asc')->get();
         $suggestedCode = $this->generateReferenceCode();
         return view('stocks.create', compact('items', 'suggestedCode'));
     }

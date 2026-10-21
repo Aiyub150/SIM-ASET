@@ -169,7 +169,7 @@ class LoanController extends Controller
         }
 
         $borrowers = Borrower::orderBy('institution_name', 'asc')->get();
-        $items     = Item::where('available_qty', '>', 0)->orderBy('name', 'asc')->get();
+        $items     = Item::with('category')->where('available_qty', '>', 0)->orderBy('name', 'asc')->get();
 
         return view('loans.create', compact('borrowers', 'items'));
     }
@@ -189,7 +189,7 @@ class LoanController extends Controller
             abort(403, 'Akses dilarang.');
         }
 
-        $loan->load(['borrower', 'user', 'loanItems.item']);
+        $loan->load(['borrower', 'user', 'loanItems.item.category']);
 
         $pendingItems = $loan->loanItems->filter(function ($loanItem) {
             return $loanItem->qty > $loanItem->returned_qty;

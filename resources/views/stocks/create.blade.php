@@ -66,11 +66,18 @@
                     <div class="mb-3">
                         <label class="form-label">Pilih Barang</label>
                         <select name="item_id" id="stock_item_id" class="form-select @error('item_id') is-invalid @enderror" required>
-                            <option value="">— Pilih Barang —</option>
+                            <option value="">— Pilih atau cari barang… —</option>
                             @foreach($items as $item)
-                                <option value="{{ $item->id }}" {{ old('item_id') == $item->id ? 'selected' : '' }}>
-                                    [{{ $item->sku }}] {{ $item->name }}
-                                    &nbsp;— Fisik: {{ $item->total_qty }}, Tersedia: {{ $item->available_qty }}
+                                <option value="{{ $item->id }}"
+                                        data-name="{{ $item->name }}"
+                                        data-sku="{{ $item->sku }}"
+                                        data-category="{{ $item->category->name ?? 'Tanpa Kategori' }}"
+                                        data-image="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
+                                        data-image-name="{{ $item->image ? basename($item->image) : '' }}"
+                                        data-available="{{ $item->available_qty }}"
+                                        data-total="{{ $item->total_qty }}"
+                                        {{ old('item_id') == $item->id ? 'selected' : '' }}>
+                                    [{{ $item->sku }}] {{ $item->name }} — Fisik: {{ $item->total_qty }}, Tersedia: {{ $item->available_qty }}
                                 </option>
                             @endforeach
                         </select>
@@ -135,13 +142,82 @@
     if (stockItemSelect) {
         new TomSelect(stockItemSelect, {
             create: false,
-            plugins: ['dropdown_input'],
-            sortField: {
-                field: "text",
-                direction: "asc"
-            },
             placeholder: '— Pilih atau cari barang… —',
             render: {
+                option: function(data, escape) {
+                    const opt = data.$option;
+                    if (!data.value || !opt) {
+                        return `<div>${escape(data.text)}</div>`;
+                    }
+                    const name = opt.getAttribute('data-name') || data.text;
+                    const sku = opt.getAttribute('data-sku') || '';
+                    const category = opt.getAttribute('data-category') || '-';
+                    const imgUrl = opt.getAttribute('data-image');
+                    const imgName = opt.getAttribute('data-image-name');
+                    const available = opt.getAttribute('data-available') || '0';
+                    const total = opt.getAttribute('data-total') || '0';
+
+                    const imgHtml = imgUrl 
+                        ? `<img src="${escape(imgUrl)}" alt="${escape(name)}" class="rounded-3 border shadow-sm" style="width: 44px; height: 44px; object-fit: cover; flex-shrink: 0;">`
+                        : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 44px; height: 44px; flex-shrink: 0;"><i class="fa-solid fa-box text-secondary" style="font-size: 1.2rem;"></i></div>`;
+
+                    const imgBadge = imgName 
+                        ? `<span class="badge bg-light text-secondary border" style="font-size: 0.68rem;" title="Nama file gambar"><i class="fa-regular fa-image text-primary me-1"></i>${escape(imgName)}</span>`
+                        : `<span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Tanpa Foto</span>`;
+
+                    return `<div class="d-flex align-items-center justify-content-between p-2 border-bottom border-light">
+                        <div class="d-flex align-items-center gap-3 text-truncate me-2">
+                            ${imgHtml}
+                            <div class="text-truncate">
+                                <div class="d-flex align-items-center gap-1 text-truncate">
+                                    <span class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">${escape(name)}</span>
+                                    <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escape(sku)}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-1 text-secondary small text-truncate">
+                                    ${imgBadge}
+                                    <span class="text-muted" style="font-size: 0.75rem;">Kat: ${escape(category)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end flex-shrink-0">
+                            <span class="badge bg-success-subtle text-success border d-block mb-1" style="font-size: 0.72rem;">
+                                Tersedia: ${escape(available)}
+                            </span>
+                            <small class="text-muted" style="font-size: 0.68rem;">Total: ${escape(total)}</small>
+                        </div>
+                    </div>`;
+                },
+                item: function(data, escape) {
+                    const opt = data.$option;
+                    if (!data.value || !opt) {
+                        return `<div>${escape(data.text)}</div>`;
+                    }
+                    const name = opt.getAttribute('data-name') || data.text;
+                    const sku = opt.getAttribute('data-sku') || '';
+                    const imgUrl = opt.getAttribute('data-image');
+                    const imgName = opt.getAttribute('data-image-name');
+                    const available = opt.getAttribute('data-available') || '0';
+
+                    const imgHtml = imgUrl 
+                        ? `<img src="${escape(imgUrl)}" alt="${escape(name)}" class="rounded me-2 border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0;">`
+                        : `<i class="fa-solid fa-box text-muted me-2" style="font-size: 0.85rem;"></i>`;
+
+                    const imgBadge = imgName 
+                        ? `<span class="badge bg-light text-secondary border ms-2" style="font-size: 0.7rem;"><i class="fa-regular fa-image text-primary me-1"></i>${escape(imgName)}</span>`
+                        : '';
+
+                    return `<div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                        <div class="d-flex align-items-center text-truncate">
+                            ${imgHtml}
+                            <span class="fw-bold text-dark text-truncate">${escape(name)}</span>
+                            <span class="badge bg-light text-dark border ms-2" style="font-size: 0.7rem; font-family: monospace;">${escape(sku)}</span>
+                            ${imgBadge}
+                        </div>
+                        <span class="badge bg-success-subtle text-success border ms-2" style="font-size: 0.72rem; flex-shrink: 0;">
+                            Tersedia: ${escape(available)}
+                        </span>
+                    </div>`;
+                },
                 no_results: function(data, escape) {
                     return '<div class="no-results" style="padding: 10px; color: #6c757d;">Barang tidak ditemukan.</div>';
                 }

@@ -70,6 +70,22 @@
             border-radius: 0.4rem !important;
             padding: 0.45rem 0.75rem !important;
             font-size: 0.85rem !important;
+            border-bottom: 1px solid #f8fafc;
+            transition: background-color 0.15s ease-in-out;
+        }
+        .ts-dropdown .option:last-child {
+            border-bottom: none;
+        }
+        .ts-dropdown .ts-dropdown-content {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .ts-dropdown .ts-dropdown-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
         }
         .ts-dropdown .active {
             background-color: #eff6ff !important;

@@ -175,10 +175,16 @@
                     <div class="col-md-7">
                         <label class="form-label">Pilih Barang yang Dikembalikan</label>
                         <select name="items[0][loan_item_id]" class="form-select loan-item-select" required>
-                            <option value="">— Pilih Barang —</option>
+                            <option value="">— Pilih Barang yang Dikembalikan —</option>
                             @foreach($pendingItems as $pending)
-                                <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}" data-sku="{{ $pending->item->sku }}">
-                                    {{ $pending->item->sku }} — {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
+                                <option value="{{ $pending->id }}"
+                                        data-max="{{ $pending->qty - $pending->returned_qty }}"
+                                        data-sku="{{ $pending->item->sku }}"
+                                        data-name="{{ $pending->item->name }}"
+                                        data-image="{{ $pending->item->image ? asset('storage/' . $pending->item->image) : '' }}"
+                                        data-image-name="{{ $pending->item->image ? basename($pending->item->image) : '' }}"
+                                        data-category="{{ $pending->item->category->name ?? 'Tanpa Kategori' }}">
+                                    [{{ $pending->item->sku }}] {{ $pending->item->name }} — Sisa: {{ $pending->qty - $pending->returned_qty }}
                                 </option>
                             @endforeach
                         </select>
@@ -214,10 +220,16 @@
         <div class="col-md-7">
             <label class="form-label">Pilih Barang yang Dikembalikan</label>
             <select class="form-select loan-item-select" required>
-                <option value="">— Pilih Barang —</option>
+                <option value="">— Pilih Barang yang Dikembalikan —</option>
                 @foreach($pendingItems as $pending)
-                    <option value="{{ $pending->id }}" data-max="{{ $pending->qty - $pending->returned_qty }}" data-sku="{{ $pending->item->sku }}">
-                        {{ $pending->item->sku }} — {{ $pending->item->name }} &nbsp;(Hutang: {{ $pending->qty - $pending->returned_qty }})
+                    <option value="{{ $pending->id }}"
+                            data-max="{{ $pending->qty - $pending->returned_qty }}"
+                            data-sku="{{ $pending->item->sku }}"
+                            data-name="{{ $pending->item->name }}"
+                            data-image="{{ $pending->item->image ? asset('storage/' . $pending->item->image) : '' }}"
+                            data-image-name="{{ $pending->item->image ? basename($pending->item->image) : '' }}"
+                            data-category="{{ $pending->item->category->name ?? 'Tanpa Kategori' }}">
+                        [{{ $pending->item->sku }}] {{ $pending->item->name }} — Sisa: {{ $pending->qty - $pending->returned_qty }}
                     </option>
                 @endforeach
             </select>
@@ -244,15 +256,107 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        function initTomSelect(selectEl) {
+            if (!selectEl || typeof TomSelect === 'undefined' || selectEl.tomselect) return selectEl?.tomselect;
+            return new TomSelect(selectEl, {
+                create: false,
+                placeholder: '— Pilih Barang yang Dikembalikan —',
+                render: {
+                    option: function(data, escape) {
+                        const opt = data.$option;
+                        if (!data.value || !opt) {
+                            return `<div>${escape(data.text)}</div>`;
+                        }
+                        const name = opt.getAttribute('data-name') || data.text;
+                        const sku = opt.getAttribute('data-sku') || '';
+                        const category = opt.getAttribute('data-category') || '-';
+                        const imgUrl = opt.getAttribute('data-image');
+                        const imgName = opt.getAttribute('data-image-name');
+                        const max = opt.getAttribute('data-max') || '0';
+
+                        const imgHtml = imgUrl 
+                            ? `<img src="${escape(imgUrl)}" alt="${escape(name)}" class="rounded-3 border shadow-sm" style="width: 40px; height: 40px; object-fit: cover; flex-shrink: 0;">`
+                            : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="fa-solid fa-box text-secondary" style="font-size: 1.1rem;"></i></div>`;
+
+                        const imgBadge = imgName 
+                            ? `<span class="badge bg-light text-secondary border" style="font-size: 0.68rem;" title="Nama file foto"><i class="fa-regular fa-image text-primary me-1"></i>${escape(imgName)}</span>`
+                            : `<span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Tanpa Foto</span>`;
+
+                        return `<div class="d-flex align-items-center justify-content-between p-2 border-bottom border-light">
+                            <div class="d-flex align-items-center gap-3 text-truncate me-2">
+                                ${imgHtml}
+                                <div class="text-truncate">
+                                    <div class="d-flex align-items-center gap-1 text-truncate">
+                                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">${escape(name)}</span>
+                                        <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escape(sku)}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 mt-1 text-secondary small text-truncate">
+                                        ${imgBadge}
+                                        <span class="text-muted" style="font-size: 0.75rem;">Kat: ${escape(category)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end flex-shrink-0">
+                                <span class="badge bg-warning-subtle text-dark border d-block" style="font-size: 0.72rem;">
+                                    Sisa: ${escape(max)}
+                                </span>
+                            </div>
+                        </div>`;
+                    },
+                    item: function(data, escape) {
+                        const opt = data.$option;
+                        if (!data.value || !opt) {
+                            return `<div>${escape(data.text)}</div>`;
+                        }
+                        const name = opt.getAttribute('data-name') || data.text;
+                        const sku = opt.getAttribute('data-sku') || '';
+                        const imgUrl = opt.getAttribute('data-image');
+                        const imgName = opt.getAttribute('data-image-name');
+                        const max = opt.getAttribute('data-max') || '0';
+
+                        const imgHtml = imgUrl 
+                            ? `<img src="${escape(imgUrl)}" alt="${escape(name)}" class="rounded me-2 border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0;">`
+                            : `<i class="fa-solid fa-box text-muted me-2" style="font-size: 0.85rem;"></i>`;
+
+                        const imgBadge = imgName 
+                            ? `<span class="badge bg-light text-secondary border ms-2" style="font-size: 0.7rem;"><i class="fa-regular fa-image text-primary me-1"></i>${escape(imgName)}</span>`
+                            : '';
+
+                        return `<div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                            <div class="d-flex align-items-center text-truncate">
+                                ${imgHtml}
+                                <span class="fw-bold text-dark text-truncate">${escape(name)}</span>
+                                <span class="badge bg-light text-dark border ms-2" style="font-size: 0.7rem; font-family: monospace;">${escape(sku)}</span>
+                                ${imgBadge}
+                            </div>
+                            <span class="badge bg-warning-subtle text-dark border ms-2" style="font-size: 0.72rem; flex-shrink: 0;">
+                                Sisa: ${escape(max)}
+                            </span>
+                        </div>`;
+                    }
+                }
+            });
+        }
+
         function attachMaxLogic(row) {
             const sel   = row.querySelector('.loan-item-select');
             const input = row.querySelector('.return-qty-input');
             if (!sel) return;
-            sel.addEventListener('change', function () {
-                const max = sel.options[sel.selectedIndex].getAttribute('data-max');
-                if (max) { input.setAttribute('max', max); input.value = max; }
-                else { input.removeAttribute('max'); input.value = ''; }
-            });
+            const ts = initTomSelect(sel);
+            if (ts) {
+                ts.on('change', function(val) {
+                    const opt = sel.querySelector(`option[value="${val}"]`);
+                    const max = opt ? opt.getAttribute('data-max') : null;
+                    if (max) { input.setAttribute('max', max); input.value = max; }
+                    else { input.removeAttribute('max'); input.value = ''; }
+                });
+            } else {
+                sel.addEventListener('change', function () {
+                    const max = sel.options[sel.selectedIndex]?.getAttribute('data-max');
+                    if (max) { input.setAttribute('max', max); input.value = max; }
+                    else { input.removeAttribute('max'); input.value = ''; }
+                });
+            }
         }
 
         const firstRow = document.querySelector('#return-items-container .item-row');
@@ -269,8 +373,8 @@
                 newRow.querySelector('.loan-item-select').setAttribute('name', `items[${idx}][loan_item_id]`);
                 newRow.querySelector('.return-qty-input').setAttribute('name', `items[${idx}][return_qty]`);
                 newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
-                attachMaxLogic(newRow);
                 container.appendChild(newRow);
+                attachMaxLogic(newRow);
                 idx++;
             });
         }
@@ -290,14 +394,18 @@
                     sel.setAttribute('name', `items[${idx}][loan_item_id]`);
                     qty.setAttribute('name', `items[${idx}][return_qty]`);
                     
-                    sel.value = opt.value;
+                    newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
+                    container.appendChild(newRow);
+                    attachMaxLogic(newRow);
+                    if (sel.tomselect) {
+                        sel.tomselect.setValue(opt.value);
+                    } else {
+                        sel.value = opt.value;
+                    }
                     const max = opt.getAttribute('data-max');
                     qty.setAttribute('max', max);
                     qty.value = max;
                     
-                    newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
-                    attachMaxLogic(newRow);
-                    container.appendChild(newRow);
                     idx++;
                 });
             });
@@ -464,7 +572,11 @@
             const row = select.closest('.item-row');
             const qtyInput = row.querySelector('.return-qty-input');
             const max = option.getAttribute('data-max');
-            select.value = option.value;
+            if (select.tomselect) {
+                select.tomselect.setValue(option.value);
+            } else {
+                select.value = option.value;
+            }
             qtyInput.setAttribute('max', max);
             qtyInput.value = max;
             returnSkuFeedback.textContent = 'Barang cocok ditemukan. Jumlah pengembalian otomatis diisi.';

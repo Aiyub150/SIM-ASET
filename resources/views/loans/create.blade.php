@@ -16,7 +16,15 @@
 {{-- Data barang dari server — dipakai JS, tidak di-render sebagai <select> panjang --}}
 @php
     $itemsJson = $items->map(function ($i) {
-        return ['id' => $i->id, 'name' => $i->name, 'sku' => $i->sku ?? '', 'qty' => $i->available_qty];
+        return [
+            'id' => $i->id,
+            'name' => $i->name,
+            'sku' => $i->sku ?? '',
+            'qty' => $i->available_qty,
+            'image' => $i->image ? asset('storage/' . $i->image) : null,
+            'image_name' => $i->image ? basename($i->image) : null,
+            'category' => $i->category->name ?? 'Tanpa Kategori',
+        ];
     });
 @endphp
 <script id="items-data" type="application/json">
@@ -368,7 +376,8 @@
 
             ITEMS.forEach(item => {
                 const matchText = item.name.toLowerCase().includes(q)
-                               || item.sku.toLowerCase().includes(q);
+                               || item.sku.toLowerCase().includes(q)
+                               || (item.image_name && item.image_name.toLowerCase().includes(q));
                 if (!matchText) return;
 
                 const isUsed   = used.includes(item.id);
@@ -382,11 +391,34 @@
                     (isSelf     ? ' selected'  : '');
                 opt.dataset.id  = item.id;
                 opt.dataset.max = item.qty;
-                opt.innerHTML   = `
-                    <span class="option-name">${escapeHtml(item.name)}${item.sku ? ` <small style="color:#94a3b8;">(${escapeHtml(item.sku)})</small>` : ''}</span>
-                    <span class="option-badge ${item.qty === 0 ? 'zero' : ''}">
-                        ${isUsed ? 'Dipilih' : 'Stok: ' + item.qty}
-                    </span>`;
+
+                const imgHtml = item.image 
+                    ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="rounded-3 border shadow-sm" style="width: 38px; height: 38px; object-fit: cover; flex-shrink: 0;">`
+                    : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 38px; height: 38px; flex-shrink: 0;"><i class="fa-solid fa-box text-secondary" style="font-size: 1.1rem;"></i></div>`;
+
+                const imgBadge = item.image_name 
+                    ? `<span class="badge bg-light text-secondary border" style="font-size: 0.68rem;" title="Nama file foto"><i class="fa-regular fa-image text-primary me-1"></i>${escapeHtml(item.image_name)}</span>`
+                    : `<span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Tanpa Foto</span>`;
+
+                opt.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                        ${imgHtml}
+                        <div class="text-truncate">
+                            <div class="d-flex align-items-center gap-1 text-truncate">
+                                <span class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">${escapeHtml(item.name)}</span>
+                                <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escapeHtml(item.sku)}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mt-1 text-secondary small text-truncate">
+                                ${imgBadge}
+                                <span class="text-muted" style="font-size: 0.75rem;">Kat: ${escapeHtml(item.category)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end flex-shrink-0">
+                        <span class="option-badge ${item.qty === 0 ? 'zero' : ''}">
+                            ${isUsed ? 'Dipilih' : 'Stok: ' + item.qty}
+                        </span>
+                    </div>`;
 
                 if (!disabled) {
                     opt.addEventListener('click', () => selectItem(item));
@@ -410,8 +442,15 @@
             // Update tampilan display
             display.classList.remove('is-invalid');
             display.querySelector('.display-text').className = 'display-text selected-text';
-            display.querySelector('.display-text').textContent =
-                item.name + (item.sku ? ` (${item.sku})` : '') + ` — Stok: ${item.qty}`;
+            display.querySelector('.display-text').innerHTML = `
+                <div class="d-flex align-items-center gap-2 text-truncate">
+                    ${item.image ? `<img src="${escapeHtml(item.image)}" class="rounded border" style="width: 22px; height: 22px; object-fit: cover;">` : '<i class="fa-solid fa-box text-muted"></i>'}
+                    <span class="fw-bold text-dark text-truncate">${escapeHtml(item.name)}</span>
+                    <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escapeHtml(item.sku)}</span>
+                    ${item.image_name ? `<span class="badge bg-light text-secondary border ms-1" style="font-size: 0.68rem;"><i class="fa-regular fa-image text-primary me-1"></i>${escapeHtml(item.image_name)}</span>` : ''}
+                    <span class="badge bg-success-subtle text-success border ms-1" style="font-size: 0.7rem;">Stok: ${escapeHtml(item.qty)}</span>
+                </div>
+            `;
 
             closeDropdown();
 
