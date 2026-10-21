@@ -187,11 +187,16 @@
     document.addEventListener('DOMContentLoaded', function () {
         const roleFilter = document.getElementById('user_role_filter');
         if (roleFilter && typeof TomSelect !== 'undefined') {
+            let roleInit = false;
             new TomSelect(roleFilter, {
                 create: false,
                 placeholder: 'Semua Peran / Role',
                 allowEmptyOption: true,
+                onInitialize: function() {
+                    roleInit = true;
+                },
                 onChange: function() {
+                    if (!roleInit) return;
                     roleFilter.closest('form').submit();
                 },
                 render: {
@@ -221,12 +226,17 @@
 
         const statusFilter = document.getElementById('user_status_filter');
         if (statusFilter && typeof TomSelect !== 'undefined') {
+            let statusInit = false;
             new TomSelect(statusFilter, {
                 create: false,
                 controlInput: null,
                 placeholder: 'Semua Status',
                 allowEmptyOption: true,
+                onInitialize: function() {
+                    statusInit = true;
+                },
                 onChange: function() {
+                    if (!statusInit) return;
                     statusFilter.closest('form').submit();
                 }
             });

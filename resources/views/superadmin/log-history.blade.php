@@ -273,11 +273,16 @@ function showPayloadDetails(properties, description) {
 document.addEventListener('DOMContentLoaded', function () {
     const moduleFilter = document.getElementById('log_module_filter');
     if (moduleFilter && typeof TomSelect !== 'undefined') {
+        let moduleInit = false;
         new TomSelect(moduleFilter, {
             create: false,
             placeholder: 'Semua Modul',
             allowEmptyOption: true,
+            onInitialize: function() {
+                moduleInit = true;
+            },
             onChange: function() {
+                if (!moduleInit) return;
                 moduleFilter.closest('form').submit();
             }
         });
@@ -285,11 +290,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const actionFilter = document.getElementById('log_action_filter');
     if (actionFilter && typeof TomSelect !== 'undefined') {
+        let actionInit = false;
         new TomSelect(actionFilter, {
             create: false,
             placeholder: 'Semua Aksi',
             allowEmptyOption: true,
+            onInitialize: function() {
+                actionInit = true;
+            },
             onChange: function() {
+                if (!actionInit) return;
                 actionFilter.closest('form').submit();
             }
         });

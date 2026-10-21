@@ -22,7 +22,6 @@
             'sku' => $i->sku ?? '',
             'qty' => $i->available_qty,
             'image' => $i->image ? asset('storage/' . $i->image) : null,
-            'image_name' => $i->image ? basename($i->image) : null,
             'category' => $i->category->name ?? 'Tanpa Kategori',
         ];
     });
@@ -377,7 +376,7 @@
             ITEMS.forEach(item => {
                 const matchText = item.name.toLowerCase().includes(q)
                                || item.sku.toLowerCase().includes(q)
-                               || (item.image_name && item.image_name.toLowerCase().includes(q));
+                               || (item.category && item.category.toLowerCase().includes(q));
                 if (!matchText) return;
 
                 const isUsed   = used.includes(item.id);
@@ -396,10 +395,6 @@
                     ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="rounded-3 border shadow-sm" style="width: 38px; height: 38px; object-fit: cover; flex-shrink: 0;">`
                     : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 38px; height: 38px; flex-shrink: 0;"><i class="fa-solid fa-box text-secondary" style="font-size: 1.1rem;"></i></div>`;
 
-                const imgBadge = item.image_name 
-                    ? `<span class="badge bg-light text-secondary border" style="font-size: 0.68rem;" title="Nama file foto"><i class="fa-regular fa-image text-primary me-1"></i>${escapeHtml(item.image_name)}</span>`
-                    : `<span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Tanpa Foto</span>`;
-
                 opt.innerHTML = `
                     <div class="d-flex align-items-center gap-2 text-truncate me-2">
                         ${imgHtml}
@@ -408,9 +403,8 @@
                                 <span class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">${escapeHtml(item.name)}</span>
                                 <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escapeHtml(item.sku)}</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2 mt-1 text-secondary small text-truncate">
-                                ${imgBadge}
-                                <span class="text-muted" style="font-size: 0.75rem;">Kat: ${escapeHtml(item.category)}</span>
+                            <div class="text-muted small mt-1 text-truncate" style="font-size: 0.75rem;">
+                                Kategori: <span class="text-dark">${escapeHtml(item.category)}</span>
                             </div>
                         </div>
                     </div>
@@ -447,7 +441,6 @@
                     ${item.image ? `<img src="${escapeHtml(item.image)}" class="rounded border" style="width: 22px; height: 22px; object-fit: cover;">` : '<i class="fa-solid fa-box text-muted"></i>'}
                     <span class="fw-bold text-dark text-truncate">${escapeHtml(item.name)}</span>
                     <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escapeHtml(item.sku)}</span>
-                    ${item.image_name ? `<span class="badge bg-light text-secondary border ms-1" style="font-size: 0.68rem;"><i class="fa-regular fa-image text-primary me-1"></i>${escapeHtml(item.image_name)}</span>` : ''}
                     <span class="badge bg-success-subtle text-success border ms-1" style="font-size: 0.7rem;">Stok: ${escapeHtml(item.qty)}</span>
                 </div>
             `;

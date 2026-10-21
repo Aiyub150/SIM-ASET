@@ -124,12 +124,17 @@
     document.addEventListener('DOMContentLoaded', function () {
         const loanStatusFilter = document.getElementById('loan_status_filter');
         if (loanStatusFilter && typeof TomSelect !== 'undefined') {
+            let loanInit = false;
             new TomSelect(loanStatusFilter, {
                 create: false,
                 controlInput: null,
-                placeholder: 'Semua Status',
+                placeholder: 'Semua Status Peminjaman',
                 allowEmptyOption: true,
+                onInitialize: function() {
+                    loanInit = true;
+                },
                 onChange: function() {
+                    if (!loanInit) return;
                     loanStatusFilter.closest('form').submit();
                 }
             });

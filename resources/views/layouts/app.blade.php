@@ -47,12 +47,23 @@
         * { box-sizing: border-box; }
 
         /* Custom TomSelect Enhancements */
+        .ts-wrapper.form-select,
+        .ts-wrapper.form-select-sm {
+            padding: 0 !important;
+            border: none !important;
+            background-image: none !important;
+            box-shadow: none !important;
+        }
         .ts-control {
             border-radius: 0.5rem !important;
             border-color: #dee2e6 !important;
             padding: 0.45rem 0.75rem !important;
             font-size: 0.875rem !important;
             box-shadow: none !important;
+            background-color: #fff !important;
+            min-height: 38px !important;
+            display: flex !important;
+            align-items: center !important;
         }
         .ts-control.focus {
             border-color: #3b82f6 !important;
@@ -65,10 +76,11 @@
             padding: 0.35rem !important;
             margin-top: 4px !important;
             z-index: 1060 !important;
+            background-color: #fff !important;
         }
         .ts-dropdown .option {
             border-radius: 0.4rem !important;
-            padding: 0.45rem 0.75rem !important;
+            padding: 0.5rem 0.75rem !important;
             font-size: 0.85rem !important;
             border-bottom: 1px solid #f8fafc;
             transition: background-color 0.15s ease-in-out;
@@ -92,9 +104,13 @@
             color: #1d4ed8 !important;
         }
         .ts-wrapper.form-select-sm .ts-control {
-            padding: 0.3rem 0.6rem !important;
+            padding: 0.28rem 0.6rem !important;
             font-size: 0.8125rem !important;
             border-radius: 0.375rem !important;
+            min-height: 31px !important;
+        }
+        .ts-wrapper .ts-control > input {
+            font-size: inherit !important;
         }
 
         /* ── COLLAPSE & ACCORDION FIX ─────────────── */

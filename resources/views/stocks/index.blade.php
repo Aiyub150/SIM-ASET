@@ -114,12 +114,17 @@
     document.addEventListener('DOMContentLoaded', function () {
         const stockTypeFilter = document.getElementById('stock_type_filter');
         if (stockTypeFilter && typeof TomSelect !== 'undefined') {
+            let typeInit = false;
             new TomSelect(stockTypeFilter, {
                 create: false,
                 controlInput: null,
                 placeholder: 'Semua Tipe Mutasi',
                 allowEmptyOption: true,
+                onInitialize: function() {
+                    typeInit = true;
+                },
                 onChange: function() {
+                    if (!typeInit) return;
                     stockTypeFilter.closest('form').submit();
                 }
             });

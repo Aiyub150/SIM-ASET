@@ -211,7 +211,6 @@
                                         'role' => $u->roles->pluck('name')->first() ?? 'Tanpa Role',
                                         'initial' => strtoupper(substr($u->name, 0, 1)),
                                         'avatar' => $u->avatar ? asset('storage/' . $u->avatar) : null,
-                                        'avatar_file' => $u->avatar ? basename($u->avatar) : null,
                                     ];
                                 })->values();
                             @endphp
@@ -345,23 +344,19 @@
                 placeholder: 'Ketik nama, email, atau peran pengguna...',
                 render: {
                     option: function(data, escape) {
+                        if (!data.value) {
+                            return `<div class="p-2 text-muted">${escape(data.name || 'Pilih pengguna...')}</div>`;
+                        }
                         const avatarHtml = data.avatar 
                             ? `<img src="${escape(data.avatar)}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 36px; height: 36px; object-fit: cover; flex-shrink: 0;">`
-                            : `<div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem; flex-shrink: 0;">${escape(data.initial)}</div>`;
-                        
-                        const fileBadge = data.avatar_file
-                            ? `<span class="badge bg-light text-secondary border ms-1" style="font-size: 0.68rem; font-weight: 500;" title="Nama file foto"><i class="fa-regular fa-image text-primary me-1"></i>${escape(data.avatar_file)}</span>`
-                            : `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.68rem; font-weight: 400;">Tanpa Foto</span>`;
+                            : `<div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem; flex-shrink: 0;">${escape(data.initial || '?')}</div>`;
 
                         return `<div class="d-flex align-items-center justify-content-between p-2 border-bottom border-light">
                             <div class="d-flex align-items-center gap-2 text-truncate me-2">
                                 ${avatarHtml}
                                 <div class="text-truncate">
                                     <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">${escape(data.name)}</div>
-                                    <div class="d-flex align-items-center gap-1 text-secondary small text-truncate" style="font-size: 0.75rem;">
-                                        <span>${escape(data.email)}</span>
-                                        ${fileBadge}
-                                    </div>
+                                    <div class="text-secondary small text-truncate" style="font-size: 0.75rem;">${escape(data.email)}</div>
                                 </div>
                             </div>
                             <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.72rem; flex-shrink: 0;">
@@ -370,20 +365,18 @@
                         </div>`;
                     },
                     item: function(data, escape) {
+                        if (!data.value) {
+                            return `<div>${escape(data.name || '')}</div>`;
+                        }
                         const avatarHtml = data.avatar 
                             ? `<img src="${escape(data.avatar)}" alt="Avatar" class="rounded-circle me-2 border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0;">`
-                            : `<span class="badge bg-primary-subtle text-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 0.7rem; flex-shrink: 0;">${escape(data.initial)}</span>`;
-
-                        const fileBadge = data.avatar_file
-                            ? `<span class="badge bg-light text-secondary border ms-2" style="font-size: 0.7rem;"><i class="fa-regular fa-image text-primary me-1"></i>${escape(data.avatar_file)}</span>`
-                            : '';
+                            : `<span class="badge bg-primary-subtle text-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 0.7rem; flex-shrink: 0;">${escape(data.initial || '?')}</span>`;
 
                         return `<div class="d-flex align-items-center justify-content-between w-100 gap-2">
                             <div class="d-flex align-items-center text-truncate">
                                 ${avatarHtml}
                                 <span class="fw-bold text-dark text-truncate">${escape(data.name)}</span>
                                 <span class="text-secondary small ms-2 text-truncate">(${escape(data.email)})</span>
-                                ${fileBadge}
                             </div>
                             <span class="badge bg-primary-subtle text-primary border ms-2" style="font-size: 0.72rem; flex-shrink: 0;">
                                 ${escape(data.role)}

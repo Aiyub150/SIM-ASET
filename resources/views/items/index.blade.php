@@ -196,11 +196,16 @@
 
         const categoryFilter = document.getElementById('item_category_filter');
         if (categoryFilter && typeof TomSelect !== 'undefined') {
+            let catInit = false;
             new TomSelect(categoryFilter, {
                 create: false,
                 placeholder: 'Semua Kategori',
                 allowEmptyOption: true,
+                onInitialize: function() {
+                    catInit = true;
+                },
                 onChange: function() {
+                    if (!catInit) return;
                     categoryFilter.closest('form').submit();
                 }
             });
