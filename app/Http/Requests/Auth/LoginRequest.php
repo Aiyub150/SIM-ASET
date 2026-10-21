@@ -49,10 +49,16 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey(), self::LOCKOUT_SECONDS);
             RateLimiter::hit($this->ipThrottleKey(), self::LOCKOUT_SECONDS);
 
-            $remaining = RateLimiter::remaining($this->throttleKey(), self::MAX_ATTEMPTS);
+            $remaining = min(
+                RateLimiter::remaining($this->throttleKey(), self::MAX_ATTEMPTS),
+                RateLimiter::remaining($this->ipThrottleKey(), self::MAX_ATTEMPTS)
+            );
 
             if ($remaining <= 0) {
-                $seconds = RateLimiter::availableIn($this->throttleKey());
+                $seconds = max(
+                    RateLimiter::availableIn($this->throttleKey()),
+                    RateLimiter::availableIn($this->ipThrottleKey())
+                );
                 $lockSec = $seconds > 0 ? $seconds : self::LOCKOUT_SECONDS;
                 session()->flash('lockout_seconds', $lockSec);
 

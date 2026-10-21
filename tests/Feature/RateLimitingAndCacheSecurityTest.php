@@ -122,6 +122,11 @@ class RateLimitingAndCacheSecurityTest extends TestCase
                 ]);
             $response->assertSessionHasErrors('email');
             $this->assertNull(session('lockout_seconds'));
+
+            // Verifikasi box timer lockout disembunyikan (display:none) pada percobaan ke-1 s.d. 4
+            $loginPageView = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
+                ->get('/login');
+            $loginPageView->assertSee('id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="display:none;"', false);
         }
 
         // Percobaan ke-5 gagal -> langsung dikunci 15 menit (900 detik)

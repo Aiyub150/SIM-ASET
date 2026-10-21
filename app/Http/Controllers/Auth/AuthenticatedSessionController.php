@@ -17,14 +17,16 @@ class AuthenticatedSessionController extends Controller
     public function create(Request $request): View
     {
         $ipKey = 'login_ip|' . $request->ip();
-        $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
 
-        $lockoutSeconds = (int) session('lockout_seconds', 0);
-        if ($lockoutSeconds <= 0) {
-            $lockoutSeconds = max(
-                \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey),
-                \Illuminate\Support\Facades\RateLimiter::availableIn($deviceKey)
-            );
+        // Lockout timer HANYA aktif jika sudah melampaui batas maksimal kegagalan (tooManyAttempts)
+        $lockoutSeconds = 0;
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, LoginRequest::MAX_ATTEMPTS)) {
+            $lockoutSeconds = (int) \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey);
+            if ($lockoutSeconds <= 0) {
+                $lockoutSeconds = LoginRequest::LOCKOUT_SECONDS;
+            }
+        } elseif (session()->has('lockout_seconds')) {
+            $lockoutSeconds = (int) session('lockout_seconds');
         }
 
         return view('auth.login', [
