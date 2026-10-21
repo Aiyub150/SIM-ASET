@@ -92,4 +92,25 @@ class SecurityValidationTest extends TestCase
             return new \Symfony\Component\HttpFoundation\Response();
         });
     }
+
+    public function test_seeder_blocks_execution_in_production_without_env_password(): void
+    {
+        // Mock production environment
+        app()['env'] = 'production';
+        putenv('SEEDER_SUPERADMIN_PASSWORD');
+        putenv('SEEDER_DEFAULT_PASSWORD');
+        unset($_ENV['SEEDER_SUPERADMIN_PASSWORD'], $_ENV['SEEDER_DEFAULT_PASSWORD']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Keamanan Terancam');
+
+        $seeder = new \Database\Seeders\RoleAndAdminSeeder();
+        $seeder->run();
+    }
+
+    public function test_seeder_does_not_contain_hardcoded_password123(): void
+    {
+        $seederContent = file_get_contents(database_path('seeders/RoleAndAdminSeeder.php'));
+        $this->assertStringNotContainsString('password123', $seederContent);
+    }
 }

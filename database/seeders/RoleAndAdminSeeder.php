@@ -11,6 +11,11 @@ class RoleAndAdminSeeder extends Seeder
 {
     public function run(): void
     {
+        // Enforce safe credential configuration: Tolak eksekusi pada environment produksi tanpa password aman dari ENV
+        if (app()->environment('production') && !env('SEEDER_SUPERADMIN_PASSWORD') && !env('SEEDER_DEFAULT_PASSWORD')) {
+            throw new \RuntimeException("Keamanan Terancam: SEEDER_SUPERADMIN_PASSWORD atau SEEDER_DEFAULT_PASSWORD wajib dikonfigurasi melalui environment variable pada environment production.");
+        }
+
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
@@ -61,8 +66,10 @@ class RoleAndAdminSeeder extends Seeder
             'reports.view',
         ]);
 
+        $defaultDevPassword = env('SEEDER_DEFAULT_PASSWORD', '@SimAset2026!Secured');
+
         // 2. Super Admin — akses penuh termasuk user management
-        $superAdminPassword = env('SEEDER_SUPERADMIN_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
+        $superAdminPassword = env('SEEDER_SUPERADMIN_PASSWORD', $defaultDevPassword);
         $superAdmin = User::firstOrCreate(
             ['email' => 'superadmin@simaset.com'],
             [
@@ -73,7 +80,7 @@ class RoleAndAdminSeeder extends Seeder
         $superAdmin->syncRoles($roleSuperAdmin);
 
         // 3. Admin — akses semua fitur operasional, kecuali user management
-        $adminPassword = env('SEEDER_ADMIN_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
+        $adminPassword = env('SEEDER_ADMIN_PASSWORD', $defaultDevPassword);
         $admin = User::firstOrCreate(
             ['email' => 'admin@simaset.com'],
             [
@@ -84,7 +91,7 @@ class RoleAndAdminSeeder extends Seeder
         $admin->syncRoles($roleAdmin);
 
         // 4. Staff Logistik — hanya bisa input & lihat peminjaman miliknya sendiri
-        $staffPassword = env('SEEDER_STAFF_PASSWORD', env('SEEDER_DEFAULT_PASSWORD', 'password123'));
+        $staffPassword = env('SEEDER_STAFF_PASSWORD', $defaultDevPassword);
         $staff = User::firstOrCreate(
             ['email' => 'staff@simaset.com'],
             [
