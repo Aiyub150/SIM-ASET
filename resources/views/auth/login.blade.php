@@ -7,6 +7,10 @@
     {{-- Banner Lockout Countdown jika Terkena Proteksi Brute Force --}}
     @php
         $activeLockoutSeconds = (int) ($lockoutSeconds ?? session('lockout_seconds', 0));
+        // Jika masih ada sisa kesempatan login, kunci form TIDAK BOLEH aktif
+        if ($errors->has('email') && str_contains($errors->first('email'), 'Sisa kesempatan')) {
+            $activeLockoutSeconds = 0;
+        }
     @endphp
 
     <div id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="{{ $activeLockoutSeconds > 0 ? '' : 'display:none;' }}">
