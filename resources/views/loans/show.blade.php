@@ -255,8 +255,36 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('return-items-container');
+        const template  = document.getElementById('return-template')?.querySelector('.item-row');
+        const btnAdd    = document.getElementById('btn-add-return');
+        const totalPending = {{ $pendingItems->count() }};
+
+        function getSelectedLoanItemIds(excludeRow = null) {
+            const selected = [];
+            if (!container) return selected;
+            container.querySelectorAll('.item-row').forEach(r => {
+                if (r === excludeRow) return;
+                const s = r.querySelector('.loan-item-select');
+                const v = s?.tomselect ? s.tomselect.getValue() : s?.value;
+                if (v) selected.push(String(v));
+            });
+            return selected;
+        }
+
+        function refreshAllTomSelects() {
+            if (!container) return;
+            container.querySelectorAll('.item-row .loan-item-select').forEach(s => {
+                if (s.tomselect) {
+                    s.tomselect.refreshOptions(false);
+                }
+            });
+        }
+
         function initTomSelect(selectEl) {
             if (!selectEl || typeof TomSelect === 'undefined' || selectEl.tomselect) return selectEl?.tomselect;
+            const parentRow = selectEl.closest('.item-row');
+
             return new TomSelect(selectEl, {
                 create: false,
                 placeholder: '— Pilih Barang yang Dikembalikan —',
@@ -272,9 +300,31 @@
                         const imgUrl = opt.getAttribute('data-image');
                         const max = opt.getAttribute('data-max') || '0';
 
+                        const isUsedInOther = getSelectedLoanItemIds(parentRow).includes(String(data.value));
+
                         const imgHtml = imgUrl 
                             ? `<img src="${escape(imgUrl)}" alt="${escape(name)}" class="rounded-3 border shadow-sm" style="width: 40px; height: 40px; object-fit: cover; flex-shrink: 0;">`
                             : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="fa-solid fa-box text-secondary" style="font-size: 1.1rem;"></i></div>`;
+
+                        if (isUsedInOther) {
+                            return `<div class="d-flex align-items-center justify-content-between p-2 border-bottom border-light opacity-50 bg-light" style="cursor: not-allowed;">
+                                <div class="d-flex align-items-center gap-3 text-truncate me-2">
+                                    ${imgHtml}
+                                    <div class="text-truncate">
+                                        <div class="d-flex align-items-center gap-1 text-truncate">
+                                            <span class="fw-bold text-secondary text-truncate" style="font-size: 0.88rem;">${escape(name)}</span>
+                                            <span class="badge bg-light text-muted border ms-1" style="font-size: 0.72rem; font-family: monospace;">${escape(sku)}</span>
+                                        </div>
+                                        <div class="text-danger small mt-1 text-truncate" style="font-size: 0.75rem;">
+                                            <i class="fa-solid fa-ban me-1"></i>Sudah dipilih di baris lain
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-secondary-subtle text-secondary border flex-shrink-0" style="font-size: 0.7rem;">
+                                    Sudah Dipilih
+                                </span>
+                            </div>`;
+                        }
 
                         return `<div class="d-flex align-items-center justify-content-between p-2 border-bottom border-light">
                             <div class="d-flex align-items-center gap-3 text-truncate me-2">
@@ -332,13 +382,39 @@
             const ts = initTomSelect(sel);
             if (ts) {
                 ts.on('change', function(val) {
+                    if (val && getSelectedLoanItemIds(row).includes(String(val))) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Barang Sudah Dipilih',
+                            text: 'Barang ini sudah ada pada baris pengembalian lain. Silakan pilih barang yang berbeda.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                        ts.setValue('', true);
+                        input.removeAttribute('max');
+                        input.value = '';
+                        refreshAllTomSelects();
+                        return;
+                    }
                     const opt = sel.querySelector(`option[value="${val}"]`);
                     const max = opt ? opt.getAttribute('data-max') : null;
                     if (max) { input.setAttribute('max', max); input.value = max; }
                     else { input.removeAttribute('max'); input.value = ''; }
+                    refreshAllTomSelects();
                 });
             } else {
                 sel.addEventListener('change', function () {
+                    if (this.value && getSelectedLoanItemIds(row).includes(String(this.value))) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Barang Sudah Dipilih',
+                            text: 'Barang ini sudah ada pada baris pengembalian lain.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                        this.value = '';
+                        input.removeAttribute('max');
+                        input.value = '';
+                        return;
+                    }
                     const max = sel.options[sel.selectedIndex]?.getAttribute('data-max');
                     if (max) { input.setAttribute('max', max); input.value = max; }
                     else { input.removeAttribute('max'); input.value = ''; }
@@ -350,19 +426,44 @@
         if (firstRow) attachMaxLogic(firstRow);
 
         let idx = 1;
-        const container = document.getElementById('return-items-container');
-        const template  = document.getElementById('return-template')?.querySelector('.item-row');
-        const btnAdd    = document.getElementById('btn-add-return');
 
         if (btnAdd && template) {
             btnAdd.addEventListener('click', function () {
+                const currentRows = container.querySelectorAll('.item-row').length;
+                if (currentRows >= totalPending) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Semua Barang Sudah Dipilih',
+                        text: `Semua barang yang belum lunas (total ${totalPending} item) sudah ada di formulir pengembalian.`,
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+
                 const newRow = template.cloneNode(true);
-                newRow.querySelector('.loan-item-select').setAttribute('name', `items[${idx}][loan_item_id]`);
+                const newSel = newRow.querySelector('.loan-item-select');
+                newSel.setAttribute('name', `items[${idx}][loan_item_id]`);
                 newRow.querySelector('.return-qty-input').setAttribute('name', `items[${idx}][return_qty]`);
-                newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
+                newRow.querySelector('.btn-remove').addEventListener('click', () => {
+                    if (newSel.tomselect) {
+                        newSel.tomselect.destroy();
+                    }
+                    newRow.remove();
+                    refreshAllTomSelects();
+                });
                 container.appendChild(newRow);
                 attachMaxLogic(newRow);
+
+                // Auto-pilih item pending pertama yang belum digunakan
+                const usedIds = getSelectedLoanItemIds(newRow);
+                const availableOpt = Array.from(template.querySelector('.loan-item-select').options)
+                    .find(opt => opt.value && !usedIds.includes(String(opt.value)));
+                if (availableOpt && newSel.tomselect) {
+                    newSel.tomselect.setValue(availableOpt.value);
+                }
+
                 idx++;
+                refreshAllTomSelects();
             });
         }
 
@@ -381,7 +482,13 @@
                     sel.setAttribute('name', `items[${idx}][loan_item_id]`);
                     qty.setAttribute('name', `items[${idx}][return_qty]`);
                     
-                    newRow.querySelector('.btn-remove').addEventListener('click', () => newRow.remove());
+                    newRow.querySelector('.btn-remove').addEventListener('click', () => {
+                        if (sel.tomselect) {
+                            sel.tomselect.destroy();
+                        }
+                        newRow.remove();
+                        refreshAllTomSelects();
+                    });
                     container.appendChild(newRow);
                     attachMaxLogic(newRow);
                     if (sel.tomselect) {
@@ -395,6 +502,52 @@
                     
                     idx++;
                 });
+                refreshAllTomSelects();
+            });
+        }
+
+        // Validasi Submit Form Pengembalian
+        const returnForm = container?.closest('form');
+        if (returnForm) {
+            returnForm.addEventListener('submit', function (e) {
+                const rows = container.querySelectorAll('.item-row');
+                const selected = [];
+                let hasEmpty = false;
+                let hasDuplicate = false;
+
+                rows.forEach(r => {
+                    const sel = r.querySelector('.loan-item-select');
+                    const val = sel?.tomselect ? sel.tomselect.getValue() : sel?.value;
+                    if (!val) {
+                        hasEmpty = true;
+                    } else if (selected.includes(val)) {
+                        hasDuplicate = true;
+                    } else {
+                        selected.push(val);
+                    }
+                });
+
+                if (hasEmpty) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Barang Belum Dipilih',
+                        text: 'Pastikan seluruh baris telah memilih barang yang akan dikembalikan.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return false;
+                }
+
+                if (hasDuplicate) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Duplikasi Barang Terdeteksi',
+                        text: 'Terdapat barang yang dipilih lebih dari sekali. Hapus baris duplikat sebelum memproses pengembalian.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return false;
+                }
             });
         }
 
@@ -526,48 +679,78 @@
 
         populateReturnCameraDevices();
 
-        function findLoanItemBySku(sku) {
-            const normalized = (sku || '').trim().toUpperCase();
-            if (!normalized) return null;
-
-            const selects = Array.from(document.querySelectorAll('.loan-item-select'));
-            for (const select of selects) {
-                for (const option of Array.from(select.options)) {
-                    const text = (option.textContent || '').toUpperCase();
-                    const skuText = (option.getAttribute('data-sku') || '').toUpperCase();
-                    if (option.value && (skuText === normalized || text.includes(normalized))) {
-                        return { select, option };
-                    }
-                }
-            }
-
-            return null;
-        }
-
         function applyReturnedSkuMatch(sku) {
-            const normalized = (sku || '').trim();
+            const normalized = (sku || '').trim().toUpperCase();
             if (!normalized) return;
 
-            const match = findLoanItemBySku(normalized);
-            if (!match) {
+            const templateSelect = template.querySelector('.loan-item-select');
+            const targetOption = Array.from(templateSelect.options).find(opt => {
+                const skuAttr = (opt.getAttribute('data-sku') || '').toUpperCase();
+                return opt.value && (skuAttr === normalized || (opt.textContent || '').toUpperCase().includes(normalized));
+            });
+
+            if (!targetOption) {
                 returnSkuFeedback.textContent = 'SKU tidak cocok dengan barang yang masih dipinjam.';
                 returnSkuFeedback.className = 'small mt-2 text-danger';
                 return;
             }
 
-            const { select, option } = match;
-            const row = select.closest('.item-row');
-            const qtyInput = row.querySelector('.return-qty-input');
-            const max = option.getAttribute('data-max');
-            if (select.tomselect) {
-                select.tomselect.setValue(option.value);
-            } else {
-                select.value = option.value;
+            const targetVal = String(targetOption.value);
+            const max = targetOption.getAttribute('data-max');
+
+            // Cek apakah barang ini sudah dipilih di suatu baris
+            let existingRow = null;
+            container.querySelectorAll('.item-row').forEach(r => {
+                const sel = r.querySelector('.loan-item-select');
+                const val = sel?.tomselect ? sel.tomselect.getValue() : sel?.value;
+                if (String(val) === targetVal) {
+                    existingRow = r;
+                }
+            });
+
+            if (existingRow) {
+                const qtyInput = existingRow.querySelector('.return-qty-input');
+                qtyInput.value = max;
+                returnSkuFeedback.textContent = `Barang [${targetOption.getAttribute('data-sku') || normalized}] sudah ada di daftar pengembalian (Jumlah diset ke ${max}).`;
+                returnSkuFeedback.className = 'small mt-2 text-success';
+                return;
             }
-            qtyInput.setAttribute('max', max);
-            qtyInput.value = max;
-            returnSkuFeedback.textContent = 'Barang cocok ditemukan. Jumlah pengembalian otomatis diisi.';
-            returnSkuFeedback.className = 'small mt-2 text-success';
+
+            // Cari baris yang masih kosong jika ada
+            let emptyRow = null;
+            container.querySelectorAll('.item-row').forEach(r => {
+                if (!emptyRow) {
+                    const sel = r.querySelector('.loan-item-select');
+                    const val = sel?.tomselect ? sel.tomselect.getValue() : sel?.value;
+                    if (!val) emptyRow = r;
+                }
+            });
+
+            if (!emptyRow) {
+                if (container.querySelectorAll('.item-row').length >= totalPending) {
+                    returnSkuFeedback.textContent = 'Semua barang yang belum lunas sudah masuk ke daftar pengembalian.';
+                    returnSkuFeedback.className = 'small mt-2 text-warning';
+                    return;
+                }
+                btnAdd.click();
+                const allRows = container.querySelectorAll('.item-row');
+                emptyRow = allRows[allRows.length - 1];
+            }
+
+            if (emptyRow) {
+                const sel = emptyRow.querySelector('.loan-item-select');
+                const qtyInput = emptyRow.querySelector('.return-qty-input');
+                if (sel.tomselect) {
+                    sel.tomselect.setValue(targetVal);
+                } else {
+                    sel.value = targetVal;
+                }
+                qtyInput.setAttribute('max', max);
+                qtyInput.value = max;
+                refreshAllTomSelects();
+                returnSkuFeedback.textContent = `Barang [${targetOption.getAttribute('data-sku') || normalized}] berhasil ditambahkan ke pengembalian.`;
+                returnSkuFeedback.className = 'small mt-2 text-success';
+            }
         }
 
         const handleReturnScan = (event) => {

@@ -505,14 +505,52 @@
             });
         }
 
-        // Form submit validation: pastikan item dipilih
-        document.getElementById('loan-form').addEventListener('submit', function () {
-            if (!state.selectedId) {
-                display.classList.add('is-invalid');
+        return row;
+    }
+
+    // Form submit validation: pastikan item valid dan tidak ada duplikat
+    const loanForm = document.getElementById('loan-form');
+    if (loanForm) {
+        loanForm.addEventListener('submit', function (e) {
+            const selectedIds = [];
+            let hasEmpty = false;
+            let hasDuplicate = false;
+
+            pickers.forEach(p => {
+                const display = p.row.querySelector('.item-picker-display');
+                if (!p.selectedId) {
+                    hasEmpty = true;
+                    if (display) display.classList.add('is-invalid');
+                } else if (selectedIds.includes(p.selectedId)) {
+                    hasDuplicate = true;
+                } else {
+                    selectedIds.push(p.selectedId);
+                    if (display) display.classList.remove('is-invalid');
+                }
+            });
+
+            if (hasEmpty) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Barang Belum Dipilih',
+                    text: 'Pastikan seluruh baris peminjaman telah memilih barang.',
+                    confirmButtonColor: '#2563eb'
+                });
+                return false;
+            }
+
+            if (hasDuplicate) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplikasi Barang Terdeteksi',
+                    text: 'Terdapat barang yang dipilih lebih dari sekali pada formulir peminjaman.',
+                    confirmButtonColor: '#2563eb'
+                });
+                return false;
             }
         });
-
-        return row;
     }
 
     // Tutup dropdown milik picker tertentu
