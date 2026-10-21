@@ -43,7 +43,8 @@ class CodeFormatSettingController extends Controller
             'custom_suffix.regex' => 'Format akhiran kustom hanya boleh mengandung huruf, angka, minus, garis miring, atau underscore.',
         ]);
 
-        $dateFormat = $validated['date_format'] === 'NONE' ? null : $validated['date_format'];
+        $rawDateFormat = $validated['date_format'] ?? 'NONE';
+        $dateFormat = ($rawDateFormat === 'NONE' || empty($rawDateFormat)) ? null : $rawDateFormat;
 
         $oldConfig = [
             'prefix'        => $setting->prefix,
@@ -113,7 +114,14 @@ class CodeFormatSettingController extends Controller
             $padLen = ($setting->suffix_type === 'INCREMENT_4_DIGIT') ? 4 : 3;
 
             if ($setting->entity === 'item_sku') {
-                $items = Item::with('category')->orderBy('id')->get();
+                // Proteksi Imunitas: HANYA ubah aset milik internal/sendiri. Barang vendor dan instansi lain TIDAK disentuh.
+                $items = Item::with('category')
+                    ->where(function ($q) {
+                        $q->whereNull('ownership_status')
+                          ->orWhere('ownership_status', 'internal');
+                    })
+                    ->orderBy('id')
+                    ->get();
                 $seq = 1;
                 foreach ($items as $item) {
                     $prefix = $setting->prefix ?: ($item->category->sku_prefix ?: strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $item->category->name ?? 'ASET'), 0, 4)));

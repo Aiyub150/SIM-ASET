@@ -14,15 +14,23 @@ class UpdateItemRequest extends FormRequest
         $safeTextPattern = '/^(?=.*\pL)[\pL\pN\s\.\-\/&(),\'+]+$/u';
 
         return [
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'name'        => [
+            'category_id'      => ['required', 'integer', 'exists:categories,id'],
+            'ownership_status' => ['nullable', 'in:internal,vendor,external'],
+            'owner_name'       => [
+                'nullable',
+                'string',
+                'max:255',
+                'required_if:ownership_status,vendor,external',
+                'regex:' . $safeTextPattern,
+            ],
+            'name'             => [
                 'required',
                 'string',
                 'max:255',
                 'regex:' . $safeTextPattern,
             ],
-            'total_qty'   => ['nullable', 'integer', 'min:0'],
-            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'total_qty'        => ['nullable', 'integer', 'min:0'],
+            'image'            => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

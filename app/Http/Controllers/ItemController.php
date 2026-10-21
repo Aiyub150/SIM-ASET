@@ -30,16 +30,21 @@ class ItemController extends Controller
 
         $search = $request->query('search');
         $categoryId = $request->query('category_id');
+        $ownershipStatus = $request->query('ownership_status');
 
         $items = Item::with('category')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($subQ) use ($search) {
                     $subQ->where('name', 'like', "%{$search}%")
-                         ->orWhere('sku', 'like', "%{$search}%");
+                         ->orWhere('sku', 'like', "%{$search}%")
+                         ->orWhere('owner_name', 'like', "%{$search}%");
                 });
             })
             ->when($categoryId, function ($query, $categoryId) {
                 return $query->where('category_id', $categoryId);
+            })
+            ->when($ownershipStatus, function ($query, $ownershipStatus) {
+                return $query->where('ownership_status', $ownershipStatus);
             })
             ->orderBy('name', 'asc')
             ->paginate(15)
@@ -47,7 +52,7 @@ class ItemController extends Controller
 
         $categories = Category::orderBy('name')->get();
 
-        return view('items.index', compact('items', 'categories', 'search', 'categoryId'));
+        return view('items.index', compact('items', 'categories', 'search', 'categoryId', 'ownershipStatus'));
     }
 
     public function lookupBySku(Request $request)
@@ -156,25 +161,34 @@ class ItemController extends Controller
     {
         $category = Category::findOrFail($request->category_id);
         $totalQty = $request->filled('total_qty') ? (int) $request->total_qty : 0;
+        $ownershipStatus = $request->input('ownership_status', 'internal');
+        $ownerName = in_array($ownershipStatus, ['vendor', 'external']) ? trim($request->owner_name) : null;
 
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images/items', 'public');
         }
 
-        $item = DB::transaction(function () use ($category, $totalQty, $request, $imagePath) {
-            // Generate SKU di dalam transaksi agar autonumber aman
-            $sku = $this->generateSkuInsideTransaction($category);
+        $item = DB::transaction(function () use ($category, $totalQty, $request, $imagePath, $ownershipStatus, $ownerName) {
+            // Jika milik sendiri (internal): generate SKU otomatis sesuai format sistem
+            // Jika milik vendor / instansi lain: gunakan SKU/barcode bawaan vendor yang diinput pengguna
+            if ($ownershipStatus === 'internal') {
+                $sku = $this->generateSkuInsideTransaction($category);
+            } else {
+                $sku = trim(strtoupper($request->sku));
+            }
 
             // Buat item dengan stok 0 terlebih dahulu
             $item = Item::create([
-                'category_id'   => $category->id,
-                'location_id'   => 1, // default; bisa ditambah field lokasi nanti
-                'name'          => $request->name,
-                'sku'           => $sku,
-                'image'         => $imagePath,
-                'total_qty'     => 0,
-                'available_qty' => 0,
+                'category_id'      => $category->id,
+                'location_id'      => 1, // default; bisa ditambah field lokasi nanti
+                'name'             => $request->name,
+                'sku'              => $sku,
+                'ownership_status' => $ownershipStatus,
+                'owner_name'       => $ownerName,
+                'image'            => $imagePath,
+                'total_qty'        => 0,
+                'available_qty'    => 0,
             ]);
 
             // Jika ada stok awal, catat sebagai stock movement tipe 'in'
@@ -191,11 +205,17 @@ class ItemController extends Controller
             return $item;
         });
 
+        $ownershipLabel = match($item->ownership_status) {
+            'vendor'   => " (Milik Vendor: {$item->owner_name})",
+            'external' => " (Milik Instansi Lain: {$item->owner_name})",
+            default    => ' (Milik Sendiri)'
+        };
+
         \App\Services\ActivityLogger::log(
             'CREATE',
             'Barang',
-            "Menambahkan barang inventaris baru: {$item->name} (SKU: {$item->sku})",
-            ['item_id' => $item->id, 'sku' => $item->sku, 'name' => $item->name],
+            "Menambahkan barang inventaris baru: {$item->name} (SKU: {$item->sku}){$ownershipLabel}",
+            ['item_id' => $item->id, 'sku' => $item->sku, 'name' => $item->name, 'ownership_status' => $item->ownership_status, 'owner_name' => $item->owner_name],
             $request
         );
 
@@ -212,8 +232,16 @@ class ItemController extends Controller
 
     public function update(UpdateItemRequest $request, Item $item): RedirectResponse
     {
-        // Nama boleh diperbarui; SKU dan category_id tidak berubah
-        $dataToUpdate = ['name' => $request->name];
+        $ownershipStatus = $request->input('ownership_status', 'internal');
+        $ownerName = in_array($ownershipStatus, ['vendor', 'external']) ? trim($request->owner_name) : null;
+
+        // Nama, status kepemilikan, dan nama pemilik dapat diperbarui
+        $dataToUpdate = [
+            'name'             => $request->name,
+            'category_id'      => $request->category_id,
+            'ownership_status' => $ownershipStatus,
+            'owner_name'       => $ownerName,
+        ];
 
         if ($request->hasFile('image')) {
             if ($item->image && Storage::disk('public')->exists($item->image)) {
@@ -223,9 +251,11 @@ class ItemController extends Controller
         }
 
         $oldData = [
-            'name'          => $item->name,
-            'total_qty'     => $item->total_qty,
-            'available_qty' => $item->available_qty,
+            'name'             => $item->name,
+            'ownership_status' => $item->ownership_status,
+            'owner_name'       => $item->owner_name,
+            'total_qty'        => $item->total_qty,
+            'available_qty'    => $item->available_qty,
         ];
 
         $item->update($dataToUpdate);
@@ -257,9 +287,11 @@ class ItemController extends Controller
                 'sku'     => $item->sku,
                 'before'  => $oldData,
                 'after'   => [
-                    'name'          => $item->name,
-                    'total_qty'     => $item->total_qty,
-                    'available_qty' => $item->available_qty,
+                    'name'             => $item->name,
+                    'ownership_status' => $item->ownership_status,
+                    'owner_name'       => $item->owner_name,
+                    'total_qty'        => $item->total_qty,
+                    'available_qty'    => $item->available_qty,
                 ],
             ],
             $request
