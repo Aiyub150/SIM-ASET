@@ -16,14 +16,31 @@ class RolePermissionController extends Controller
     private array $systemRoles = ['Super Admin', 'Admin', 'Staff Logistik'];
 
     /**
+     * Cek apakah suatu peran adalah peran inti sistem (dilindungi dari penghapusan)
+     */
+    protected function isSystemRole(Role $role): bool
+    {
+        $normalized = strtolower(str_replace([' ', '-', '_'], '', $role->name));
+        return in_array($role->id, [1, 2, 3]) || in_array($normalized, ['superadmin', 'admin', 'stafflogistik']);
+    }
+
+    /**
      * Halaman Utama Manajemen Role
      */
-    public function indexRoles(): View
+    public function indexRoles(Request $request): View
     {
-        $roles = Role::withCount(['users', 'permissions'])->orderBy('id')->get();
+        $search = trim((string) $request->input('search', ''));
+        $rolesQuery = Role::withCount(['users', 'permissions']);
+
+        if ($search !== '') {
+            $rolesQuery->where('name', 'like', "%{$search}%");
+        }
+
+        $roles = $rolesQuery->orderBy('id')->paginate(15)->appends($request->query());
 
         return view('administration.roles.index', [
             'roles'       => $roles,
+            'search'      => $search,
             'systemRoles' => $this->systemRoles,
         ]);
     }
@@ -41,6 +58,12 @@ class RolePermissionController extends Controller
                 'unique:roles,name',
                 'regex:/^[\pL\pN\s\-_]+$/u',
             ],
+            'color' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i',
+            ],
         ], [
             'name.required' => 'Nama peran/role wajib diisi.',
             'name.unique'   => 'Nama role sudah terdaftar.',
@@ -50,13 +73,14 @@ class RolePermissionController extends Controller
         $role = Role::create([
             'name'       => trim($validated['name']),
             'guard_name' => 'web',
+            'color'      => $validated['color'] ?? '#2563eb',
         ]);
 
         ActivityLogger::log(
             'CREATE',
             'Manajemen Role',
             "Membuat peran baru: {$role->name}",
-            ['role_id' => $role->id, 'name' => $role->name],
+            ['role_id' => $role->id, 'name' => $role->name, 'color' => $role->color],
             $request
         );
 
@@ -65,14 +89,10 @@ class RolePermissionController extends Controller
     }
 
     /**
-     * Update Nama Role
+     * Update Nama & Warna Role
      */
     public function updateRole(Request $request, Role $role): RedirectResponse
     {
-        if (in_array($role->name, $this->systemRoles)) {
-            return back()->with('error', "Role bawaan sistem ({$role->name}) tidak boleh diubah namanya.");
-        }
-
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -81,21 +101,37 @@ class RolePermissionController extends Controller
                 Rule::unique('roles', 'name')->ignore($role->id),
                 'regex:/^[\pL\pN\s\-_]+$/u',
             ],
+            'color' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i',
+            ],
+        ], [
+            'name.required' => 'Nama peran/role wajib diisi.',
+            'name.unique'   => 'Nama role sudah terdaftar.',
+            'name.regex'    => 'Format nama role hanya boleh huruf, angka, spasi, tanda minus, dan garis bawah.',
         ]);
 
         $oldName = $role->name;
-        $role->update(['name' => trim($validated['name'])]);
+        $newName = trim($validated['name']);
+        $newColor = $validated['color'] ?? ($role->color ?? '#2563eb');
+
+        $role->update([
+            'name'  => $newName,
+            'color' => $newColor,
+        ]);
 
         ActivityLogger::log(
             'UPDATE',
             'Manajemen Role',
-            "Mengubah nama peran: dari {$oldName} menjadi {$role->name}",
-            ['role_id' => $role->id, 'old_name' => $oldName, 'new_name' => $role->name],
+            "Memperbarui peran {$oldName}: nama menjadi '{$newName}', warna {$newColor}",
+            ['role_id' => $role->id, 'old_name' => $oldName, 'new_name' => $newName, 'color' => $newColor],
             $request
         );
 
         return redirect()->route('admin-settings.roles.index')
-            ->with('success', "Role \"{$oldName}\" berhasil diubah menjadi \"{$role->name}\".");
+            ->with('success', "Role \"{$oldName}\" berhasil diperbarui.");
     }
 
     /**
@@ -103,7 +139,7 @@ class RolePermissionController extends Controller
      */
     public function destroyRole(Request $request, Role $role): RedirectResponse
     {
-        if (in_array($role->name, $this->systemRoles)) {
+        if ($this->isSystemRole($role)) {
             return back()->with('error', "Role inti sistem ({$role->name}) tidak dapat dihapus demi integritas sistem.");
         }
 

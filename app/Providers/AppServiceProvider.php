@@ -29,9 +29,13 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
-        // Implicitly grant "Super Admin" role all permissions
+        // Implicitly grant Super Admin role all permissions (flexible naming: "Super Admin", "Superadmin", etc.)
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('Super Admin') ? true : null;
+            $isSuperAdmin = $user->roles->contains(function ($r) {
+                $normalized = strtolower(str_replace([' ', '-', '_'], '', $r->name));
+                return in_array($normalized, ['superadmin', 'superadministrator']) || $r->id === 1;
+            });
+            return $isSuperAdmin ? true : null;
         });
 
         // Carbon Macros for Localized Timezone Formatting (WIB / WITA / WIT)

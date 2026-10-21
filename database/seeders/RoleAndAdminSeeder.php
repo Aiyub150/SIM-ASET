@@ -39,9 +39,9 @@ class RoleAndAdminSeeder extends Seeder
         }
 
         // 2. Buat Roles (3 level bawaan)
-        $roleSuperAdmin = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
-        $roleAdmin      = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
-        $roleStaff      = Role::firstOrCreate(['name' => 'Staff Logistik', 'guard_name' => 'web']);
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web'], ['color' => '#d97706']);
+        $roleAdmin      = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web'], ['color' => '#2563eb']);
+        $roleStaff      = Role::firstOrCreate(['name' => 'Staff Logistik', 'guard_name' => 'web'], ['color' => '#059669']);
 
         // 3. Beri Permissions Default
         $roleSuperAdmin->syncPermissions(Permission::all());
