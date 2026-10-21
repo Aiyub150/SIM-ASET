@@ -107,7 +107,7 @@
                                                    value="{{ $permName }}" 
                                                    id="perm_{{ $permId }}"
                                                    style="width: 2.5em; height: 1.35em;"
-                                                   {{ $role->hasPermissionTo($permName) ? 'checked' : '' }}
+                                                   {{ ($permissions->has($permName) && $role->hasPermissionTo($permName)) ? 'checked' : '' }}
                                                    {{ $role->name === 'Super Admin' ? 'checked disabled' : '' }}
                                                    onchange="updateCheckedCount()">
                                         </div>

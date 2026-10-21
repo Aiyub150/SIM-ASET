@@ -176,7 +176,7 @@
                                     </td>
                                     @foreach($roles as $r)
                                     <td class="text-center py-2">
-                                        @if($r->name === 'Super Admin' || $r->hasPermissionTo($permName))
+                                        @if($r->name === 'Super Admin' || ($permissions->has($permName) && $r->hasPermissionTo($permName)))
                                             <span class="badge bg-success-subtle text-success p-2 rounded-circle" title="Diizinkan">
                                                 <i class="fa-solid fa-check fs-6"></i>
                                             </span>
@@ -272,8 +272,8 @@
                                         <div class="card-body p-3 d-flex flex-column gap-3">
                                             @foreach($perms as $permName => $meta)
                                             @php
-                                                $hasViaRole = $selectedUser->hasPermissionTo($permName) && !$selectedUser->hasDirectPermission($permName);
-                                                $hasDirect  = $selectedUser->hasDirectPermission($permName);
+                                                $hasViaRole = in_array($permName, $userRolePermissions ?? []);
+                                                $hasDirect  = in_array($permName, $userDirectPermissions ?? []);
                                             @endphp
                                             <div class="p-2 rounded-3 bg-white border d-flex justify-content-between align-items-center" style="border-color: #e2e8f0 !important;">
                                                 <div class="pe-3">
