@@ -218,10 +218,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="#2563eb" class="me-1" viewBox="0 0 16 16">
                             <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
                         </svg>
-                        Versi Rilis 1.1.0 (2026)
+                        Versi Rilis 1.2.0 (2026)
                     </span>
                     <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.78rem; padding: 0.5rem 0.8rem;">
-                        Modul: Peminjaman &bull; Master Barang &bull; Kartu Stok &bull; Laporan BAST
+                        Modul: Peminjaman &bull; Master Barang &bull; Kartu Stok &bull; Admin Settings &bull; Laporan BAST
                     </span>
                 </div>
             </div>
@@ -256,17 +256,17 @@
             </a>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="#pengenalan" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">1. Filosofi & Tampilan UI/UX</a>
-            <a href="#format-kode" class="btn btn-sm btn-outline-primary py-1 fw-bold" style="font-size: 0.78rem;"><i class="fa-solid fa-barcode me-1"></i> 2. Standarisasi Format Kode SKU & Dokumen</a>
-            <a href="#administrasi-sistem" class="btn btn-sm btn-outline-primary py-1 fw-bold" style="font-size: 0.78rem;"><i class="fa-solid fa-sliders me-1"></i> 3. Pengaturan Administrasi Sistem & Audit Trail</a>
-            <a href="#peran-pengguna" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">4. Hak Akses (Dynamic RBAC)</a>
-            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">5. Alur Peminjaman Aset</a>
-            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">6. Alur Pengembalian Aset</a>
-            <a href="#master-barang" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">7. Master Barang & Label</a>
-            <a href="#kartu-stok" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">8. Kartu Stok & Buku Besar</a>
-            <a href="#laporan-bast" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">9. Laporan & Cetak BAST</a>
-            <a href="#tips-scanner" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">10. Penggunaan Scanner & Kamera</a>
-            <a href="#faq" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">11. Tanya Jawab (FAQ)</a>
+            <a href="#pengenalan" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-palette me-1"></i> 1. Filosofi & Tampilan UI/UX</a>
+            <a href="#format-kode" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-barcode me-1"></i> 2. Standarisasi Format Kode SKU & Dokumen</a>
+            <a href="#administrasi-sistem" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-sliders me-1"></i> 3. Pengaturan Administrasi Sistem & Audit Trail</a>
+            <a href="#peran-pengguna" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-shield-halved me-1"></i> 4. Hak Akses (Dynamic RBAC)</a>
+            <a href="#alur-peminjaman" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-arrow-right-arrow-left me-1"></i> 5. Alur Peminjaman Aset</a>
+            <a href="#alur-pengembalian" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-rotate-left me-1"></i> 6. Alur Pengembalian Aset</a>
+            <a href="#master-barang" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-boxes-stacked me-1"></i> 7. Master Barang & Label</a>
+            <a href="#kartu-stok" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-table-list me-1"></i> 8. Kartu Stok & Buku Besar</a>
+            <a href="#laporan-bast" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-file-lines me-1"></i> 9. Laporan & Cetak BAST</a>
+            <a href="#tips-scanner" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-camera me-1"></i> 10. Penggunaan Scanner & Kamera</a>
+            <a href="#faq" class="btn btn-sm btn-outline-primary py-1 fw-semibold" style="font-size: 0.78rem;"><i class="fa-solid fa-circle-question me-1"></i> 11. Tanya Jawab (FAQ)</a>
         </div>
     </div>
 

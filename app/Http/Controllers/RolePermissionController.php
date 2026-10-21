@@ -220,18 +220,60 @@ class RolePermissionController extends Controller
     }
 
     /**
+     * Helper: pemetaan kode permission ke label ramah pengguna
+     */
+    public static function getPermissionLabelMap(): array
+    {
+        $map = [];
+        foreach (self::getPermissionDefinitions() as $group => $perms) {
+            foreach ($perms as $code => $info) {
+                $map[$code] = $info['label'];
+            }
+        }
+        return $map;
+    }
+
+    /**
      * Simpan Pembaruan Matriks Hak Akses Role
      */
     public function updateRolePermissions(Request $request, Role $role): RedirectResponse
     {
+        $permMap = self::getPermissionLabelMap();
+        $oldPermissions = $role->permissions->pluck('name')->toArray();
         $permissionNames = $request->input('permissions', []);
+        
         $role->syncPermissions($permissionNames);
+
+        $added = array_diff($permissionNames, $oldPermissions);
+        $removed = array_diff($oldPermissions, $permissionNames);
+
+        $addedLabels = array_map(fn($p) => $permMap[$p] ?? $p, $added);
+        $removedLabels = array_map(fn($p) => $permMap[$p] ?? $p, $removed);
+
+        $actor = auth()->user()->name ?? 'Administrator';
+
+        if (!empty($added) && empty($removed)) {
+            $desc = "{$actor} memberikan akses " . implode(', ', $addedLabels) . " kepada role {$role->name}";
+        } elseif (empty($added) && !empty($removed)) {
+            $desc = "{$actor} mencabut akses " . implode(', ', $removedLabels) . " dari role {$role->name}";
+        } elseif (!empty($added) && !empty($removed)) {
+            $desc = "{$actor} memberikan akses " . implode(', ', $addedLabels) . " dan mencabut " . implode(', ', $removedLabels) . " untuk role {$role->name}";
+        } else {
+            $desc = "{$actor} memperbarui konfigurasi hak akses role {$role->name}";
+        }
+
+        $oldLabels = array_values(array_map(fn($p) => $permMap[$p] ?? $p, $oldPermissions));
+        $newLabels = array_values(array_map(fn($p) => $permMap[$p] ?? $p, $permissionNames));
 
         ActivityLogger::log(
             'UPDATE',
             'Manajemen Hak Akses',
-            "Memperbarui hak akses matriks untuk peran: {$role->name}",
-            ['role_id' => $role->id, 'permissions_count' => count($permissionNames)],
+            $desc,
+            [
+                'role'   => $role->name,
+                'before' => ['Daftar Izin' => !empty($oldLabels) ? implode(', ', $oldLabels) : 'Tidak ada izin'],
+                'after'  => ['Daftar Izin' => !empty($newLabels) ? implode(', ', $newLabels) : 'Tidak ada izin'],
+            ],
             $request
         );
 
@@ -243,14 +285,43 @@ class RolePermissionController extends Controller
      */
     public function updateUserPermissions(Request $request, User $user): RedirectResponse
     {
+        $permMap = self::getPermissionLabelMap();
+        $oldPermissions = $user->permissions->pluck('name')->toArray();
         $permissionNames = $request->input('permissions', []);
+
         $user->syncPermissions($permissionNames);
+
+        $added = array_diff($permissionNames, $oldPermissions);
+        $removed = array_diff($oldPermissions, $permissionNames);
+
+        $addedLabels = array_map(fn($p) => $permMap[$p] ?? $p, $added);
+        $removedLabels = array_map(fn($p) => $permMap[$p] ?? $p, $removed);
+
+        $actor = auth()->user()->name ?? 'Administrator';
+
+        if (!empty($added) && empty($removed)) {
+            $desc = "{$actor} memberikan akses " . implode(', ', $addedLabels) . " kepada user {$user->name}";
+        } elseif (empty($added) && !empty($removed)) {
+            $desc = "{$actor} mencabut akses " . implode(', ', $removedLabels) . " dari user {$user->name}";
+        } elseif (!empty($added) && !empty($removed)) {
+            $desc = "{$actor} memberikan akses " . implode(', ', $addedLabels) . " dan mencabut " . implode(', ', $removedLabels) . " untuk user {$user->name}";
+        } else {
+            $desc = "{$actor} memperbarui konfigurasi hak akses user {$user->name}";
+        }
+
+        $oldLabels = array_values(array_map(fn($p) => $permMap[$p] ?? $p, $oldPermissions));
+        $newLabels = array_values(array_map(fn($p) => $permMap[$p] ?? $p, $permissionNames));
 
         ActivityLogger::log(
             'UPDATE',
             'Manajemen Hak Akses',
-            "Memperbarui direct permissions (override) untuk pengguna: {$user->name} ({$user->email})",
-            ['user_id' => $user->id, 'permissions' => $permissionNames],
+            $desc,
+            [
+                'user'   => $user->name,
+                'email'  => $user->email,
+                'before' => ['Izin Khusus' => !empty($oldLabels) ? implode(', ', $oldLabels) : 'Tidak ada izin khusus'],
+                'after'  => ['Izin Khusus' => !empty($newLabels) ? implode(', ', $newLabels) : 'Tidak ada izin khusus'],
+            ],
             $request
         );
 

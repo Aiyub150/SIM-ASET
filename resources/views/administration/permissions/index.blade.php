@@ -10,25 +10,85 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         border-radius: 12px;
+        border: 1px solid #cbd5e1;
     }
     .matrix-table {
         min-width: 800px;
         margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .matrix-table th, 
+    .matrix-table td {
+        border-right: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .matrix-table th:last-child, 
+    .matrix-table td:last-child {
+        border-right: none;
+    }
+    .matrix-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .matrix-table thead th {
+        border-bottom: 2px solid #cbd5e1;
+        background-color: #f8fafc;
     }
     .matrix-sticky-col {
         position: sticky;
         left: 0;
         background-color: #ffffff;
         z-index: 5;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.04);
+        border-right: 2px solid #cbd5e1 !important;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.03);
     }
     .matrix-table thead th.matrix-sticky-col {
         background-color: #f8fafc;
         z-index: 6;
+        border-right: 2px solid #cbd5e1 !important;
     }
     .matrix-role-col {
         min-width: 140px;
         max-width: 180px;
+    }
+    .matrix-category-row td {
+        border-top: 1px solid #cbd5e1 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        background-color: #f1f5f9 !important;
+    }
+    .ts-wrapper.form-select {
+        padding: 0 !important;
+        border: none !important;
+    }
+    .ts-wrapper .ts-control {
+        border-radius: 8px !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 0.5rem 0.85rem !important;
+        min-height: 44px !important;
+        box-shadow: none !important;
+        background-color: #ffffff !important;
+    }
+    .ts-wrapper.focus .ts-control {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15) !important;
+    }
+    .ts-dropdown {
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+        z-index: 1050 !important;
+        padding: 4px 0 !important;
+    }
+    .ts-dropdown .option {
+        padding: 8px 12px !important;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .ts-dropdown .option:last-child {
+        border-bottom: none;
+    }
+    .ts-dropdown .active {
+        background-color: #eff6ff !important;
+        color: inherit !important;
     }
 </style>
 
@@ -83,8 +143,8 @@
                         <table class="table table-hover align-middle matrix-table" style="font-size: 0.85rem;">
                             <thead class="table-light border-bottom">
                                 <tr>
-                                    <th class="ps-4 matrix-sticky-col" style="min-width: 320px;">
-                                        <div class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Modul & Aksi Fungsional</div>
+                                    <th class="px-4 py-3 align-middle matrix-sticky-col text-center" style="min-width: 320px;">
+                                        <div class="text-uppercase text-secondary fw-bold" style="font-size: 0.88rem; letter-spacing: 0.5px;">Modul & Aksi Fungsional</div>
                                     </th>
                                     @foreach($roles as $r)
                                     <th class="text-center matrix-role-col px-3 py-3">
@@ -100,8 +160,8 @@
                             </thead>
                             <tbody>
                                 @foreach($permissionDefs as $moduleName => $perms)
-                                <tr class="table-secondary bg-opacity-25">
-                                    <td colspan="{{ count($roles) + 1 }}" class="ps-4 py-2 text-dark fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; background-color: #f1f5f9;">
+                                <tr class="matrix-category-row">
+                                    <td colspan="{{ count($roles) + 1 }}" class="text-start ps-3 ps-md-4 py-2 text-dark fw-bold text-uppercase" style="font-size: 0.90rem; letter-spacing: 0.8px;">
                                         <i class="fa-solid fa-folder-closed text-primary me-2"></i> Modul {{ $moduleName }}
                                     </td>
                                 </tr>
@@ -142,8 +202,20 @@
                             <h6 class="fw-bold text-dark mb-1">Pilih Pengguna untuk Mengatur Hak Akses Khusus</h6>
                             <p class="text-secondary small mb-3">Cari nama atau email pengguna. Anda dapat memberikan hak akses tambahan langsung (*Direct Permission*) khusus untuk akun yang dipilih tanpa harus mengubah peran dasarnya.</p>
                             
+                            @php
+                                $usersJson = $users->map(function($u) {
+                                    return [
+                                        'value' => (string) $u->id,
+                                        'name' => $u->name,
+                                        'email' => $u->email,
+                                        'role' => $u->roles->pluck('name')->first() ?? 'Tanpa Role',
+                                        'initial' => strtoupper(substr($u->name, 0, 1)),
+                                    ];
+                                })->values();
+                            @endphp
+
                             <form method="GET" action="{{ route('admin-settings.permissions.index') }}" id="formSelectUser" class="row g-2 align-items-center">
-                                <div class="col-md-7 col-lg-5">
+                                <div class="col-md-8 col-lg-6">
                                     <select name="user_id" id="selectUserTom" class="form-select rounded-3" placeholder="Ketik nama atau email pengguna...">
                                         <option value="">-- Ketik untuk mencari pengguna --</option>
                                         @foreach($users as $u)
@@ -154,7 +226,7 @@
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3">
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3 py-2">
                                         <i class="fa-solid fa-user-check me-1"></i> Buka Pengguna
                                     </button>
                                 </div>
@@ -192,8 +264,8 @@
                                 @foreach($permissionDefs as $moduleName => $perms)
                                 <div class="col-md-6 col-lg-6">
                                     <div class="card h-100 border rounded-4 shadow-none" style="background-color: #f8fafc; border-color: #cbd5e1 !important;">
-                                        <div class="card-header bg-white py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                                        <div class="card-header bg-white py-2 px-3 border-bottom text-center">
+                                            <span class="fw-bold text-dark text-uppercase" style="font-size: 0.95rem; letter-spacing: 0.5px;">
                                                 <i class="fa-solid fa-folder-closed text-primary me-2"></i> Modul {{ $moduleName }}
                                             </span>
                                         </div>
@@ -266,10 +338,43 @@
     document.addEventListener('DOMContentLoaded', function() {
         const selectEl = document.getElementById('selectUserTom');
         if (selectEl && typeof TomSelect !== 'undefined') {
+            const userOptions = {!! json_encode($usersJson ?? []) !!};
             new TomSelect(selectEl, {
+                options: userOptions,
+                valueField: 'value',
+                labelField: 'name',
+                searchField: ['name', 'email', 'role'],
                 create: false,
-                sortField: { field: "text", direction: "asc" },
-                placeholder: 'Ketik nama atau email pengguna...',
+                placeholder: 'Ketik nama, email, atau peran pengguna...',
+                render: {
+                    option: function(data, escape) {
+                        return '<div class="d-flex align-items-center justify-content-between p-2">' +
+                            '<div class="d-flex align-items-center gap-2 text-truncate me-2">' +
+                                '<div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem; flex-shrink: 0;">' +
+                                    escape(data.initial) +
+                                '</div>' +
+                                '<div class="text-truncate">' +
+                                    '<div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">' + escape(data.name) + '</div>' +
+                                    '<div class="text-secondary small text-truncate" style="font-size: 0.75rem;">' + escape(data.email) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<span class="badge bg-light text-primary border" style="font-size: 0.72rem; flex-shrink: 0;">' +
+                                escape(data.role) +
+                            '</span>' +
+                        '</div>';
+                    },
+                    item: function(data, escape) {
+                        return '<div class="d-flex align-items-center justify-content-between w-100 gap-2">' +
+                            '<div class="d-flex align-items-center gap-2 text-truncate">' +
+                                '<span class="fw-bold text-dark text-truncate">' + escape(data.name) + '</span>' +
+                                '<span class="text-secondary small text-truncate">(' + escape(data.email) + ')</span>' +
+                            '</div>' +
+                            '<span class="badge bg-primary-subtle text-primary border" style="font-size: 0.72rem; flex-shrink: 0;">' +
+                                escape(data.role) +
+                            '</span>' +
+                        '</div>';
+                    }
+                },
                 onChange: function(value) {
                     if (value) {
                         document.getElementById('formSelectUser').submit();

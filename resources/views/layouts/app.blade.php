@@ -382,7 +382,7 @@
     <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-brand">
-            <a href="{{ route('loans.index') }}" class="brand-logo">
+            <a href="{{ route('dashboard') }}" class="brand-logo">
                 <img src="{{ asset('images/sim-aset_logo.svg') }}"
                      alt="SIM-ASET Logo"
                      style="width:36px; height:36px; flex-shrink:0; border-radius:9px;">
@@ -405,8 +405,35 @@
                 Dashboard
             </a>
 
-            <div class="nav-section-label" style="margin-top:.5rem;">Transaksi</div>
+            @php
+                $user = auth()->user();
+                $hasPerm = function(string $perm) use ($user): bool {
+                    if (!$user) return false;
+                    if ($user->hasRole('Super Admin')) return true;
+                    if ($user->hasRole('Admin') && in_array($perm, ['loans.view', 'borrowers.view', 'items.view', 'stocks.view', 'reports.view', 'categories.view'])) return true;
+                    if ($user->hasRole('Staff Logistik') && in_array($perm, ['loans.view', 'items.view', 'reports.view'])) return true;
+                    return rescue(fn() => $user->can($perm), false) ?? false;
+                };
 
+                $canSeeLoans = $hasPerm('loans.view');
+                $canSeeBorrowers = $hasPerm('borrowers.view');
+                $canSeeItems = $hasPerm('items.view');
+                $canSeeStocks = $hasPerm('stocks.view');
+                $canSeeReports = $hasPerm('reports.view');
+                $canSeeCategories = $hasPerm('categories.view');
+
+                $canAccessLogHistory = $user->hasRole('Super Admin') || rescue(fn() => $user->can('audit.view'), false);
+                $canAccessRoles = $user->hasRole('Super Admin') || rescue(fn() => $user->can('roles.manage'), false);
+                $canAccessPermissions = $user->hasRole('Super Admin') || rescue(fn() => $user->can('permissions.manage'), false);
+                $canAccessUsers = $user->hasRole('Super Admin') || rescue(fn() => $user->can('users.view'), false);
+                $canAccessSku = $user->hasRole('Super Admin') || rescue(fn() => $user->can('sku.manage'), false);
+
+                $canSeeAdminSettings = $canAccessLogHistory || $canAccessRoles || $canAccessPermissions || $canAccessUsers || $canAccessSku;
+                $isAdminSettingsActive = request()->routeIs('admin-settings.*') || request()->routeIs('superadmin.log-history*') || request()->routeIs('users.*');
+            @endphp
+
+            @if($canSeeLoans)
+            <div class="nav-section-label" style="margin-top:.5rem;">Transaksi</div>
             <a href="{{ route('loans.index') }}"
                class="sidebar-link {{ request()->routeIs('loans.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -414,10 +441,12 @@
                 </svg>
                 Peminjaman
             </a>
+            @endif
 
-            @hasanyrole('Super Admin|Admin')
+            @if($canSeeBorrowers || $canSeeItems)
             <div class="nav-section-label" style="margin-top:.5rem;">Master Data</div>
 
+            @if($canSeeBorrowers)
             <a href="{{ route('borrowers.index') }}"
                class="sidebar-link {{ request()->routeIs('borrowers.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -425,8 +454,9 @@
                 </svg>
                 Data Instansi
             </a>
-            @endhasanyrole
+            @endif
 
+            @if($canSeeItems)
             <a href="{{ route('items.index') }}"
                class="sidebar-link {{ request()->routeIs('items.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
@@ -434,8 +464,10 @@
                 </svg>
                 Master Barang
             </a>
+            @endif
+            @endif
 
-            @hasanyrole('Super Admin|Admin')
+            @if($canSeeStocks)
             <div class="nav-section-label" style="margin-top:.5rem;">Pengelolaan</div>
 
             <a href="{{ route('stocks.index') }}"
@@ -445,19 +477,21 @@
                 </svg>
                 Kartu Stok
             </a>
-            @endhasanyrole
+            @endif
 
+            @if($canSeeReports)
             <div class="nav-section-label" style="margin-top:.5rem;">Laporan & Analitik</div>
             <a href="{{ route('reports.index') }}"
                class="sidebar-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
-                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                    <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
                 </svg>
                 Laporan
             </a>
+            @endif
 
-            @hasanyrole('Super Admin|Admin')
+            @if($canSeeCategories)
             <div class="nav-section-label" style="margin-top:.5rem;">Administrasi</div>
             <a href="{{ route('categories.index') }}"
                class="sidebar-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
@@ -467,12 +501,8 @@
                 </svg>
                 Manajemen Kategori
             </a>
-            @endhasanyrole
-
-            @role('Super Admin')
-            @php
-                $isAdminSettingsActive = request()->routeIs('admin-settings.*') || request()->routeIs('superadmin.log-history*') || request()->routeIs('users.*');
-            @endphp
+            @endif
+            @if($canSeeAdminSettings)
             <div class="nav-item">
                 <a class="sidebar-link d-flex justify-content-between align-items-center {{ $isAdminSettingsActive ? 'active' : '' }}" 
                    data-bs-toggle="collapse" 
@@ -493,6 +523,7 @@
                 </a>
                 
                 <div class="collapse {{ $isAdminSettingsActive ? 'show' : '' }} ps-3 mt-1" id="adminSettingsCollapse">
+                    @if($canAccessLogHistory)
                     <a href="{{ route('admin-settings.log-history') }}"
                        class="sidebar-link {{ request()->routeIs('admin-settings.log-history*') || request()->routeIs('superadmin.log-history*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -501,6 +532,9 @@
                         </svg>
                         Log History
                     </a>
+                    @endif
+
+                    @if($canAccessRoles)
                     <a href="{{ route('admin-settings.roles.index') }}"
                        class="sidebar-link {{ request()->routeIs('admin-settings.roles.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -508,6 +542,9 @@
                         </svg>
                         Manajemen Role
                     </a>
+                    @endif
+
+                    @if($canAccessPermissions)
                     <a href="{{ route('admin-settings.permissions.index') }}"
                        class="sidebar-link {{ request()->routeIs('admin-settings.permissions.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -515,6 +552,9 @@
                         </svg>
                         Manajemen Hak Akses
                     </a>
+                    @endif
+
+                    @if($canAccessUsers)
                     <a href="{{ route('users.index') }}"
                        class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -524,6 +564,9 @@
                         </svg>
                         Kelola Pengguna
                     </a>
+                    @endif
+
+                    @if($canAccessSku)
                     <a href="{{ route('admin-settings.code-formats.index') }}"
                        class="sidebar-link {{ request()->routeIs('admin-settings.code-formats.*') ? 'active' : '' }}" style="font-size: 0.82rem; padding: 0.45rem 0.65rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -531,9 +574,10 @@
                         </svg>
                         Manajemen Kode SKU
                     </a>
+                    @endif
                 </div>
             </div>
-            @endrole
+            @endif
 
             <div class="nav-section-label" style="margin-top:.5rem;">Pengaturan</div>
             <a href="{{ route('profile.edit') }}"
@@ -560,30 +604,10 @@
             </a>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="user-card">
-                @if(auth()->user()->avatar)
-                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="user-avatar" style="object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
-                @else
-                    <div class="user-avatar">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
-                @endif
-                <div style="min-width:0;">
-                    <div class="user-name text-truncate">{{ auth()->user()->name }}</div>
-                    <div class="user-role text-truncate">{{ auth()->user()->roles->pluck('name')->first() ?? 'User' }}</div>
-                </div>
-            </div>
-            <form method="POST" action="{{ route('logout') }}" class="m-0">
-                @csrf
-                <button type="submit" class="btn-logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                        <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                    </svg>
-                    Keluar
-                </button>
-            </form>
+        <div class="sidebar-footer text-center py-3">
+            <span class="badge bg-white bg-opacity-10 text-white-50 font-monospace" style="font-size: 0.7rem;">
+                SIM-ASET v1.2.0
+            </span>
         </div>
     </aside>
 
@@ -600,16 +624,71 @@
             <span class="page-title">@yield('page-title', 'Dashboard')</span>
             <div class="ms-auto d-flex align-items-center gap-2">
                 @hasanyrole('Super Admin|Admin')
-                <button type="button" class="btn btn-sm btn-light border d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#calendarModal" style="width: 32px; height: 32px; padding: 0;">
+                <button type="button" class="btn btn-sm btn-light border d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#calendarModal" style="width: 32px; height: 32px; padding: 0;" title="Kalender Aktivitas">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                     </svg>
                 </button>
                 @endhasanyrole
-                <span class="text-muted fw-medium" style="font-size:.85rem;">{{ \App\Services\TimezoneHelper::formatTranslated(now(), 'd F Y') }}</span>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1" style="font-size: 0.72rem;" title="Zona Waktu Perangkat Anda">
+                <span class="text-muted fw-medium d-none d-sm-inline" style="font-size:.85rem;">{{ \App\Services\TimezoneHelper::formatTranslated(now(), 'd F Y') }}</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1 d-none d-sm-inline" style="font-size: 0.72rem;" title="Zona Waktu Perangkat Anda">
                     {{ \App\Services\TimezoneHelper::getTimezoneLabel() }}
                 </span>
+
+                <!-- User Profile Dropdown (Topbar Kanan Atas) -->
+                <div class="dropdown ms-1">
+                    <button class="btn btn-sm btn-light border d-flex align-items-center gap-2 px-2 py-1 shadow-sm rounded-pill" 
+                            type="button" 
+                            id="topbarUserDropdown" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false" 
+                            style="transition: all .2s ease;">
+                        @if(auth()->user()->avatar)
+                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                        @else
+                            <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white fw-bold" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        <div class="d-none d-md-flex flex-column text-start" style="line-height: 1.1;">
+                            <span class="fw-semibold text-dark text-truncate" style="font-size: 0.8rem; max-width: 120px;">{{ auth()->user()->name }}</span>
+                            <span class="text-muted" style="font-size: 0.68rem;">{{ auth()->user()->roles->pluck('name')->first() ?? 'User' }}</span>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#64748b" class="ms-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border py-2" aria-labelledby="topbarUserDropdown" style="min-width: 220px; border-radius: 12px;">
+                        <li class="px-3 py-2 border-bottom mb-1 bg-light bg-opacity-50">
+                            <div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">{{ auth()->user()->name }}</div>
+                            <div class="text-muted text-truncate" style="font-size: 0.72rem;">{{ auth()->user()->email }}</div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-1" style="font-size: 0.65rem;">
+                                {{ auth()->user()->roles->pluck('name')->first() ?? 'User' }}
+                            </span>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('profile.edit') }}" style="font-size: 0.82rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#475569" viewBox="0 0 16 16">
+                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                </svg>
+                                <span>Edit Profil</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                @csrf
+                                <button type="submit" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" style="font-size: 0.82rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                        <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                                    </svg>
+                                    <span>Keluar</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 

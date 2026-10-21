@@ -24,31 +24,36 @@
                 </div>
                 <div class="d-none d-md-flex gap-2">
                     <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-user-pen me-1"></i> Edit Profil</a>
-                    @hasanyrole('Super Admin|Admin')
+                    @if(auth()->user()->can('loans.create') || auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Admin'))
                         <a href="{{ route('loans.create') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-plus me-1"></i> Peminjaman Baru</a>
-                    @else
+                    @elseif(auth()->user()->can('loans.view'))
                         <a href="{{ route('loans.index') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-list me-1"></i> Peminjaman Saya</a>
-                    @endhasanyrole
+                    @else
+                        <a href="{{ route('guide') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-book-open me-1"></i> Panduan Penggunaan</a>
+                    @endif
                 </div>
             </div>
             {{-- Mobile Actions --}}
             <div class="card-footer bg-transparent border-top border-white-50 d-md-none d-flex gap-2 p-3">
                 <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-light flex-fill"><i class="fa-solid fa-user-pen me-1"></i> Profil</a>
-                @hasanyrole('Super Admin|Admin')
+                @if(auth()->user()->can('loans.create') || auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Admin'))
                     <a href="{{ route('loans.create') }}" class="btn btn-sm btn-light text-primary flex-fill"><i class="fa-solid fa-plus me-1"></i> Peminjaman</a>
-                @else
+                @elseif(auth()->user()->can('loans.view'))
                     <a href="{{ route('loans.index') }}" class="btn btn-sm btn-light text-primary flex-fill"><i class="fa-solid fa-list me-1"></i> Peminjaman</a>
-                @endhasanyrole
+                @else
+                    <a href="{{ route('guide') }}" class="btn btn-sm btn-light text-primary flex-fill"><i class="fa-solid fa-book-open me-1"></i> Panduan</a>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
-@if($isStaff)
-    {{-- STAFF LAYOUT --}}
+@if(!$canViewAllData)
+    {{-- SCOPED PERSONAL DASHBOARD LAYOUT (Staff & Peran Khusus Non-Global) --}}
     <div class="row">
         <div class="col-lg-8">
             <div class="row mb-4">
+                @if($canViewItems)
                 <div class="col-md-6 mb-3">
                     <div class="card bg-white text-dark h-100 border-0 shadow-sm" style="border-left: 4px solid #2563eb !important;">
                         <div class="card-body d-flex justify-content-between align-items-center">
@@ -71,6 +76,32 @@
                         </div>
                     </div>
                 </div>
+                @else
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-white text-dark h-100 border-0 shadow-sm" style="border-left: 4px solid #6366f1 !important;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1" style="font-size: 0.8rem;">Peran Akses</h6>
+                                <h4 class="mb-0 fw-bold text-primary">{{ auth()->user()->roles->first()->name ?? 'Pengguna' }}</h4>
+                                <small class="text-muted" style="font-size: 0.72rem;">Status Akun: Aktif</small>
+                            </div>
+                            <div style="font-size: 2rem; color: #6366f1; opacity: 0.8;"><i class="fa-solid fa-id-badge"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-white text-dark h-100 border-0 shadow-sm" style="border-left: 4px solid #0ea5e9 !important;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1" style="font-size: 0.8rem;">Total Transaksi Saya</h6>
+                                <h3 class="mb-0 fw-bold">{{ number_format($myLoansCount ?? 0) }}</h3>
+                                <small class="text-muted" style="font-size: 0.72rem;">Peminjaman tercatat</small>
+                            </div>
+                            <div style="font-size: 2rem; color: #0ea5e9; opacity: 0.8;"><i class="fa-solid fa-clipboard-user"></i></div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="card bg-warning text-dark h-100 border-0 shadow-sm">
                         <div class="card-body d-flex justify-content-between align-items-center">
@@ -98,7 +129,9 @@
             <div class="card mb-4 shadow-sm border-0">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h6 class="mb-0 fw-bold"><i class="fa-solid fa-handshake text-warning me-2"></i>Peminjaman Terbaru Anda</h6>
+                    @if(auth()->user()->can('loans.view') || auth()->user()->hasRole('Super Admin'))
                     <a href="{{ route('loans.index') }}" class="btn btn-sm btn-link text-decoration-none">Lihat Semua</a>
+                    @endif
                 </div>
                 <div class="list-group list-group-flush">
                     @forelse($recentLoans as $loan)
@@ -112,7 +145,10 @@
                             </span>
                         </div>
                     @empty
-                        <div class="list-group-item text-center text-muted py-4">Belum ada peminjaman.</div>
+                        <div class="list-group-item text-center text-muted py-4">
+                            <i class="fa-solid fa-inbox mb-2 d-block text-muted" style="font-size: 1.5rem; opacity: 0.4;"></i>
+                            Belum ada transaksi peminjaman atas nama Anda.
+                        </div>
                     @endforelse
                 </div>
             </div>

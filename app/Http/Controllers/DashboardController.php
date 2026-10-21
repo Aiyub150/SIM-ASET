@@ -13,24 +13,31 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
-        $isAdmin = $user->hasRole('Admin');
         $isSuperAdmin = $user->hasRole('Super Admin');
+        $isAdmin = $user->hasRole('Admin');
+        $isStaff = $user->hasRole('Staff Logistik') || $user->hasRole('Staff');
 
+        // Hak akses membaca data agregat / manajemen keseluruhan:
+        $canViewAllData = $isSuperAdmin || $isAdmin || (rescue(fn() => $user->can('reports.view'), false) && !$isStaff);
+        $canViewItems   = $canViewAllData || rescue(fn() => $user->can('items.view'), false);
+        $canViewStocks  = $canViewAllData || rescue(fn() => $user->can('stocks.view'), false);
+
+        // Jika bukan pemegang hak data agregat, batasi kueri peminjaman HANYA ke data milik user sendiri
         $loanQuery = Loan::query();
-        if ($isStaff) {
+        if (!$canViewAllData) {
             $loanQuery->where('user_id', $user->id);
         }
 
-        $totalItems = Item::count();
-        $totalStock = Item::sum('total_qty');
-        $activeLoans = (clone $loanQuery)->where('status', 'active')->count();
+        $totalItems   = $canViewItems ? Item::count() : 0;
+        $totalStock   = $canViewItems ? Item::sum('total_qty') : 0;
+        $activeLoans  = (clone $loanQuery)->where('status', 'active')->count();
         $overdueLoans = (clone $loanQuery)->where('status', 'active')->where('due_date', '<', now())->count();
-        $totalUsers = \App\Models\User::count();
+        $myLoansCount = (clone $loanQuery)->count();
+        $totalUsers   = $isSuperAdmin ? \App\Models\User::count() : 0;
         
-        $recentMovements = $isStaff ? collect() : StockMovement::with(['item', 'user'])->latest()->take(5)->get();
+        $recentMovements = $canViewStocks ? StockMovement::with(['item', 'user'])->latest()->take(5)->get() : collect();
         $recentLoans = (clone $loanQuery)->with(['borrower', 'user'])->latest()->take(5)->get();
-        $lowStockItems = Item::where('available_qty', '<', 5)->take(5)->get(); // Example for low stock
+        $lowStockItems = $canViewItems ? Item::where('available_qty', '<', 5)->take(5)->get() : collect();
 
         // Chart Data Filter (hari, bulan, tahun)
         $period = $request->query('period', 'bulan'); // default 'bulan'
@@ -98,6 +105,7 @@ class DashboardController extends Controller
             'totalStock', 
             'activeLoans', 
             'overdueLoans',
+            'myLoansCount',
             'totalUsers',
             'recentMovements',
             'recentLoans',
@@ -109,6 +117,9 @@ class DashboardController extends Controller
             'isStaff',
             'isAdmin',
             'isSuperAdmin',
+            'canViewAllData',
+            'canViewItems',
+            'canViewStocks',
             'holidays',
             'calMonth',
             'calYear',

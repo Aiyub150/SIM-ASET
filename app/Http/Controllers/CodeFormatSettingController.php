@@ -74,6 +74,10 @@ class CodeFormatSettingController extends Controller
         // Sinkronisasi data riwayat massal jika dicentang oleh pengguna
         $syncedCount = 0;
         if ($request->boolean('sync_legacy_data')) {
+            // Naikkan limit waktu dan memori agar pemrosesan ribuan data tidak terputus timeout
+            @set_time_limit(0);
+            @ini_set('max_execution_time', '0');
+            @ini_set('memory_limit', '512M');
             $syncedCount = $this->syncLegacyRecords($setting);
         }
 

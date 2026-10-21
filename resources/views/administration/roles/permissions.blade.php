@@ -73,7 +73,7 @@
                         <div class="col-md-6 col-lg-6">
                             <div class="card h-100 border rounded-4 shadow-none" style="background-color: #f8fafc; border-color: #cbd5e1 !important;">
                                 <div class="card-header bg-white py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                                    <span class="fw-bold text-dark text-uppercase" style="font-size: 0.95rem; letter-spacing: 0.5px;">
                                         <i class="fa-solid fa-folder-closed text-primary me-2"></i> {{ $moduleName }}
                                     </span>
                                     @if($role->name !== 'Super Admin')

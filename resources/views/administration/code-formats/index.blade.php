@@ -257,6 +257,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    if (isSync) {
+                        Swal.fire({
+                            title: 'Sedang Menyinkronkan Data...',
+                            html: `
+                                <div class="py-2 text-center">
+                                    <p class="text-secondary small mb-3">Memperbarui seluruh data riwayat ke format kode baru secara aman. Mohon tunggu sejenak, sistem sedang memproses...</p>
+                                    <div class="progress" style="height: 18px; border-radius: 9px; background-color: #e2e8f0;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                             role="progressbar" 
+                                             style="width: 100%; font-size: 0.75rem; font-weight: 600;" 
+                                             aria-valuenow="100" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            Memproses Sinkronisasi Database...
+                                        </div>
+                                    </div>
+                                    <span class="text-muted d-block mt-2 font-monospace" style="font-size: 0.7rem;">Jangan menutup atau merefresh peramban ini</span>
+                                </div>
+                            `,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+                    }
                     form.submit();
                 }
             });
