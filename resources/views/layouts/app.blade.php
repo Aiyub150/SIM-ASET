@@ -46,21 +46,43 @@
 
         * { box-sizing: border-box; }
 
-        /* Custom TomSelect Enhancements */
+        /* ── CUSTOM TOMSELECT & SELECT ENHANCEMENTS ── */
+        select.form-select,
+        .form-select {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.375rem !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Container wrapper TomSelect: hilangkan border agar tidak double border dengan .ts-control */
         .ts-wrapper.form-select,
-        .ts-wrapper.form-select-sm {
+        .ts-wrapper.form-select-sm,
+        .ts-wrapper.form-select-lg {
             padding: 0 !important;
             border: none !important;
             background: transparent !important;
             box-shadow: none !important;
         }
+
+        /* 
+           Gunakan selector dengan spesifisitas tinggi agar meng-override 
+           aturan bawaan tom-select.bootstrap5.min.css:
+           (.ts-wrapper.form-select .ts-control { border: none !important; background: transparent !important; })
+        */
+        .ts-wrapper.form-select .ts-control,
+        .ts-wrapper.form-select:not(.disabled) .ts-control,
+        .ts-wrapper.form-select.single.input-active .ts-control,
+        .ts-wrapper.form-select:not(.disabled).single.input-active .ts-control,
+        .ts-wrapper.form-control .ts-control,
+        .ts-wrapper.form-control:not(.disabled) .ts-control,
+        .ts-wrapper .ts-control,
         .ts-control {
-            border: 1px solid #ced4da !important;
-            border-radius: 0.5rem !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.375rem !important;
             padding: 0.45rem 2.25rem 0.45rem 0.75rem !important;
             font-size: 0.875rem !important;
             box-shadow: none !important;
-            background-color: #fff !important;
+            background-color: #ffffff !important;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
             background-repeat: no-repeat !important;
             background-position: right 0.75rem center !important;
@@ -71,16 +93,49 @@
             cursor: pointer !important;
             transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out !important;
         }
+
+        .ts-wrapper.form-select:not(.disabled) .ts-control:hover,
+        .ts-wrapper.form-select .ts-control:hover,
+        .ts-wrapper .ts-control:hover,
         .ts-control:hover {
             border-color: #94a3b8 !important;
         }
+
+        .ts-wrapper.form-select.focus .ts-control,
+        .ts-wrapper.form-select:not(.disabled).focus .ts-control,
+        .ts-wrapper.form-select.input-active .ts-control,
         .ts-wrapper.focus .ts-control,
-        .ts-control.focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2) !important;
+        .ts-wrapper.input-active .ts-control,
+        .ts-control.focus,
+        .ts-control:focus {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+            outline: 0 !important;
         }
+
         .ts-wrapper.single .ts-control::after {
             display: none !important;
+        }
+
+        .ts-wrapper.form-select-sm .ts-control,
+        .ts-wrapper.form-select-sm:not(.disabled) .ts-control {
+            padding: 0.28rem 1.8rem 0.28rem 0.6rem !important;
+            font-size: 0.8125rem !important;
+            border-radius: 0.25rem !important;
+            min-height: 31px !important;
+            background-size: 12px 10px !important;
+            background-position: right 0.5rem center !important;
+        }
+
+        .ts-wrapper .ts-control > .item {
+            color: #212529 !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+        }
+
+        .ts-wrapper .ts-control > input {
+            font-size: inherit !important;
+            color: #212529 !important;
         }
         .ts-dropdown {
             border-radius: 0.75rem !important;
@@ -116,17 +171,7 @@
             background-color: #eff6ff !important;
             color: #1d4ed8 !important;
         }
-        .ts-wrapper.form-select-sm .ts-control {
-            padding: 0.28rem 1.8rem 0.28rem 0.6rem !important;
-            font-size: 0.8125rem !important;
-            border-radius: 0.375rem !important;
-            min-height: 31px !important;
-            background-size: 12px 10px !important;
-            background-position: right 0.5rem center !important;
-        }
-        .ts-wrapper .ts-control > input {
-            font-size: inherit !important;
-        }
+
 
         /* ── COLLAPSE & ACCORDION FIX ─────────────── */
         .collapse.show,
@@ -376,7 +421,7 @@
         /* ── FORMS ───────────────────────────────── */
         .form-control, .form-select {
             border-radius: 8px;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid #cbd5e1;
             font-size: 0.875rem;
             padding: 0.5rem 0.75rem;
             transition: border-color .2s, box-shadow .2s;
