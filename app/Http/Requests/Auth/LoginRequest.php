@@ -74,6 +74,8 @@ class LoginRequest extends FormRequest
 
         RateLimiter::clear($this->throttleKey());
         RateLimiter::clear($this->ipThrottleKey());
+        RateLimiter::clear($this->ip());
+        RateLimiter::clear(sha1($this->ip() . '|' . ($this->header('User-Agent') ?? 'unknown-device')));
     }
 
     /**

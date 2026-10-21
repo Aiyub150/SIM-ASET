@@ -16,12 +16,22 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
-        $ipKey = 'login_ip|' . $request->ip();
+        $ip = $request->ip();
+        $deviceKey = sha1($ip . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
+        $ipKey = 'login_ip|' . $ip;
 
-        // Lockout timer HANYA aktif jika sudah melampaui batas maksimal kegagalan (tooManyAttempts)
+        // Cek semua kemungkinan key lockout (IP limiter middleware, device fingerprint, atau IP key LoginRequest)
+        $isLocked = \Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ip, LoginRequest::MAX_ATTEMPTS)
+                 || \Illuminate\Support\Facades\RateLimiter::tooManyAttempts($deviceKey, LoginRequest::MAX_ATTEMPTS)
+                 || \Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, LoginRequest::MAX_ATTEMPTS);
+
         $lockoutSeconds = 0;
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, LoginRequest::MAX_ATTEMPTS)) {
-            $lockoutSeconds = (int) \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey);
+        if ($isLocked) {
+            $lockoutSeconds = max(
+                (int) \Illuminate\Support\Facades\RateLimiter::availableIn($ip),
+                (int) \Illuminate\Support\Facades\RateLimiter::availableIn($deviceKey),
+                (int) \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey)
+            );
             if ($lockoutSeconds <= 0) {
                 $lockoutSeconds = LoginRequest::LOCKOUT_SECONDS;
             }

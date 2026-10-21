@@ -83,12 +83,27 @@ class AppServiceProvider extends ServiceProvider
             $deviceKey = sha1($request->ip() . '|' . ($request->header('User-Agent') ?? 'unknown-device'));
             $email = strtolower((string) $request->input('email', ''));
 
+            $responseCallback = function (Request $request, array $headers) {
+                $seconds = (int) ($headers['Retry-After'] ?? 900);
+                $minutes = ceil($seconds / 60);
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => "Terlalu banyak percobaan login. Akses dikunci sementara selama {$minutes} menit demi keamanan.",
+                        'retry_after' => $seconds,
+                    ], 429, $headers);
+                }
+
+                return response()->view('auth.login', [
+                    'lockoutSeconds' => $seconds,
+                    'errorMessage' => "Terlalu banyak percobaan login yang gagal. Akun dan IP Anda dikunci sementara selama {$minutes} menit demi keamanan.",
+                ], 429, $headers);
+            };
+
             return [
-                Limit::perMinutes(15, 5)->by($deviceKey)->response(function (Request $request, array $headers) {
-                    return response('Terlalu banyak percobaan login dari perangkat ini. Akses dikunci sementara selama 15 menit.', 429, $headers);
-                }),
-                Limit::perMinutes(15, 5)->by($request->ip()),
-                Limit::perMinutes(15, 5)->by($email . '|' . $request->ip()),
+                Limit::perMinutes(15, 5)->by($deviceKey)->response($responseCallback),
+                Limit::perMinutes(15, 5)->by($request->ip())->response($responseCallback),
+                Limit::perMinutes(15, 5)->by($email . '|' . $request->ip())->response($responseCallback),
             ];
         });
 
