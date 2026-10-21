@@ -165,7 +165,10 @@
         Proses Pengembalian Barang
     </div>
     <div class="card-body p-4">
-        <form action="{{ route('loans.return', $loan->id) }}" method="POST">
+        <form action="{{ route('loans.return', $loan->id) }}" 
+              method="POST"
+              data-confirm="Apakah Anda yakin ingin memproses pengembalian barang peminjaman ini?"
+              data-confirm-title="Konfirmasi Pengembalian Barang?">
             @csrf
             <div id="return-items-container">
                 <div class="row g-2 align-items-end item-row mb-3" data-index="0">

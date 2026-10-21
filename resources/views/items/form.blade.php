@@ -31,7 +31,11 @@
                     </div>
                 @endif
 
-                <form action="{{ isset($item) ? route('items.update', $item->id) : route('items.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ isset($item) ? route('items.update', $item->id) : route('items.store') }}" 
+                      method="POST" 
+                      enctype="multipart/form-data"
+                      data-confirm="{{ isset($item) ? 'Simpan seluruh pembaruan data barang ini ke dalam sistem?' : 'Tambahkan data barang baru ini ke dalam katalog aset?' }}"
+                      data-confirm-title="{{ isset($item) ? 'Perbarui Data Barang?' : 'Tambah Barang Baru?' }}">
                     @csrf
                     @if(isset($item)) @method('PUT') @endif
 

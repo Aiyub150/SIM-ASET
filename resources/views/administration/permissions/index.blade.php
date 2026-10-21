@@ -215,7 +215,7 @@
                             @endphp
 
                             <form method="GET" action="{{ route('admin-settings.permissions.index') }}" id="formSelectUser" class="row g-2 align-items-center">
-                                <div class="col-md-8 col-lg-6">
+                                <div class="col-md-9 col-lg-7">
                                     <select name="user_id" id="selectUserTom" class="form-select rounded-3" placeholder="Ketik nama atau email pengguna...">
                                         <option value="">-- Ketik untuk mencari pengguna --</option>
                                         @foreach($users as $u)
@@ -224,11 +224,6 @@
                                         </option>
                                         @endforeach
                                     </select>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3 py-2">
-                                        <i class="fa-solid fa-user-check me-1"></i> Buka Pengguna
-                                    </button>
                                 </div>
                             </form>
                         </div>

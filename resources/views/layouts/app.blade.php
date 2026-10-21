@@ -849,16 +849,33 @@
 
             document.addEventListener('submit', function (e) {
                 const form = e.target;
-                if (form && form.dataset && form.dataset.confirm && !form.dataset.confirmed) {
+                if (!form || !form.tagName || form.tagName.toLowerCase() !== 'form') return;
+
+                // Abaikan form pencarian / filter GET
+                if (form.method && form.method.toLowerCase() === 'get') return;
+
+                // Cek apakah form memiliki konfirmasi eksplisit atau merupakan aksi delete
+                const hasExplicitConfirm = form.dataset && form.dataset.confirm;
+                const methodInput = form.querySelector('input[name="_method"]');
+                const isDelete = methodInput && methodInput.value.toUpperCase() === 'DELETE';
+
+                if ((hasExplicitConfirm || isDelete) && !form.dataset.confirmed) {
                     e.preventDefault();
+
+                    const title = form.dataset.confirmTitle || (isDelete ? 'Konfirmasi Hapus Data' : 'Konfirmasi Tindakan');
+                    const text = form.dataset.confirm || (isDelete ? 'Apakah Anda yakin ingin menghapus data ini? Aksi ini tidak dapat dibatalkan.' : 'Apakah data yang dimasukkan sudah benar?');
+                    const icon = isDelete ? 'warning' : 'question';
+                    const confirmColor = isDelete ? '#dc2626' : '#2563eb';
+                    const confirmBtnText = isDelete ? 'Ya, Hapus' : 'Ya, Lanjutkan';
+
                     Swal.fire({
-                        title: 'Konfirmasi',
-                        text: form.dataset.confirm,
-                        icon: 'question',
+                        title: title,
+                        text: text,
+                        icon: icon,
                         showCancelButton: true,
-                        confirmButtonColor: '#2563eb',
+                        confirmButtonColor: confirmColor,
                         cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Ya, Lanjutkan',
+                        confirmButtonText: confirmBtnText,
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {

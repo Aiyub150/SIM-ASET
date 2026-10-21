@@ -76,7 +76,10 @@
                 <div class="modal fade" id="editModal{{ $category->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form action="{{ route('categories.update', $category->id) }}" method="POST">
+                            <form action="{{ route('categories.update', $category->id) }}" 
+                                  method="POST"
+                                  data-confirm="Apakah Anda yakin ingin menyimpan perubahan data kategori ini?"
+                                  data-confirm-title="Simpan Perubahan Kategori?">
                                 @csrf
                                 @method('PUT')
                                 <div class="modal-header">
@@ -122,7 +125,10 @@
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('categories.store') }}" method="POST">
+            <form action="{{ route('categories.store') }}" 
+                  method="POST"
+                  data-confirm="Tambahkan kategori barang baru ini ke dalam katalog?"
+                  data-confirm-title="Tambah Kategori Baru?">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Kategori Baru</h5>

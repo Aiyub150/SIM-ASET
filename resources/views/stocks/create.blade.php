@@ -29,7 +29,10 @@
         <div class="card">
             <div class="card-header">Formulir Mutasi Stok</div>
             <div class="card-body p-4">
-                <form action="{{ route('stocks.store') }}" method="POST">
+                <form action="{{ route('stocks.store') }}" 
+                      method="POST"
+                      data-confirm="Apakah Anda yakin ingin memproses transaksi mutasi stok ini?"
+                      data-confirm-title="Simpan Mutasi Stok?">
                     @csrf
 
                     <div class="mb-3">

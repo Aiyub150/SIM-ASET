@@ -27,7 +27,7 @@
                     @if(auth()->user()->can('loans.create') || auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Admin'))
                         <a href="{{ route('loans.create') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-plus me-1"></i> Peminjaman Baru</a>
                     @elseif(auth()->user()->can('loans.view'))
-                        <a href="{{ route('loans.index') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-list me-1"></i> Peminjaman Saya</a>
+                        <a href="{{ route('loans.index') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-list me-1"></i> Lihat Peminjaman</a>
                     @else
                         <a href="{{ route('guide') }}" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-book-open me-1"></i> Panduan Penggunaan</a>
                     @endif
