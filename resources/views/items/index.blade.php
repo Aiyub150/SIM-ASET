@@ -99,33 +99,33 @@
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex align-items-center gap-2">
-                                @if($item->image)
-                                    <img src="{{ asset('storage/' . $item->image) }}" alt="Foto" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                @else
-                                    <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="width: 38px; height: 38px; border-radius: 6px; border: 1px dashed #cbd5e1; font-size: 0.65rem; text-align: center; line-height: 1;">
-                                        No Pic
-                                    </div>
-                                @endif
-                                @if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
+                            @if($item->image)
                                 <button type="button" 
-                                        class="btn btn-sm btn-outline-secondary py-0 px-2" 
-                                        style="font-size: 0.72rem; height: 26px;"
+                                        class="btn p-0 border-0 bg-transparent btn-preview-image position-relative" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#quickUploadModal"
-                                        data-item-id="{{ $item->id }}"
+                                        data-bs-target="#imagePreviewModal"
                                         data-item-name="{{ $item->name }}"
                                         data-item-sku="{{ $item->sku }}"
-                                        data-item-image="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
-                                        title="{{ $item->image ? 'Ganti Foto' : 'Upload Foto' }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
-                                    </svg>
-                                    {{ $item->image ? 'Ganti' : 'Upload' }}
+                                        data-image-src="{{ asset('storage/' . $item->image) }}"
+                                        title="Klik untuk memperbesar gambar">
+                                    <img src="{{ asset('storage/' . $item->image) }}" 
+                                         alt="{{ $item->name }}" 
+                                         style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; transition: transform 0.15s ease, box-shadow 0.15s ease;"
+                                         class="item-thumbnail shadow-xs">
+                                    <span class="position-absolute bottom-0 end-0 bg-dark bg-opacity-75 text-white p-1 rounded-circle d-flex align-items-center justify-content-center" 
+                                          style="width: 16px; height: 16px; font-size: 9px;" title="Perbesar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </svg>
+                                    </span>
                                 </button>
-                                @endif
-                            </div>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center bg-light text-muted" 
+                                     style="width: 44px; height: 44px; border-radius: 8px; border: 1px dashed #cbd5e1; font-size: 0.68rem; text-align: center; line-height: 1.1;"
+                                     title="Belum ada foto">
+                                    No Pic
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <div style="font-weight:600; color:#1e293b;">{{ $item->name }}</div>
@@ -170,22 +170,27 @@
                         @if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-1">
-                                <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Data Barang">Edit</a>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#quickUploadModal"
+                                        data-item-id="{{ $item->id }}"
+                                        data-item-name="{{ $item->name }}"
+                                        data-item-sku="{{ $item->sku }}"
+                                        data-item-image="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
+                                        title="{{ $item->image ? 'Ganti Foto Barang' : 'Upload Foto Barang' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                                    </svg>
+                                    {{ $item->image ? 'Ganti Foto' : 'Upload Foto' }}
+                                </button>
                                 <a href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" 
                                    target="_blank" 
                                    class="btn btn-sm btn-outline-primary"
                                    title="Cetak Label Barcode Kotak">
                                     Label
                                 </a>
-                                <form action="{{ route('items.destroy', $item->id) }}" method="POST" class="d-inline"
-                                      data-confirm="Apakah Anda yakin ingin menghapus barang &quot;{{ $item->name }}&quot; (SKU: {{ $item->sku }})? Aksi ini tidak dapat dibatalkan."
-                                      data-confirm-title="Hapus Master Barang?">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Barang">
-                                        Hapus
-                                    </button>
-                                </form>
                             </div>
                         </td>
                         @endif
@@ -208,6 +213,30 @@
         {{ $items->links('pagination::bootstrap-5') }}
     </div>
     @endif
+</div>
+
+{{-- MODAL PREVIEW FOTO BARANG (POPUP JELAS) --}}
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px; overflow: hidden;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark mb-0" id="imagePreviewModalLabel">-</h5>
+                    <span class="badge bg-white text-primary border font-monospace mt-1" id="imagePreviewModalSku">-</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-center p-2 rounded" style="background: #f8fafc; min-height: 280px; border: 1px dashed #e2e8f0;">
+                    <img id="imagePreviewModalImg" src="" alt="Pratinjau Foto Barang" class="img-fluid rounded shadow-sm" style="max-height: 65vh; max-width: 100%; object-fit: contain;">
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2 px-4 bg-light d-flex justify-content-between">
+                <span class="text-muted small">Klik di luar area modal atau tombol Tutup untuk kembali.</span>
+                <button type="button" class="btn btn-secondary btn-sm px-3 fw-semibold" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- MODAL UPLOAD / GANTI FOTO CEPAT --}}
@@ -320,6 +349,23 @@
                     if (!ownInit) return;
                     ownershipFilter.closest('form').submit();
                 }
+            });
+        }
+
+        // Handler Modal Preview Gambar Jelas
+        const previewModal = document.getElementById('imagePreviewModal');
+        if (previewModal) {
+            previewModal.addEventListener('show.bs.modal', function (event) {
+                const trigger = event.relatedTarget;
+                if (!trigger) return;
+
+                const name = trigger.getAttribute('data-item-name') || '-';
+                const sku = trigger.getAttribute('data-item-sku') || '-';
+                const src = trigger.getAttribute('data-image-src') || '';
+
+                document.getElementById('imagePreviewModalLabel').textContent = name;
+                document.getElementById('imagePreviewModalSku').textContent = sku;
+                document.getElementById('imagePreviewModalImg').src = src;
             });
         }
 

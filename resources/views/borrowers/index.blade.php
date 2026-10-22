@@ -65,18 +65,7 @@
                         </td>
                         @can('borrowers.edit')
                         <td class="text-center pe-4">
-                            <div class="d-flex justify-content-center gap-1">
-                                <a href="{{ route('borrowers.edit', $borrower->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                <form action="{{ route('borrowers.destroy', $borrower->id) }}" method="POST" class="d-inline"
-                                      data-confirm="Apakah Anda yakin ingin menghapus data instansi &quot;{{ $borrower->institution_name }}&quot;? Aksi ini tidak dapat dibatalkan."
-                                      data-confirm-title="Hapus Data Instansi?">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Instansi">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </div>
+                            <a href="{{ route('borrowers.edit', $borrower->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                         </td>
                         @endcan
                     </tr>

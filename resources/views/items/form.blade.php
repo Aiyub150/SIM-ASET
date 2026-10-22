@@ -184,10 +184,11 @@
                         <input type="number" name="total_qty" id="total_qty"
                                class="form-control @error('total_qty') is-invalid @enderror"
                                value="{{ old('total_qty', isset($item) ? $item->total_qty : '1') }}"
-                               min="1" step="1" placeholder="Contoh: 10" required>
+                               min="1" step="1" placeholder="Contoh: 10" required
+                               {{ isset($item) ? 'readonly style=background:#f8fafc;' : '' }}>
                         <div class="form-text text-muted" style="font-size:.78rem;">
                             @if(isset($item))
-                                Mengubah total barang akan menyesuaikan stok fisik dan stok tersedia secara proporsional.
+                                Stok barang tersimpan tidak dapat diubah dari form ini demi transparansi audit. Penyesuaian stok fisik hanya dapat dilakukan melalui menu <a href="{{ route('stocks.create') }}" class="text-decoration-none fw-semibold">Kartu Stok</a>.
                             @else
                                 Masukkan jumlah unit fisik barang yang didaftarkan (minimal 1 unit).
                             @endif

@@ -267,20 +267,23 @@ class ItemOwnershipAndSkuImmunityTest extends TestCase
         \Illuminate\Support\Facades\Storage::disk('public')->assertExists($item->image);
     }
 
-    public function test_item_can_be_deleted_without_loans(): void
+    public function test_items_index_has_image_preview_modal_and_quick_upload(): void
     {
         $item = Item::create([
             'category_id' => $this->category->id,
             'location_id' => 1,
-            'name' => 'Barang Siap Hapus',
-            'sku' => 'DEL-001',
+            'name' => 'Proyektor Epson Test',
+            'sku' => 'PRJ-999',
             'ownership_status' => 'internal',
-            'total_qty' => 1,
-            'available_qty' => 1,
+            'total_qty' => 5,
+            'available_qty' => 5,
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->delete(route('items.destroy', $item->id));
-        $response->assertRedirect(route('items.index'));
-        $this->assertDatabaseMissing('items', ['id' => $item->id]);
+        $response = $this->actingAs($this->superAdmin)->get(route('items.index'));
+        $response->assertOk();
+        $response->assertSee('imagePreviewModal');
+        $response->assertSee('quickUploadModal');
+        $response->assertSee('Upload Foto');
+        $response->assertDontSee('items.destroy');
     }
 }

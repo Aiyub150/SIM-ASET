@@ -260,24 +260,6 @@ class ItemController extends Controller
 
         $item->update($dataToUpdate);
 
-        if ($request->filled('total_qty')) {
-            $newTotal = (int) $request->total_qty;
-            $onLoan   = $item->total_qty - $item->available_qty; // qty yang masih dipinjam
-
-            // Tolak jika total baru lebih kecil dari yang sedang dipinjam —
-            // ini akan membuat available_qty negatif yang tidak masuk akal secara fisik.
-            if ($newTotal < $onLoan) {
-                return back()
-                    ->withInput()
-                    ->with('error', "Tidak dapat mengubah total menjadi {$newTotal}. Saat ini masih ada {$onLoan} unit yang sedang dipinjam. Total minimal yang diizinkan adalah {$onLoan}.");
-            }
-
-            $item->update([
-                'total_qty'     => $newTotal,
-                'available_qty' => $newTotal - $onLoan,
-            ]);
-        }
-
         \App\Services\ActivityLogger::log(
             'UPDATE',
             'Barang',
@@ -329,33 +311,6 @@ class ItemController extends Controller
         );
 
         return back()->with('success', "Foto untuk barang \"{$item->name}\" berhasil diperbarui.");
-    }
-
-    public function destroy(Item $item, Request $request): RedirectResponse
-    {
-        $hasLoans = DB::table('loan_items')->where('item_id', $item->id)->exists();
-        if ($hasLoans) {
-            return back()->with('error', "Barang \"{$item->name}\" tidak dapat dihapus karena memiliki riwayat transaksi peminjaman.");
-        }
-
-        if ($item->image && Storage::disk('public')->exists($item->image)) {
-            Storage::disk('public')->delete($item->image);
-        }
-
-        DB::table('stock_movements')->where('item_id', $item->id)->delete();
-        $itemName = $item->name;
-        $itemSku = $item->sku;
-        $item->delete();
-
-        \App\Services\ActivityLogger::log(
-            'DELETE',
-            'Barang',
-            "Menghapus master barang: {$itemName} (SKU: {$itemSku})",
-            ['sku' => $itemSku, 'name' => $itemName],
-            $request
-        );
-
-        return redirect()->route('items.index')->with('success', "Barang \"{$itemName}\" berhasil dihapus.");
     }
 
     // ── Helper: daftar kategori beserta prefix & nomor SKU berikutnya ──
