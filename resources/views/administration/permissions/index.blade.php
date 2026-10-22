@@ -387,6 +387,7 @@
         if (selectEl && typeof TomSelect !== 'undefined') {
             const userOptions = {!! json_encode($usersJson ?? []) !!};
             new TomSelect(selectEl, {
+                plugins: ['dropdown_input'],
                 options: userOptions,
                 valueField: 'value',
                 labelField: 'name',

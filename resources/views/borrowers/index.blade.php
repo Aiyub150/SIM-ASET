@@ -126,34 +126,51 @@
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama Instansi / Organisasi <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-building text-primary me-1.5"></i> Nama Instansi / Organisasi <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="institution_name" class="form-control" placeholder="Contoh: Dinas Pendidikan Kabupaten..." required>
                     </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nama Penanggung Jawab (PIC) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-user-tie text-primary me-1.5"></i> Nama Penanggung Jawab (PIC) <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="pic_name" class="form-control" placeholder="Contoh: Budi Santoso" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nomor Kontak (HP/Telp) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-phone text-primary me-1.5"></i> Nomor Kontak (HP/Telp) <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="contact_number" class="form-control" placeholder="Contoh: 081234567890" required style="font-family:monospace;">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Alamat Lengkap</label>
-                        <textarea name="address" rows="2" class="form-control" placeholder="Jalan, nomor gedung, kecamatan..."></textarea>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-location-dot text-primary me-1.5"></i> Alamat Lengkap
+                        </label>
+                        <textarea name="address" id="create_borrower_address" rows="2" class="form-control" placeholder="Jalan, nomor gedung, kecamatan..."></textarea>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Latitude (Garis Lintang)</label>
-                            <input type="text" name="latitude" class="form-control" placeholder="-0.9123456">
+                    {{-- PETA INTERAKTIF LEAFLET DENGAN PENCARIAN ALAMAT --}}
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-map-location-dot text-primary me-1.5"></i> Titik Lokasi Peta (Leaflet)</span>
+                            <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">Geser pin / cari alamat</span>
+                        </label>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" id="create_map_search_input" class="form-control" placeholder="Ketik nama tempat/gedung/jalan untuk mencari di peta...">
+                            <button class="btn btn-primary" type="button" id="btn_create_map_search">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
+                            </button>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Longitude (Garis Bujur)</label>
-                            <input type="text" name="longitude" class="form-control" placeholder="116.8123456">
+                        <div id="create_borrower_map" style="height: 280px; width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; z-index: 1;"></div>
+                        <input type="hidden" name="latitude" id="create_borrower_lat" value="-6.2088">
+                        <input type="hidden" name="longitude" id="create_borrower_lng" value="106.8456">
+                        <div class="form-text text-muted" style="font-size:0.75rem;">
+                            Klik pada peta atau geser pin marker. Alamat dan titik koordinat akan terisi otomatis.
                         </div>
                     </div>
                 </div>
@@ -181,34 +198,51 @@
                 @method('PUT')
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama Instansi / Organisasi <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-building text-primary me-1.5"></i> Nama Instansi / Organisasi <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="institution_name" id="edit_borrower_name" class="form-control" required>
                     </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nama Penanggung Jawab (PIC) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-user-tie text-primary me-1.5"></i> Nama Penanggung Jawab (PIC) <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="pic_name" id="edit_borrower_pic" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nomor Kontak (HP/Telp) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-phone text-primary me-1.5"></i> Nomor Kontak (HP/Telp) <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="contact_number" id="edit_borrower_contact" class="form-control" required style="font-family:monospace;">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Alamat Lengkap</label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-location-dot text-primary me-1.5"></i> Alamat Lengkap
+                        </label>
                         <textarea name="address" id="edit_borrower_address" rows="2" class="form-control"></textarea>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Latitude</label>
-                            <input type="text" name="latitude" id="edit_borrower_lat" class="form-control">
+                    {{-- PETA INTERAKTIF LEAFLET UNTUK EDIT --}}
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-map-location-dot text-primary me-1.5"></i> Titik Lokasi Peta (Leaflet)</span>
+                            <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">Geser pin / cari alamat</span>
+                        </label>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" id="edit_map_search_input" class="form-control" placeholder="Ketik nama tempat/gedung/jalan untuk mencari di peta...">
+                            <button class="btn btn-primary" type="button" id="btn_edit_map_search">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
+                            </button>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Longitude</label>
-                            <input type="text" name="longitude" id="edit_borrower_lng" class="form-control">
+                        <div id="edit_borrower_map" style="height: 280px; width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; z-index: 1;"></div>
+                        <input type="hidden" name="latitude" id="edit_borrower_lat">
+                        <input type="hidden" name="longitude" id="edit_borrower_lng">
+                        <div class="form-text text-muted" style="font-size:0.75rem;">
+                            Klik pada peta atau geser pin marker. Alamat dan titik koordinat akan terisi otomatis.
                         </div>
                     </div>
                 </div>
@@ -269,7 +303,162 @@
         }, { once: true });
     }
 
-    // Handler Modal Edit Instansi Popup
+    // --- LEAFLET MAP LOGIC UNTUK MODAL TAMBAH & EDIT INSTANSI ---
+    let createMapInstance = null;
+    let createMarkerInstance = null;
+    let editMapInstance = null;
+    let editMarkerInstance = null;
+
+    async function reverseGeocodeAddress(lat, lng, targetAddressInput) {
+        try {
+            const response = await fetch(`{{ route('geocoding.reverse') }}?lat=${lat}&lng=${lng}`);
+            const res = await response.json();
+            if (res && res.success && res.display_name && targetAddressInput) {
+                targetAddressInput.value = res.display_name;
+            }
+        } catch (err) {
+            console.error('Reverse geocode error:', err);
+        }
+    }
+
+    async function forwardGeocodeSearch(query, btnEl, mapObj, markerObj, latInput, lngInput, addrInput) {
+        if (!query.trim()) return;
+        const originalHtml = btnEl.innerHTML;
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mencari...';
+
+        try {
+            const response = await fetch(`{{ route('geocoding.search') }}?q=${encodeURIComponent(query)}`);
+            const res = await response.json();
+            if (res && res.success && res.data && res.data.length > 0) {
+                const first = res.data[0];
+                const lat = parseFloat(first.lat);
+                const lng = parseFloat(first.lon);
+                mapObj.setView([lat, lng], 16);
+                markerObj.setLatLng([lat, lng]);
+                latInput.value = lat;
+                lngInput.value = lng;
+                if (addrInput) addrInput.value = first.display_name;
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Pencarian Lokasi',
+                    text: 'Lokasi tidak ditemukan. Coba gunakan nama kota atau kata kunci lain.',
+                    confirmButtonColor: '#2563eb'
+                });
+            }
+        } catch (err) {
+            console.error('Forward geocode error:', err);
+        } finally {
+            btnEl.disabled = false;
+            btnEl.innerHTML = originalHtml;
+        }
+    }
+
+    // Modal Create Map Setup
+    const createBorrowerModalEl = document.getElementById('createBorrowerModal');
+    if (createBorrowerModalEl) {
+        createBorrowerModalEl.addEventListener('shown.bs.modal', function() {
+            const defaultLat = -6.2088;
+            const defaultLng = 106.8456;
+            const latInput = document.getElementById('create_borrower_lat');
+            const lngInput = document.getElementById('create_borrower_lng');
+            const addrInput = document.getElementById('create_borrower_address');
+
+            if (!createMapInstance) {
+                createMapInstance = L.map('create_borrower_map').setView([defaultLat, defaultLng], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(createMapInstance);
+
+                createMarkerInstance = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(createMapInstance);
+
+                createMarkerInstance.on('dragend', function(e) {
+                    const pos = e.target.getLatLng();
+                    latInput.value = pos.lat;
+                    lngInput.value = pos.lng;
+                    reverseGeocodeAddress(pos.lat, pos.lng, addrInput);
+                });
+
+                createMapInstance.on('click', function(e) {
+                    createMarkerInstance.setLatLng(e.latlng);
+                    latInput.value = e.latlng.lat;
+                    lngInput.value = e.latlng.lng;
+                    reverseGeocodeAddress(e.latlng.lat, e.latlng.lng, addrInput);
+                });
+
+                document.getElementById('btn_create_map_search')?.addEventListener('click', function() {
+                    const q = document.getElementById('create_map_search_input').value;
+                    forwardGeocodeSearch(q, this, createMapInstance, createMarkerInstance, latInput, lngInput, addrInput);
+                });
+
+                document.getElementById('create_map_search_input')?.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('btn_create_map_search').click();
+                    }
+                });
+            } else {
+                createMapInstance.invalidateSize();
+            }
+        });
+    }
+
+    // Modal Edit Map Setup
+    const editBorrowerModalEl = document.getElementById('editBorrowerModal');
+    if (editBorrowerModalEl) {
+        editBorrowerModalEl.addEventListener('shown.bs.modal', function() {
+            const latInput = document.getElementById('edit_borrower_lat');
+            const lngInput = document.getElementById('edit_borrower_lng');
+            const addrInput = document.getElementById('edit_borrower_address');
+
+            const currentLat = parseFloat(latInput.value) || -6.2088;
+            const currentLng = parseFloat(lngInput.value) || 106.8456;
+
+            if (!editMapInstance) {
+                editMapInstance = L.map('edit_borrower_map').setView([currentLat, currentLng], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(editMapInstance);
+
+                editMarkerInstance = L.marker([currentLat, currentLng], { draggable: true }).addTo(editMapInstance);
+
+                editMarkerInstance.on('dragend', function(e) {
+                    const pos = e.target.getLatLng();
+                    latInput.value = pos.lat;
+                    lngInput.value = pos.lng;
+                    reverseGeocodeAddress(pos.lat, pos.lng, addrInput);
+                });
+
+                editMapInstance.on('click', function(e) {
+                    editMarkerInstance.setLatLng(e.latlng);
+                    latInput.value = e.latlng.lat;
+                    lngInput.value = e.latlng.lng;
+                    reverseGeocodeAddress(e.latlng.lat, e.latlng.lng, addrInput);
+                });
+
+                document.getElementById('btn_edit_map_search')?.addEventListener('click', function() {
+                    const q = document.getElementById('edit_map_search_input').value;
+                    forwardGeocodeSearch(q, this, editMapInstance, editMarkerInstance, latInput, lngInput, addrInput);
+                });
+
+                document.getElementById('edit_map_search_input')?.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('btn_edit_map_search').click();
+                    }
+                });
+            } else {
+                editMapInstance.setView([currentLat, currentLng], 14);
+                editMarkerInstance.setLatLng([currentLat, currentLng]);
+                editMapInstance.invalidateSize();
+            }
+        });
+    }
+
+    // Handler Modal Edit Instansi Popup Trigger
     document.querySelectorAll('.btn-edit-borrower').forEach(btn => {
         btn.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
@@ -286,8 +475,8 @@
             document.getElementById('edit_borrower_pic').value = pic;
             document.getElementById('edit_borrower_contact').value = contact;
             document.getElementById('edit_borrower_address').value = address || '';
-            document.getElementById('edit_borrower_lat').value = lat || '';
-            document.getElementById('edit_borrower_lng').value = lng || '';
+            document.getElementById('edit_borrower_lat').value = lat || '-6.2088';
+            document.getElementById('edit_borrower_lng').value = lng || '106.8456';
 
             const editModal = new bootstrap.Modal(document.getElementById('editBorrowerModal'));
             editModal.show();

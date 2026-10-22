@@ -57,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
 
     // MODUL MASTER BARANG (CREATE/EDIT)
     Route::prefix('items')->name('items.')->group(function () {
+        Route::get('/check-sku-availability', [ItemController::class, 'checkSkuAvailability'])->middleware('throttle:60,1')->name('check-sku');
         Route::middleware(['role_or_permission:Super Admin|Admin|items.create'])->group(function () {
             Route::get('/create',      [ItemController::class, 'create'])->name('create');
             Route::post('/',           [ItemController::class, 'store'])->middleware('throttle:30,1')->name('store');

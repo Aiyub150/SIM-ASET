@@ -23,6 +23,12 @@ class UpdateItemRequest extends FormRequest
                 'required_if:ownership_status,vendor,external',
                 'regex:' . $safeTextPattern,
             ],
+            'sku'              => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('items', 'sku')->ignore($this->route('item')),
+            ],
             'name'             => [
                 'required',
                 'string',

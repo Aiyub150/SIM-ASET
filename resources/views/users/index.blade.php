@@ -346,6 +346,7 @@
         if (roleFilter && typeof TomSelect !== 'undefined') {
             let roleInit = false;
             new TomSelect(roleFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
                 placeholder: 'Semua Peran / Role',
                 allowEmptyOption: true,
@@ -385,8 +386,8 @@
         if (statusFilter && typeof TomSelect !== 'undefined') {
             let statusInit = false;
             new TomSelect(statusFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
-                controlInput: null,
                 placeholder: 'Semua Status',
                 allowEmptyOption: true,
                 onInitialize: function() {

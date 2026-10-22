@@ -152,6 +152,28 @@ class ItemController extends Controller
         ]];
     }
 
+    public function checkSkuAvailability(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $sku = trim((string) $request->query('sku', ''));
+        $excludeId = $request->query('exclude_id');
+
+        if ($sku === '') {
+            return response()->json(['available' => true]);
+        }
+
+        $query = Item::where('sku', $sku);
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json([
+            'available' => !$exists,
+            'message'   => $exists ? 'kode ini sudah digunakan' : 'SKU tersedia'
+        ]);
+    }
+
     public function create(): View
     {
         $categories = $this->categoriesWithNextSku();
@@ -245,6 +267,11 @@ class ItemController extends Controller
             'ownership_status' => $ownershipStatus,
             'owner_name'       => $ownerName,
         ];
+
+        // Jika bukan Milik Sendiri (Vendor / Instansi Lain), SKU dapat diperbarui jika diisi
+        if ($ownershipStatus !== 'internal' && $request->filled('sku')) {
+            $dataToUpdate['sku'] = trim($request->sku);
+        }
 
         if ($request->hasFile('image')) {
             if ($item->image && Storage::disk('public')->exists($item->image)) {

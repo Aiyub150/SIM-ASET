@@ -145,6 +145,39 @@ class EnhancedFeaturesVerificationTest extends TestCase
     }
 
     /**
+     * Uji: Pengecekan Ketersediaan SKU via Endpoint AJAX dan Validasi Unik
+     */
+    public function test_check_sku_availability_endpoint_detects_existing_sku(): void
+    {
+        $this->actingAs($this->superAdmin);
+
+        // SKU milik barang yang sudah ada
+        $response = $this->getJson(route('items.check-sku', ['sku' => $this->item->sku]));
+        $response->assertOk();
+        $response->assertJson([
+            'available' => false,
+            'message' => 'kode ini sudah digunakan',
+        ]);
+
+        // Mengabaikan ID barang milik sendiri (exclude_id)
+        $responseExclude = $this->getJson(route('items.check-sku', [
+            'sku' => $this->item->sku,
+            'exclude_id' => $this->item->id
+        ]));
+        $responseExclude->assertOk();
+        $responseExclude->assertJson([
+            'available' => true,
+        ]);
+
+        // SKU baru yang belum dipakai
+        $responseFresh = $this->getJson(route('items.check-sku', ['sku' => 'SKU-BEBAS-TEST-999']));
+        $responseFresh->assertOk();
+        $responseFresh->assertJson([
+            'available' => true,
+        ]);
+    }
+
+    /**
      * Uji 2: Warisan Foto Barang Baru ke Kartu Stok Mutasi Masuk Awal (INIT)
      */
     public function test_new_item_creation_inherits_image_to_initial_stock_movement()

@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (moduleFilter && typeof TomSelect !== 'undefined') {
         let moduleInit = false;
         new TomSelect(moduleFilter, {
+            plugins: ['dropdown_input'],
             create: false,
             placeholder: 'Semua Modul',
             allowEmptyOption: true,
@@ -298,6 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (actionFilter && typeof TomSelect !== 'undefined') {
         let actionInit = false;
         new TomSelect(actionFilter, {
+            plugins: ['dropdown_input'],
             create: false,
             placeholder: 'Semua Aksi',
             allowEmptyOption: true,

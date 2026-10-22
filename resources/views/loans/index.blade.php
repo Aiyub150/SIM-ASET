@@ -439,7 +439,9 @@
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold small">Instansi Peminjam <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-semibold small">
+                                            <i class="fa-solid fa-building text-primary me-1.5"></i> Instansi Peminjam <span class="text-danger">*</span>
+                                        </label>
                                         <select name="borrower_id" id="modal_loan_borrower_id" class="form-select" required>
                                             <option value="">— Cari atau pilih instansi… —</option>
                                             @if(isset($borrowers))
@@ -458,17 +460,23 @@
 
                                     <div class="row g-2 mb-3">
                                         <div class="col-6">
-                                            <label class="form-label fw-semibold small">Tanggal Pinjam <span class="text-danger">*</span></label>
+                                            <label class="form-label fw-semibold small">
+                                                <i class="fa-solid fa-calendar-day text-primary me-1.5"></i> Tanggal Pinjam <span class="text-danger">*</span>
+                                            </label>
                                             <input type="date" name="borrow_date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}" required>
                                         </div>
                                         <div class="col-6">
-                                            <label class="form-label fw-semibold small">Batas Kembali <span class="text-danger">*</span></label>
+                                            <label class="form-label fw-semibold small">
+                                                <i class="fa-solid fa-calendar-check text-primary me-1.5"></i> Batas Kembali <span class="text-danger">*</span>
+                                            </label>
                                             <input type="date" name="due_date" class="form-control form-control-sm" value="{{ date('Y-m-d', strtotime('+7 days')) }}" required>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold small">Bukti Serah Terima Awal <span class="text-muted fw-normal">(Opsional)</span></label>
+                                        <label class="form-label fw-semibold small">
+                                            <i class="fa-solid fa-file-invoice text-primary me-1.5"></i> Bukti Serah Terima Awal <span class="text-muted fw-normal">(Opsional)</span>
+                                        </label>
                                         <div class="d-flex align-items-center gap-2">
                                             <div style="width: 50px; height: 50px; border: 1.5px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
                                                 <img id="create_borrow_proof_preview" src="" alt="Bukti" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
@@ -482,7 +490,9 @@
                                     </div>
 
                                     <div class="mb-1">
-                                        <label class="form-label fw-semibold small">Catatan Peminjaman <span class="text-muted fw-normal">(Opsional)</span></label>
+                                        <label class="form-label fw-semibold small">
+                                            <i class="fa-solid fa-note-sticky text-primary me-1.5"></i> Catatan Peminjaman <span class="text-muted fw-normal">(Opsional)</span>
+                                        </label>
                                         <textarea name="notes" rows="2" class="form-control form-control-sm" placeholder="Contoh: Keperluan dinas rapat koordinasi wilayah..."></textarea>
                                     </div>
                                 </div>
@@ -531,8 +541,8 @@
         if (loanStatusFilter && typeof TomSelect !== 'undefined') {
             let loanInit = false;
             new TomSelect(loanStatusFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
-                controlInput: null,
                 placeholder: 'Semua Status Peminjaman',
                 allowEmptyOption: true,
                 onInitialize: function() {

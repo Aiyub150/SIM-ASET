@@ -21,6 +21,9 @@
         color: #000000;
         transition: color 0.2s;
     }
+    .ownership-card .ownership-title i {
+        margin-right: 0.5rem;
+    }
     .ownership-card .ownership-sub {
         color: #64748b;
         font-size: 0.72rem;
@@ -370,14 +373,16 @@
                 <div class="modal-body p-4">
                     {{-- STATUS KEPEMILIKAN ASET --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-shield-halved text-primary me-1.5"></i> Status Kepemilikan Aset <span class="text-danger">*</span>
+                        </label>
                         <div class="row g-2">
                             <div class="col-md-4">
                                 <label class="ownership-card hover-internal active-internal d-flex flex-row align-items-center gap-2 h-100" id="label-create-internal">
                                     <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked style="accent-color: #2563eb; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-create-internal">
-                                            <i class="fa-solid fa-building-columns"></i> Milik Sendiri
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-create-internal">
+                                            <i class="fa-solid fa-building-columns me-2"></i> Milik Sendiri
                                         </div>
                                         <div class="ownership-sub">SKU Otomatis Sistem</div>
                                     </div>
@@ -387,8 +392,8 @@
                                 <label class="ownership-card hover-vendor d-flex flex-row align-items-center gap-2 h-100" id="label-create-vendor">
                                     <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #7c3aed; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-create-vendor">
-                                            <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-create-vendor">
+                                            <i class="fa-solid fa-truck-ramp-box me-2"></i> Milik Vendor
                                         </div>
                                         <div class="ownership-sub">SKU/Barcode Asli</div>
                                     </div>
@@ -398,8 +403,8 @@
                                 <label class="ownership-card hover-external d-flex flex-row align-items-center gap-2 h-100" id="label-create-external">
                                     <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #ea580c; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-create-external">
-                                            <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-create-external">
+                                            <i class="fa-solid fa-handshake-angle me-2"></i> Instansi Lain
                                         </div>
                                         <div class="ownership-sub">SKU Titipan Asli</div>
                                     </div>
@@ -410,14 +415,18 @@
 
                     {{-- NAMA PEMILIK / VENDOR (KONDISIONAL) --}}
                     <div class="mb-3" id="create_owner_field_group" style="display: none;">
-                        <label class="form-label fw-semibold" id="create_owner_label">Nama Pemilik / Vendor <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold" id="create_owner_label">
+                            <i class="fa-solid fa-handshake text-primary me-1.5"></i> Nama Pemilik / Vendor <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="owner_name" id="create_owner_name" class="form-control" placeholder="Contoh: PT Vendor Nusantara / Dinas Kesehatan">
                     </div>
 
                     <div class="row g-3">
                         {{-- KATEGORI --}}
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-tags text-primary me-1.5"></i> Kategori <span class="text-danger">*</span>
+                            </label>
                             <select name="category_id" id="create_category_id" class="form-select" required>
                                 <option value="" disabled selected>Pilih Kategori</option>
                                 @foreach($categoriesWithSku as $cat)
@@ -433,7 +442,7 @@
                         {{-- KODE BARANG (SKU) --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
-                                <span>Kode Barang (SKU)</span>
+                                <span><i class="fa-solid fa-barcode text-primary me-1.5"></i> Kode Barang (SKU)</span>
                                 <span id="create_sku_badge" class="badge" style="background:#eff6ff; color:#2563eb; font-size:.7rem; font-weight:500;">
                                     Auto-generate
                                 </span>
@@ -447,13 +456,17 @@
 
                     {{-- NAMA BARANG --}}
                     <div class="mt-3">
-                        <label class="form-label fw-semibold">Nama Barang <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-cube text-primary me-1.5"></i> Nama Barang <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="name" class="form-control" placeholder="Contoh: Kursi Susun Chitose" required>
                     </div>
 
                     {{-- FOTO BARANG DENGAN LIVE PREVIEW --}}
                     <div class="mt-3">
-                        <label class="form-label fw-semibold">Foto Barang</label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-image text-primary me-1.5"></i> Foto Barang
+                        </label>
                         <div class="row g-2 align-items-center">
                             <div class="col-auto">
                                 <div class="preview-box" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; padding: 2px;">
@@ -476,7 +489,7 @@
                     {{-- JUMLAH BARANG (TOTAL FISIK AWAL) --}}
                     <div class="mt-3">
                         <label class="form-label fw-semibold">
-                            Jumlah Barang <span class="text-danger">*</span>
+                            <i class="fa-solid fa-boxes-stacked text-primary me-1.5"></i> Jumlah Barang <span class="text-danger">*</span>
                         </label>
                         <input type="number" name="total_qty" id="create_total_qty" class="form-control" value="1" min="1" step="1" placeholder="Contoh: 10" required>
                         <div class="form-text text-muted" style="font-size:0.75rem;">
@@ -512,14 +525,16 @@
                 <div class="modal-body p-4">
                     {{-- STATUS KEPEMILIKAN ASET --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-shield-halved text-primary me-1.5"></i> Status Kepemilikan Aset <span class="text-danger">*</span>
+                        </label>
                         <div class="row g-2">
                             <div class="col-md-4">
                                 <label class="ownership-card hover-internal d-flex flex-row align-items-center gap-2 h-100" id="label-edit-internal">
                                     <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #2563eb; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-edit-internal">
-                                            <i class="fa-solid fa-building-columns"></i> Milik Sendiri
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-edit-internal">
+                                            <i class="fa-solid fa-building-columns me-2"></i> Milik Sendiri
                                         </div>
                                         <div class="ownership-sub">Aset Internal</div>
                                     </div>
@@ -529,8 +544,8 @@
                                 <label class="ownership-card hover-vendor d-flex flex-row align-items-center gap-2 h-100" id="label-edit-vendor">
                                     <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #7c3aed; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-edit-vendor">
-                                            <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-edit-vendor">
+                                            <i class="fa-solid fa-truck-ramp-box me-2"></i> Milik Vendor
                                         </div>
                                         <div class="ownership-sub">SKU/Barcode Asli</div>
                                     </div>
@@ -540,8 +555,8 @@
                                 <label class="ownership-card hover-external d-flex flex-row align-items-center gap-2 h-100" id="label-edit-external">
                                     <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #ea580c; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold small d-flex align-items-center gap-1.5 ownership-title" id="text-edit-external">
-                                            <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
+                                        <div class="fw-bold small d-flex align-items-center ownership-title" id="text-edit-external">
+                                            <i class="fa-solid fa-handshake-angle me-2"></i> Instansi Lain
                                         </div>
                                         <div class="ownership-sub">SKU Titipan Asli</div>
                                     </div>
@@ -552,14 +567,18 @@
 
                     {{-- NAMA PEMILIK / VENDOR (KONDISIONAL) --}}
                     <div class="mb-3" id="edit_owner_field_group" style="display: none;">
-                        <label class="form-label fw-semibold" id="edit_owner_label">Nama Pemilik / Vendor <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold" id="edit_owner_label">
+                            <i class="fa-solid fa-handshake text-primary me-1.5"></i> Nama Pemilik / Vendor <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="owner_name" id="edit_owner_name" class="form-control" placeholder="Contoh: PT Vendor Nusantara">
                     </div>
 
                     <div class="row g-3">
                         {{-- KATEGORI --}}
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-tags text-primary me-1.5"></i> Kategori <span class="text-danger">*</span>
+                            </label>
                             <select name="category_id" id="edit_category_id" class="form-select" required>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -567,25 +586,32 @@
                             </select>
                         </div>
 
-                        {{-- KODE BARANG (SKU - READONLY DI FORM EDIT) --}}
+                        {{-- KODE BARANG (SKU - BISA DIEDIT UNTUK VENDOR/EXTERNAL) --}}
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kode Barang (SKU)</label>
-                            <input type="text" id="edit_sku_preview" class="form-control" readonly style="font-family:monospace; background:#f8fafc; color:#64748b;">
-                            <div class="form-text text-muted" style="font-size:0.75rem;">
-                                Kode SKU terkunci permanen untuk konsistensi transaksi dan audit.
+                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                                <span><i class="fa-solid fa-barcode text-primary me-1.5"></i> Kode Barang (SKU)</span>
+                                <span id="edit_sku_status_badge" class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">Terkunci</span>
+                            </label>
+                            <input type="text" name="sku" id="edit_sku_preview" class="form-control" readonly style="font-family:monospace; background:#f8fafc; color:#64748b;">
+                            <div class="form-text text-muted" id="edit_sku_helper_text" style="font-size:0.75rem;">
+                                Kode SKU terkunci permanen untuk aset internal demi konsistensi transaksi dan audit.
                             </div>
                         </div>
                     </div>
 
                     {{-- NAMA BARANG --}}
                     <div class="mt-3">
-                        <label class="form-label fw-semibold">Nama Barang <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-cube text-primary me-1.5"></i> Nama Barang <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="name" id="edit_item_name" class="form-control" required>
                     </div>
 
                     {{-- FOTO BARANG DENGAN LIVE PREVIEW --}}
                     <div class="mt-3">
-                        <label class="form-label fw-semibold">Foto Barang</label>
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-image text-primary me-1.5"></i> Foto Barang
+                        </label>
                         <div class="row g-2 align-items-center">
                             <div class="col-auto">
                                 <div class="preview-box" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; padding: 2px;">
@@ -672,6 +698,7 @@
         if (categoryFilter && typeof TomSelect !== 'undefined') {
             let catInit = false;
             new TomSelect(categoryFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
                 placeholder: 'Semua Kategori',
                 allowEmptyOption: true,
@@ -689,6 +716,7 @@
         if (ownershipFilter && typeof TomSelect !== 'undefined') {
             let ownInit = false;
             new TomSelect(ownershipFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
                 placeholder: 'Semua Kepemilikan',
                 allowEmptyOption: true,
@@ -895,6 +923,8 @@
             const editName       = document.getElementById('edit_item_name');
             const editSkuPreview = document.getElementById('edit_sku_preview');
             const editSkuBadge   = document.getElementById('edit_modal_sku_badge');
+            const editSkuStatusBadge = document.getElementById('edit_sku_status_badge');
+            const editSkuHelperText  = document.getElementById('edit_sku_helper_text');
             const editCategory   = document.getElementById('edit_category_id');
             const editOwnerGroup = document.getElementById('edit_owner_field_group');
             const editOwnerLabel = document.getElementById('edit_owner_label');
@@ -902,21 +932,57 @@
             const editImgContainer = document.getElementById('edit_current_image_container');
             const editImgPreview   = document.getElementById('edit_current_image_preview');
 
+            let currentEditingItemId = null;
+            let originalItemSku = '';
+
             function syncEditOwnershipUI(status) {
                 refreshOwnershipCardClasses('edit');
                 if (status === 'internal') {
                     editOwnerGroup.style.display = 'none';
                     editOwnerInput.required = false;
+
+                    editSkuPreview.readOnly = true;
+                    editSkuPreview.style.background = '#f8fafc';
+                    editSkuPreview.style.color = '#64748b';
+                    if (editSkuStatusBadge) {
+                        editSkuStatusBadge.textContent = 'Terkunci (Auto)';
+                        editSkuStatusBadge.className = 'badge bg-secondary-subtle text-secondary';
+                    }
+                    if (editSkuHelperText) {
+                        editSkuHelperText.textContent = 'Kode SKU terkunci permanen untuk aset internal demi konsistensi transaksi dan audit.';
+                    }
                 } else if (status === 'vendor') {
                     editOwnerGroup.style.display = 'block';
-                    editOwnerLabel.innerHTML = 'Nama Vendor / Perusahaan Pemilik <span class="text-danger">*</span>';
+                    editOwnerLabel.innerHTML = '<i class="fa-solid fa-handshake text-primary me-1.5"></i> Nama Vendor / Perusahaan Pemilik <span class="text-danger">*</span>';
                     editOwnerInput.placeholder = 'Contoh: PT Vendor Nusantara / CV Rental Jaya';
                     editOwnerInput.required = true;
+
+                    editSkuPreview.readOnly = false;
+                    editSkuPreview.style.background = '#ffffff';
+                    editSkuPreview.style.color = '#0f172a';
+                    if (editSkuStatusBadge) {
+                        editSkuStatusBadge.textContent = 'Dapat Diedit (Vendor)';
+                        editSkuStatusBadge.className = 'badge bg-purple-subtle text-purple';
+                    }
+                    if (editSkuHelperText) {
+                        editSkuHelperText.textContent = 'Kode SKU / Barcode vendor dapat disesuaikan jika terdapat perubahan nomor seri.';
+                    }
                 } else if (status === 'external') {
                     editOwnerGroup.style.display = 'block';
-                    editOwnerLabel.innerHTML = 'Nama Instansi Pemilik Aset <span class="text-danger">*</span>';
+                    editOwnerLabel.innerHTML = '<i class="fa-solid fa-handshake text-primary me-1.5"></i> Nama Instansi Pemilik Aset <span class="text-danger">*</span>';
                     editOwnerInput.placeholder = 'Contoh: Dinas Kesehatan / Bappeda';
                     editOwnerInput.required = true;
+
+                    editSkuPreview.readOnly = false;
+                    editSkuPreview.style.background = '#ffffff';
+                    editSkuPreview.style.color = '#0f172a';
+                    if (editSkuStatusBadge) {
+                        editSkuStatusBadge.textContent = 'Dapat Diedit (Instansi)';
+                        editSkuStatusBadge.className = 'badge bg-warning-subtle text-warning';
+                    }
+                    if (editSkuHelperText) {
+                        editSkuHelperText.textContent = 'Kode SKU / Registrasi dapat disesuaikan dengan kode inventaris resmi instansi asal.';
+                    }
                 }
             }
 
@@ -924,6 +990,57 @@
                 r.addEventListener('change', function () {
                     syncEditOwnershipUI(this.value);
                 });
+            });
+
+            // Validasi SKU real-time via AJAX agar tidak bentrok dengan barang lain
+            let skuCheckTimeout = null;
+            async function checkSkuUnique(skuVal, excludeId) {
+                if (!skuVal || skuVal.trim() === '') return { available: true };
+                try {
+                    const res = await fetch(`/items/check-sku-availability?sku=${encodeURIComponent(skuVal.trim())}&exclude_id=${excludeId}`);
+                    return await res.json();
+                } catch (e) {
+                    return { available: true };
+                }
+            }
+
+            editSkuPreview?.addEventListener('input', function() {
+                const val = this.value.trim();
+                clearTimeout(skuCheckTimeout);
+                skuCheckTimeout = setTimeout(async () => {
+                    const check = await checkSkuUnique(val, currentEditingItemId);
+                    if (!check.available) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan SKU',
+                            text: 'kode ini sudah digunakan',
+                            confirmButtonColor: '#2563eb'
+                        });
+                        editSkuPreview.classList.add('is-invalid');
+                    } else {
+                        editSkuPreview.classList.remove('is-invalid');
+                    }
+                }, 500);
+            });
+
+            formEdit?.addEventListener('submit', async function(e) {
+                const selectedRadio = document.querySelector('input[name="ownership_status"].edit-ownership-radio:checked');
+                const status = selectedRadio ? selectedRadio.value : 'internal';
+                if (status !== 'internal') {
+                    const val = editSkuPreview.value.trim();
+                    const check = await checkSkuUnique(val, currentEditingItemId);
+                    if (!check.available) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan SKU',
+                            text: 'kode ini sudah digunakan',
+                            confirmButtonColor: '#2563eb'
+                        });
+                        editSkuPreview.focus();
+                        return false;
+                    }
+                }
             });
 
             editModal.addEventListener('show.bs.modal', function (event) {
@@ -937,6 +1054,9 @@
                 const ownership  = btn.getAttribute('data-item-ownership') || 'internal';
                 const ownerName  = btn.getAttribute('data-item-owner-name') || '';
                 const itemImage  = btn.getAttribute('data-item-image') || '';
+
+                currentEditingItemId = itemId;
+                originalItemSku = itemSku;
 
                 formEdit.action = `/items/${itemId}`;
                 editName.value = itemName;

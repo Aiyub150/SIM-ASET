@@ -613,8 +613,8 @@
         if (stockTypeFilter && typeof TomSelect !== 'undefined') {
             let typeInit = false;
             new TomSelect(stockTypeFilter, {
+                plugins: ['dropdown_input'],
                 create: false,
-                controlInput: null,
                 placeholder: 'Semua Tipe Mutasi',
                 allowEmptyOption: true,
                 onInitialize: function() {
