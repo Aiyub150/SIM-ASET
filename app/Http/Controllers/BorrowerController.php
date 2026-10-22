@@ -89,4 +89,25 @@ class BorrowerController extends Controller
             ->route('borrowers.index')
             ->with('success', "Data Instansi {$borrower->institution_name} berhasil diperbarui.");
     }
+
+    public function destroy(Borrower $borrower, \Illuminate\Http\Request $request): RedirectResponse
+    {
+        $hasLoans = \Illuminate\Support\Facades\DB::table('loans')->where('borrower_id', $borrower->id)->exists();
+        if ($hasLoans) {
+            return back()->with('error', "Instansi \"{$borrower->institution_name}\" tidak dapat dihapus karena memiliki riwayat transaksi peminjaman.");
+        }
+
+        $name = $borrower->institution_name;
+        $borrower->delete();
+
+        ActivityLogger::log(
+            'DELETE',
+            'Master Data Instansi',
+            "Menghapus instansi peminjam: {$name}",
+            ['institution_name' => $name],
+            $request
+        );
+
+        return redirect()->route('borrowers.index')->with('success', "Instansi \"{$name}\" berhasil dihapus.");
+    }
 }

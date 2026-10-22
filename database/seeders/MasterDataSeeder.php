@@ -5,66 +5,35 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Location;
 use App\Models\Category;
-use App\Models\Item;
-use App\Models\Borrower;
 
 class MasterDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Catatan: user dan role dibuat oleh RoleAndAdminSeeder, bukan di sini.
+        // 1. Buat Master Lokasi dasar jika belum ada
+        Location::firstOrCreate(
+            ['name' => 'Gudang Utama Pemkab'],
+            ['address' => 'Jl. Pemuda No. 1']
+        );
+        Location::firstOrCreate(
+            ['name' => 'Gudang Aula Serbaguna'],
+            ['address' => 'Lantai 1 Gedung A']
+        );
 
-        // 1. Buat Master Lokasi
-        $gudangUtama = Location::create(['name' => 'Gudang Utama Pemkab', 'address' => 'Jl. Pemuda No. 1']);
-        $aula = Location::create(['name' => 'Gudang Aula Serbaguna', 'address' => 'Lantai 1 Gedung A']);
+        // 2. Buat Master Kategori dasar jika belum ada (sku_prefix untuk auto-generate SKU)
+        Category::firstOrCreate(
+            ['name' => 'Furnitur'],
+            ['description' => 'Meja, Kursi, Lemari', 'sku_prefix' => 'FURN']
+        );
+        Category::firstOrCreate(
+            ['name' => 'Elektronik'],
+            ['description' => 'Proyektor, Sound System, Mic', 'sku_prefix' => 'ELEC']
+        );
+        Category::firstOrCreate(
+            ['name' => 'Perlengkapan Acara'],
+            ['description' => 'Tenda, Panggung, Karpet', 'sku_prefix' => 'TENT']
+        );
 
-        // 3. Buat Master Kategori (sku_prefix wajib diisi untuk auto-generate SKU)
-        $furnitur     = Category::create(['name' => 'Furnitur',           'description' => 'Meja, Kursi, Lemari',          'sku_prefix' => 'FURN']);
-        $elektronik   = Category::create(['name' => 'Elektronik',         'description' => 'Proyektor, Sound System, Mic', 'sku_prefix' => 'ELEC']);
-        $perlengkapan = Category::create(['name' => 'Perlengkapan Acara', 'description' => 'Tenda, Panggung, Karpet',      'sku_prefix' => 'TENT']);
-
-        // 4. Buat Master Barang
-        // Kritis: Karena ini data awal, total_qty dan available_qty WAJIB sama.
-        Item::create([
-            'sku' => 'FURN-001',
-            'name' => 'Kursi Lipat Chitose',
-            'category_id' => $furnitur->id,
-            'location_id' => $gudangUtama->id,
-            'total_qty' => 500,
-            'available_qty' => 500,
-        ]);
-
-        Item::create([
-            'sku' => 'ELEC-001',
-            'name' => 'Proyektor Epson EB-X51',
-            'category_id' => $elektronik->id,
-            'location_id' => $aula->id,
-            'total_qty' => 10,
-            'available_qty' => 10,
-        ]);
-
-        Item::create([
-            'sku' => 'TENT-001',
-            'name' => 'Tenda Pleton 6x14m',
-            'category_id' => $perlengkapan->id,
-            'location_id' => $gudangUtama->id,
-            'total_qty' => 5,
-            'available_qty' => 5,
-        ]);
-
-        // 5. Buat Master Peminjam (Borrowers)
-        Borrower::create([
-            'institution_name' => 'Dinas Pendidikan',
-            'pic_name' => 'Budi Santoso',
-            'contact_number' => '081234567890',
-            'address' => 'Gedung B Lantai 2'
-        ]);
-
-        Borrower::create([
-            'institution_name' => 'Dinas Kesehatan',
-            'pic_name' => 'Siti Aminah',
-            'contact_number' => '089876543210',
-            'address' => 'Gedung C Lantai 1'
-        ]);
+        // Data dummy barang dan data instansi dihilangkan agar sistem bersih dari data dummy yang tidak bisa dihapus.
     }
 }

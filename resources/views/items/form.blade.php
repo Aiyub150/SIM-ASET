@@ -26,8 +26,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="me-1" viewBox="0 0 16 16" style="margin-top:-2px;">
                             <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
                         </svg>
-                        <strong>Kode SKU</strong> akan di-generate otomatis berdasarkan kategori yang dipilih.
-                        Stok awal otomatis <strong>0</strong> — tambahkan stok melalui menu <strong>Kartu Stok</strong>.
+                        <strong>Kode SKU</strong> akan di-generate otomatis berdasarkan kategori yang dipilih. Masukkan <strong>Jumlah Barang</strong> (minimal 1) untuk mendaftarkan aset.
                     </div>
                 @endif
 
@@ -177,29 +176,27 @@
                         @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    {{-- QTY — hanya Super Admin --}}
-                    @role('Super Admin')
+                    {{-- JUMLAH BARANG (QTY) --}}
                     <div class="mb-4">
                         <label class="form-label">
-                            Jumlah Awal (Qty)
-                            <span class="text-muted" style="font-weight:400;">(opsional)</span>
+                            Jumlah Barang <span class="text-danger">*</span>
                         </label>
-                        <input type="number" name="total_qty"
+                        <input type="number" name="total_qty" id="total_qty"
                                class="form-control @error('total_qty') is-invalid @enderror"
-                               value="{{ old('total_qty', $item->total_qty ?? '') }}"
-                               min="0" step="1" placeholder="0">
+                               value="{{ old('total_qty', isset($item) ? $item->total_qty : '1') }}"
+                               min="1" step="1" placeholder="Contoh: 10" required>
                         <div class="form-text text-muted" style="font-size:.78rem;">
                             @if(isset($item))
-                                Mengubah total qty akan menyesuaikan stok tersedia secara proporsional.
+                                Mengubah total barang akan menyesuaikan stok fisik dan stok tersedia secara proporsional.
                             @else
-                                Kosongkan jika stok belum diketahui — bisa ditambah melalui menu Kartu Stok.
+                                Masukkan jumlah unit fisik barang yang didaftarkan (minimal 1 unit).
                             @endif
                         </div>
                         @error('total_qty') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                    @endrole
 
                     <button type="submit"
+                            id="btn-submit-item"
                             class="btn {{ isset($item) ? 'btn-warning' : 'btn-primary' }} w-100 fw-bold py-2">
                         {{ isset($item) ? 'Simpan Perubahan' : 'Simpan Barang Baru' }}
                     </button>
@@ -354,6 +351,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
         sel.addEventListener('change', updatePreview);
         if (sel.value) updatePreview();
+    }
+
+    // ── Validasi Logika Jumlah Barang Minimal 1 dengan SweetAlert2 ──
+    const itemForm = document.querySelector('form[action*="items"]');
+    const totalQtyInput = document.getElementById('total_qty');
+
+    if (itemForm && totalQtyInput) {
+        itemForm.addEventListener('submit', function (e) {
+            const rawVal = totalQtyInput.value.trim();
+            const qtyVal = parseInt(rawVal, 10);
+
+            if (rawVal === '' || isNaN(qtyVal) || qtyVal <= 0) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+                        confirmButtonColor: '#2563eb'
+                    });
+                } else {
+                    alert('jumlah barang minimal 1 silahkan cek kembali pada jumlah barang');
+                }
+                totalQtyInput.focus();
+                return false;
+            }
+        }, true);
     }
 });
 </script>

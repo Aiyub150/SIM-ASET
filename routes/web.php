@@ -62,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role_or_permission:Super Admin|Admin|items.edit'])->group(function () {
             Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
             Route::put('/{item}',      [ItemController::class, 'update'])->middleware('throttle:30,1')->name('update');
+            Route::post('/{item}/quick-image', [ItemController::class, 'quickUpdateImage'])->name('quick-image');
+            Route::delete('/{item}',   [ItemController::class, 'destroy'])->name('destroy');
         });
     });
 
@@ -75,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role_or_permission:Super Admin|Admin|borrowers.edit'])->group(function () {
             Route::get('/{borrower}/edit', [BorrowerController::class, 'edit'])->name('edit');
             Route::put('/{borrower}',      [BorrowerController::class, 'update'])->middleware('throttle:30,1')->name('update');
+            Route::delete('/{borrower}',   [BorrowerController::class, 'destroy'])->name('destroy');
         });
     });
 

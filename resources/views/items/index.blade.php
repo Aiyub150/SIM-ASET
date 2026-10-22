@@ -73,14 +73,14 @@
                     @endhasanyrole
                     <th style="width:5%;">No</th>
                     <th style="width:14%;">Kode (SKU)</th>
-                    <th>Foto</th>
+                    <th style="width:14%;">Foto</th>
                     <th>Nama Barang</th>
-                    <th style="width:14%;">Kategori</th>
-                    <th class="text-center" style="width:11%;">Total Fisik</th>
-                    <th class="text-center" style="width:11%;">Tersedia</th>
-                    @hasanyrole('Super Admin|Admin')
-                    <th class="text-center pe-4" style="width:9%;">Aksi</th>
-                    @endhasanyrole
+                    <th style="width:13%;">Kategori</th>
+                    <th class="text-center" style="width:10%;">Total Fisik</th>
+                    <th class="text-center" style="width:10%;">Tersedia</th>
+                    @if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
+                    <th class="text-center pe-4" style="width:15%;">Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -99,11 +99,33 @@
                             </span>
                         </td>
                         <td>
-                            @if($item->image)
-                                <img src="{{ asset('storage/' . $item->image) }}" alt="Foto" style="max-height: 40px; border-radius: 4px;">
-                            @else
-                                <span class="text-muted" style="font-size: 0.75rem;">Tidak ada gambar</span>
-                            @endif
+                            <div class="d-flex align-items-center gap-2">
+                                @if($item->image)
+                                    <img src="{{ asset('storage/' . $item->image) }}" alt="Foto" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="width: 38px; height: 38px; border-radius: 6px; border: 1px dashed #cbd5e1; font-size: 0.65rem; text-align: center; line-height: 1;">
+                                        No Pic
+                                    </div>
+                                @endif
+                                @if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-secondary py-0 px-2" 
+                                        style="font-size: 0.72rem; height: 26px;"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#quickUploadModal"
+                                        data-item-id="{{ $item->id }}"
+                                        data-item-name="{{ $item->name }}"
+                                        data-item-sku="{{ $item->sku }}"
+                                        data-item-image="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
+                                        title="{{ $item->image ? 'Ganti Foto' : 'Upload Foto' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                                    </svg>
+                                    {{ $item->image ? 'Ganti' : 'Upload' }}
+                                </button>
+                                @endif
+                            </div>
                         </td>
                         <td>
                             <div style="font-weight:600; color:#1e293b;">{{ $item->name }}</div>
@@ -145,19 +167,28 @@
                                 </div>
                             @endif
                         </td>
-                        @hasanyrole('Super Admin|Admin')
+                        @if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
                         <td class="text-center pe-4">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Data Barang">Edit</a>
                                 <a href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" 
                                    target="_blank" 
                                    class="btn btn-sm btn-outline-primary"
                                    title="Cetak Label Barcode Kotak">
-                                    Cetak Label
+                                    Label
                                 </a>
+                                <form action="{{ route('items.destroy', $item->id) }}" method="POST" class="d-inline"
+                                      data-confirm="Apakah Anda yakin ingin menghapus barang &quot;{{ $item->name }}&quot; (SKU: {{ $item->sku }})? Aksi ini tidak dapat dibatalkan."
+                                      data-confirm-title="Hapus Master Barang?">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Barang">
+                                        Hapus
+                                    </button>
+                                </form>
                             </div>
                         </td>
-                        @endhasanyrole
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -177,6 +208,42 @@
         {{ $items->links('pagination::bootstrap-5') }}
     </div>
     @endif
+</div>
+
+{{-- MODAL UPLOAD / GANTI FOTO CEPAT --}}
+<div class="modal fade" id="quickUploadModal" tabindex="-1" aria-labelledby="quickUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="quickUploadModalLabel">Upload / Ganti Foto Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="quickUploadForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small mb-1">Barang</label>
+                        <div class="fw-bold fs-6 text-dark" id="modal-item-name">-</div>
+                        <div class="text-primary small font-monospace" id="modal-item-sku">-</div>
+                    </div>
+                    <div class="text-center mb-3" id="modal-preview-container" style="display:none;">
+                        <img id="modal-item-preview" src="" alt="Pratinjau Foto" style="max-height: 140px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick_item_image" class="form-label fw-semibold">Pilih File Foto Baru</label>
+                        <input type="file" name="image" id="quick_item_image" class="form-control" accept="image/jpeg,image/png,image/webp" required>
+                        <div class="form-text text-muted" style="font-size:0.75rem;">
+                            Format yang didukung: JPG, PNG, WEBP. Maksimal 2MB.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Simpan Foto</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -252,6 +319,39 @@
                 onChange: function() {
                     if (!ownInit) return;
                     ownershipFilter.closest('form').submit();
+                }
+            });
+        }
+
+        // Handler Modal Upload / Ganti Foto Cepat
+        const quickModal = document.getElementById('quickUploadModal');
+        if (quickModal) {
+            quickModal.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                if (!btn) return;
+
+                const itemId = btn.getAttribute('data-item-id');
+                const itemName = btn.getAttribute('data-item-name');
+                const itemSku = btn.getAttribute('data-item-sku');
+                const itemImage = btn.getAttribute('data-item-image');
+
+                const form = document.getElementById('quickUploadForm');
+                form.action = `/items/${itemId}/quick-image`;
+
+                document.getElementById('modal-item-name').textContent = itemName;
+                document.getElementById('modal-item-sku').textContent = itemSku;
+
+                const previewContainer = document.getElementById('modal-preview-container');
+                const previewImg = document.getElementById('modal-item-preview');
+                const fileInput = document.getElementById('quick_item_image');
+                fileInput.value = '';
+
+                if (itemImage && itemImage.trim() !== '') {
+                    previewImg.src = itemImage;
+                    previewContainer.style.display = 'block';
+                } else {
+                    previewImg.src = '';
+                    previewContainer.style.display = 'none';
                 }
             });
         }

@@ -35,7 +35,7 @@ class StoreItemRequest extends FormRequest
                 'max:255',
                 'regex:' . $safeTextPattern,
             ],
-            'total_qty'        => ['nullable', 'integer', 'min:0'],
+            'total_qty'        => ['required', 'integer', 'min:1'],
             'image'            => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
@@ -43,6 +43,9 @@ class StoreItemRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'total_qty.required'         => 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+            'total_qty.min'              => 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+            'total_qty.integer'          => 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
             'category_id.required'       => 'Kategori barang wajib dipilih.',
             'category_id.exists'         => 'Kategori yang dipilih tidak valid.',
             'ownership_status.required'  => 'Status kepemilikan barang wajib dipilih.',

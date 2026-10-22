@@ -302,6 +302,62 @@ class ItemController extends Controller
             ->with('success', "Data Barang \"{$item->name}\" berhasil diperbarui.");
     }
 
+    public function quickUpdateImage(Request $request, Item $item): RedirectResponse
+    {
+        $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'image.required' => 'Pilih file foto terlebih dahulu.',
+            'image.image'    => 'File yang dipilih harus berupa gambar.',
+            'image.mimes'    => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'image.max'      => 'Ukuran foto maksimal 2MB.',
+        ]);
+
+        if ($item->image && Storage::disk('public')->exists($item->image)) {
+            Storage::disk('public')->delete($item->image);
+        }
+
+        $path = $request->file('image')->store('images/items', 'public');
+        $item->update(['image' => $path]);
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Barang',
+            "Memperbarui foto barang: {$item->name} (SKU: {$item->sku})",
+            ['item_id' => $item->id, 'sku' => $item->sku, 'image' => $path],
+            $request
+        );
+
+        return back()->with('success', "Foto untuk barang \"{$item->name}\" berhasil diperbarui.");
+    }
+
+    public function destroy(Item $item, Request $request): RedirectResponse
+    {
+        $hasLoans = DB::table('loan_items')->where('item_id', $item->id)->exists();
+        if ($hasLoans) {
+            return back()->with('error', "Barang \"{$item->name}\" tidak dapat dihapus karena memiliki riwayat transaksi peminjaman.");
+        }
+
+        if ($item->image && Storage::disk('public')->exists($item->image)) {
+            Storage::disk('public')->delete($item->image);
+        }
+
+        DB::table('stock_movements')->where('item_id', $item->id)->delete();
+        $itemName = $item->name;
+        $itemSku = $item->sku;
+        $item->delete();
+
+        \App\Services\ActivityLogger::log(
+            'DELETE',
+            'Barang',
+            "Menghapus master barang: {$itemName} (SKU: {$itemSku})",
+            ['sku' => $itemSku, 'name' => $itemName],
+            $request
+        );
+
+        return redirect()->route('items.index')->with('success', "Barang \"{$itemName}\" berhasil dihapus.");
+    }
+
     // ── Helper: daftar kategori beserta prefix & nomor SKU berikutnya ──
     private function categoriesWithNextSku()
     {
