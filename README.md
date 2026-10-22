@@ -111,25 +111,36 @@ Pratinjau visual modul operasional dan administratif pada **SIM-ASET v1.2.0**:
 ### 1. Modul Utama & Dasbor Inventaris
 | Dashboard Eksekutif | Master Data Barang & Status Kepemilikan |
 | :---: | :---: |
-| ![Preview Dashboard](docs/images/dashboardv3.png) | ![Preview Master Barang](docs/images/itemsv3.png) |
+| ![Preview Dashboard](docs/images/dashboard-v12.png) | ![Preview Master Barang](docs/images/items-v12.png) |
 
 ---
 
 ### 2. Transaksi Peminjaman & Buku Besar Mutasi Stok
 | Transaksi Peminjaman (Multi-Barang) | Kartu Stok / Ledger Mutasi Aset |
 | :---: | :---: |
-| ![Preview Daftar Peminjaman](docs/images/loansv3.png) | ![Preview Kartu Stok](docs/images/stock-movementsv3.png) |
+| ![Preview Daftar Peminjaman](docs/images/loans-v12.png) | ![Preview Kartu Stok](docs/images/stock-movements-v12.png) |
 
 ---
 
 ### 3. Geospasial Instansi & Pelaporan Resmi
-| Direktori Peminjam Instansi | Peta Lokasi Interaktif Leaflet |
+| Direktori Peminjam Instansi | Peta Lokasi Interaktif Leaflet (Modal 280px) |
 | :---: | :---: |
-| ![Preview Daftar Peminjam](docs/images/borrowersv3.png) | ![Preview Map Peminjam](docs/images/mappopupv3.png) |
+| ![Preview Daftar Peminjam](docs/images/borrowers-v12.png) | ![Preview Map Peminjam](docs/images/borrower-modal-map-v12.png) |
 
-| Formulir Peminjaman & Scanner Barcode | Laporan Rekapitulasi & Ekspor Dokumen |
+| Formulir Modal Tambah Barang (Ownership Cards) | Laporan Rekapitulasi & Ekspor Dokumen |
 | :---: | :---: |
-| ![Preview Form Peminjaman](docs/images/loan-createv3.png) | ![Preview Laporan](docs/images/reportsv3.png) |
+| ![Preview Form Peminjaman](docs/images/item-ownership-cards-v12.png) | ![Preview Laporan](docs/images/reports-v12.png) |
+
+---
+
+### 4. Administrasi & Manajemen Akses RBAC (Fitur Baru v1.2.0)
+| Matriks Perizinan RBAC Dinamis | Manajemen Peran & Custom Roles |
+| :---: | :---: |
+| ![Matriks Perizinan RBAC](docs/images/rbac-matrix-v12.png) | ![Manajemen Peran Kustom](docs/images/roles-management-v12.png) |
+
+| Format Kode SKU Dinamis & Sinkronisasi Legacy | Detail Audit Trail dengan Komparasi Sebelum-Sesudah |
+| :---: | :---: |
+| ![Pengaturan Format SKU](docs/images/sku-format-v12.png) | ![Komparasi Audit Trail Sebelum-Sesudah](docs/images/log-comparison-v12.png) |
 
 ---
 
