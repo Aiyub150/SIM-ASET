@@ -16,14 +16,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
-        $lockoutSeconds = 0;
-        if (session()->has('lockout_seconds')) {
-            $lockoutSeconds = (int) session('lockout_seconds');
-        }
-
-        return view('auth.login', [
-            'lockoutSeconds' => $lockoutSeconds,
-        ]);
+        return view('auth.login');
     }
 
     /**

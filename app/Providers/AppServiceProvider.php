@@ -77,46 +77,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($request->ip());
         });
 
-        // ── RATE LIMITERS: IP & DEVICE FINGERPRINTING ─────────────────────
-        // 1. Login Protection (IP & Device) - 5 attempts per 15 minutes (900s lockdown)
+        // ── RATE LIMITERS ───────────────────────────────────────────────
+        // 1. Login (Dinonaktifkan sementara sesuai permintaan)
         RateLimiter::for('auth.login', function (Request $request) {
-            $clientIp = \App\Services\ActivityLogger::resolveClientIp($request);
-            $deviceId = $request->cookie('simaset_did') 
-                ?? $request->header('X-Device-Id') 
-                ?? sha1($request->header('User-Agent') ?? 'unknown-device');
-            $deviceKey = 'dev_' . substr(sha1($deviceId), 0, 16);
-            $email = strtolower((string) $request->input('email', ''));
-
-            $responseCallback = function (Request $request, array $headers) {
-                $seconds = (int) ($headers['Retry-After'] ?? 900);
-                $minutes = ceil($seconds / 60);
-
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'message' => "Terlalu banyak percobaan login. Akses dikunci sementara selama {$minutes} menit demi keamanan.",
-                        'retry_after' => $seconds,
-                    ], 429, $headers);
-                }
-
-                return response()->view('auth.login', [
-                    'lockoutSeconds' => $seconds,
-                    'errorMessage' => "Terlalu banyak percobaan login yang gagal. Akun dan IP Anda dikunci sementara selama {$minutes} menit demi keamanan.",
-                ], 429, $headers);
-            };
-
-            $limits = [
-                Limit::perMinutes(15, 5)->by($deviceKey)->response($responseCallback),
-            ];
-
-            // Hanya kunci IP jika BUKAN internal loopback/server IP
-            if (!\App\Services\ActivityLogger::isInternalOrLoopbackIp($clientIp)) {
-                $limits[] = Limit::perMinutes(15, 5)->by($clientIp)->response($responseCallback);
-                $limits[] = Limit::perMinutes(15, 5)->by($email . '|' . $clientIp)->response($responseCallback);
-            } else {
-                $limits[] = Limit::perMinutes(15, 5)->by($email . '|' . $deviceKey)->response($responseCallback);
-            }
-
-            return $limits;
+            return Limit::none();
         });
 
         // 2. Forgot Password Protection (IP & Device)

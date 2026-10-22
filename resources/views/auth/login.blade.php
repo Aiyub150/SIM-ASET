@@ -4,31 +4,6 @@
     <h6 class="fw-600 mb-1" style="font-weight:600; color:#1e293b;">Masuk ke Sistem</h6>
     <p class="text-muted mb-4" style="font-size:.82rem;">Masukkan kredensial akun Anda untuk melanjutkan.</p>
 
-    {{-- Banner Lockout Countdown jika Terkena Proteksi Brute Force --}}
-    @php
-        $activeLockoutSeconds = (int) ($lockoutSeconds ?? session('lockout_seconds', 0));
-        // Jika masih ada sisa kesempatan login, kunci form TIDAK BOLEH aktif
-        if ($errors->has('email') && str_contains($errors->first('email'), 'Sisa kesempatan')) {
-            $activeLockoutSeconds = 0;
-        }
-    @endphp
-
-    <div id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="{{ $activeLockoutSeconds > 0 ? '' : 'display:none;' }}">
-        <div class="d-flex align-items-center gap-2 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-danger flex-shrink-0" viewBox="0 0 16 16">
-                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-            </svg>
-            <strong class="text-danger" style="font-size: .88rem;">Akun / IP Terkunci Sementara</strong>
-        </div>
-        <p class="mb-2 text-danger-emphasis" style="font-size: .8rem; line-height: 1.4;">
-            Terdeteksi lebih dari 5 kali kegagalan login berturut-turut. Demi keamanan, sistem mengunci akses login selama 15 menit. Pembersihan cache browser atau local storage tidak akan mereset masa penguncian.
-        </p>
-        <div class="bg-white rounded-2 p-2 border border-danger-subtle text-center">
-            <span class="text-muted small">Waktu tunggu tersisa:</span>
-            <div id="lockout-countdown" class="font-monospace fw-bold text-danger fs-5">00:00</div>
-        </div>
-    </div>
-
     <form method="POST" action="{{ route('login') }}" id="form-login">
         @csrf
 
@@ -72,44 +47,4 @@
             </a>
         </div>
     </form>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let secondsLeft = {{ (int) ($activeLockoutSeconds ?? 0) }};
-        const countdownEl = document.getElementById('lockout-countdown');
-        const timerBox = document.getElementById('lockout-timer-box');
-        const submitBtn = document.getElementById('btn-login-submit');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-
-        function formatTime(sec) {
-            const m = Math.floor(sec / 60);
-            const s = sec % 60;
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        if (secondsLeft > 0 && countdownEl) {
-            timerBox.style.display = 'block';
-            if (submitBtn) submitBtn.disabled = true;
-            if (emailInput) emailInput.disabled = true;
-            if (passwordInput) passwordInput.disabled = true;
-            countdownEl.textContent = formatTime(secondsLeft);
-
-            const interval = setInterval(function () {
-                secondsLeft--;
-                if (secondsLeft <= 0) {
-                    clearInterval(interval);
-                    countdownEl.textContent = '00:00';
-                    timerBox.className = 'alert alert-success p-3 mb-4 rounded-3 border-success shadow-sm';
-                    timerBox.innerHTML = '<div class="d-flex align-items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="text-success" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><strong class="text-success" style="font-size: .88rem;">Kunci telah dibuka!</strong></div><p class="mb-0 text-success-emphasis mt-1" style="font-size: .8rem;">Silakan masukkan kembali email dan password Anda untuk masuk.</p>';
-                    if (submitBtn) submitBtn.disabled = false;
-                    if (emailInput) emailInput.disabled = false;
-                    if (passwordInput) passwordInput.disabled = false;
-                } else {
-                    countdownEl.textContent = formatTime(secondsLeft);
-                }
-            }, 1000);
-        }
-    });
-    </script>
 </x-guest-layout>

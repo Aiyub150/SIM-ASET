@@ -10,23 +10,21 @@ class RateLimitingAndCacheSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_endpoint_enforces_rate_limiting(): void
+    public function test_login_endpoint_does_not_lockout_user_temporarily(): void
     {
-        // 5 allowed requests per minute
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 7; $i++) {
             $response = $this->post('/login', [
-                'email' => 'attacker@test.com',
+                'email' => 'user@test.com',
                 'password' => 'wrongpassword',
             ]);
+            $response->assertSessionHasErrors('email');
             $this->assertNotEquals(429, $response->getStatusCode());
         }
 
-        // 6th attempt must trigger 429 Too Many Requests
-        $response = $this->post('/login', [
-            'email' => 'attacker@test.com',
-            'password' => 'wrongpassword',
-        ]);
-        $response->assertStatus(429);
+        $loginView = $this->get('/login');
+        $loginView->assertStatus(200);
+        $loginView->assertDontSee('lockout-countdown');
+        $loginView->assertDontSee('Akun / IP Terkunci Sementara');
     }
 
     public function test_forgot_password_endpoint_enforces_rate_limiting(): void
@@ -108,85 +106,5 @@ class RateLimitingAndCacheSecurityTest extends TestCase
         $otherIpResponse = $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.88'])
             ->get('/login');
         $this->assertEquals(200, $otherIpResponse->getStatusCode());
-    }
-
-    public function test_login_lockout_enforces_15_minute_lock_and_flashes_countdown(): void
-    {
-        $attackerIp = '198.51.100.99';
-
-        for ($i = 1; $i <= 4; $i++) {
-            $response = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
-                ->post('/login', [
-                    'email' => 'victim@test.com',
-                    'password' => 'wrong-pass',
-                ]);
-            $response->assertSessionHasErrors('email');
-            $this->assertNull(session('lockout_seconds'));
-
-            // Verifikasi box timer lockout disembunyikan (display:none) pada percobaan ke-1 s.d. 4
-            $loginPageView = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
-                ->get('/login');
-            $loginPageView->assertSee('id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="display:none;"', false);
-        }
-
-        // Percobaan ke-5 gagal -> langsung dikunci 15 menit (900 detik)
-        $response5 = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
-            ->post('/login', [
-                'email' => 'victim@test.com',
-                'password' => 'wrong-pass',
-            ]);
-
-        $response5->assertSessionHas('lockout_seconds');
-        $lockSec = session('lockout_seconds');
-        $this->assertGreaterThan(850, $lockSec);
-        $this->assertLessThanOrEqual(900, $lockSec);
-
-        // Percobaan ke-6 dari IP terkunci
-        $response6 = $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
-            ->get('/login');
-        $response6->assertSee('lockout-countdown');
-        $response6->assertSee('Akun / IP Terkunci Sementara');
-    }
-
-    public function test_different_devices_are_isolated_and_loopback_ip_does_not_lock_all_devices(): void
-    {
-        $serverLoopbackIp = '127.0.0.1';
-        $device1Token = 'device-token-uuid-111111111111';
-        $device2Token = 'device-token-uuid-222222222222';
-
-        // Device 1 fails 5 times
-        for ($i = 0; $i < 5; $i++) {
-            $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
-                ->withCookies(['simaset_did' => $device1Token])
-                ->post('/login', [
-                    'email' => 'superadmin@simaset.com',
-                    'password' => 'wrongpass',
-                ]);
-        }
-
-        // Device 1 is now locked out
-        $device1Login = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
-            ->withCookies(['simaset_did' => $device1Token])
-            ->get('/login');
-        $device1Login->assertSee('lockout-countdown');
-
-        // Device 2 (different device / browser) opens login on the same server IP
-        // Must NOT be locked out!
-        $device2Login = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
-            ->withCookies(['simaset_did' => $device2Token])
-            ->get('/login');
-        $device2Login->assertSee('id="lockout-timer-box" class="alert alert-danger p-3 mb-4 rounded-3 border-danger shadow-sm" style="display:none;"', false);
-
-        // Device 2 attempts login with wrong password for a different user account (1st attempt)
-        // Must show remaining 4 attempts, NOT lockout!
-        $device2Attempt1 = $this->withServerVariables(['REMOTE_ADDR' => $serverLoopbackIp])
-            ->withCookies(['simaset_did' => $device2Token])
-            ->post('/login', [
-                'email' => 'staff@simaset.com',
-                'password' => 'wrongpass',
-            ]);
-        $device2Attempt1->assertSessionHasErrors('email');
-        $this->assertStringContainsString('Sisa kesempatan login: 4 kali', session('errors')->first('email'));
-        $this->assertNull(session('lockout_seconds'));
     }
 }
