@@ -1,22 +1,55 @@
 # SIM-ASET: Technical Documentation
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/Aiyub150/SIM-ASET)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/Aiyub150/SIM-ASET)
 [![Framework](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Security](https://img.shields.io/badge/security-OWASP%20Hardened-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-107%20passed-brightgreen.svg)]()
 
-SIM-ASET adalah sistem informasi manajemen inventaris aset daerah yang dikembangkan menggunakan kerangka kerja Laravel. Repositori ini berisi dokumentasi arsitektur, struktur basis data, spesifikasi sistem, serta panduan teknis operasional (rilis stabil mutakhir: **Versi 1.1.0**).
+<p align="center">
+  <img src="public/images/sim-aset_banner.png" alt="SIM-ASET Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+</p>
+
+SIM-ASET adalah sistem informasi manajemen inventaris dan sirkulasi aset daerah modern yang dikembangkan dengan kerangka kerja **Laravel 12.x** dan **Bootstrap 5.x**. Repositori ini berisi dokumentasi arsitektur perangkat lunak, skema basis data, spesifikasi sistem, manajemen hak akses terdistribusi (*Dynamic RBAC Matrix*), serta panduan teknis operasional (rilis stabil mutakhir: **Versi 1.2.0**).
 
 ## Spesifikasi Teknis (Tech Stack)
 
-*   **Backend Framework**: Laravel 12.x
-*   **Runtime**: PHP 8.2+
-*   **Frontend**: Bootstrap 5.x, Vanilla JavaScript
-*   **Database Engine**: Mendukung SQLite (lokal/development) dan MySQL/MariaDB (production)
-*   **Authentication & Authorization**: Laravel Breeze & Spatie Laravel Permission
-*   **PDF Generation**: barryvdh/laravel-dompdf
-*   **Charts & Visualization**: Chart.js
+*   **Backend Framework**: Laravel 12.x (Modern PHP Foundation)
+*   **Runtime Engine**: PHP 8.2+
+*   **Frontend UI & UX**: Bootstrap 5.x, FontAwesome 6 (Icon-Assisted Labels), Vanilla JavaScript ES6+, TomSelect (Dedicated Dropdown Search)
+*   **Geospatial & Mapping**: Leaflet.js 1.9.4 & OpenStreetMap Nominatim Engine (Forward/Reverse Geocoding)
+*   **Database Engine**: SQLite (Development/Testing) & MySQL 8.0+ / MariaDB 10.5+ (Production)
+*   **Authentication & Authorization**: Laravel Breeze & Spatie Laravel-Permission (Dynamic Role-Based Access Control & User Direct Permission Overrides)
+*   **Barcode & Hardware Integration**: Square 2D QR Code Generation, HTML5 Video Stream (`navigator.mediaDevices.getUserMedia`)
+*   **Document & Export Engine**: `barryvdh/laravel-dompdf` (Laporan Bulanan & Panduan Resmi PDF)
+*   **Testing Framework**: PHPUnit / Pest Test Suite (107 Tests, 666 Assertions Passing)
+
+---
+
+## Fitur Unggulan (Core Highlights v1.2.0)
+
+### 1. Dynamic RBAC & Permission Matrix
+*   **Manajemen Peran Fleksibel**: Super Admin dapat membuat, mengubah deskripsi, dan menghapus peran (*role*) kustom tanpa intervensi kode sumber (peran bawaan sistem seperti *Super Admin* dan *Admin* memiliki imunitas proteksi).
+*   **Matriks Otorisasi Interaktif**: Tabel matriks izin berbasis modul yang dilengkapi dengan *Sticky Table Header* dan kolom identifikasi visual (*badge* bawaan peran vs izin khusus langsung).
+*   **Izin Khusus Langsung (*User-Specific Direct Permissions*)**: Memberikan fleksibilitas pemberian hak akses individual kepada staf atau auditor tertentu tanpa harus mengubah peran dasarnya.
+
+### 2. Manajemen Format Kode SKU Fleksibel
+*   **Visual Anatomy Blocks**: Pratinjau interaktif pembedahan kode SKU secara visual (Prefix Kategori, Pemisah/Separator, dan Nomor Urut/Counter Padding).
+*   **Live Preview & Validasi Unik Real-Time**: Input SKU otomatis mendeteksi bentrok dengan database via AJAX; jika duplikat, sistem langsung mengaktifkan notifikasi SweetAlert2 *"kode ini sudah digunakan"*.
+*   **Legacy SKU Bulk Synchronization**: Utilitas sinkronisasi massal untuk merapikan SKU data lama agar seragam mengikuti formula format terbaru dengan perlindungan kebal (*immunity*) terhadap barang titipan vendor/instansi lain.
+
+### 3. Peta Interaktif Geospasial di Modal Instansi
+*   **Pencarian Alamat Cerdas (*Nominatim Engine*)**: Pengguna tidak perlu menghafal atau mengetik angka desimal Latitude/Longitude. Cukup ketik nama jalan, gedung, atau instansi di kotak pencarian peta Leaflet 280px.
+*   **Draggable Pin & Reverse Geocoding**: Menggeser pin penanda secara otomatis mengisi alamat lengkap dan menyimpan koordinat spasial secara transparan melalui input tersembunyi.
+
+### 4. Transaksi Peminjaman & Mutasi Zero-Redirect
+*   **Modal Interaktif Pop-up**: Tambah barang inventaris, edit instansi, peminjaman baru, serta pelunasan pengembalian barang diselesaikan secara instan di dalam modal tanpa *page reload* atau *redirect*.
+*   **Scanner Barcode & Live Photo Preview**: Terintegrasi langsung dengan kamera perangkat untuk pemindaian SKU fisik serta verifikasi unggah foto BAST / bukti serah terima barang.
+
+### 5. Audit Trail & Log History dengan Inspeksi Visual
+*   **Before-After Comparison Modal**: Riwayat modifikasi data aset menampilkan komparasi visual sebelum dan sesudah perubahan (*state comparison*).
+*   **Filter TomSelect Terstandarisasi**: Panel filter modul dan aksi menggunakan *dedicated dropdown search* yang bersih dan bebas dari konflik teks placeholder.
 
 ---
 
@@ -71,33 +104,34 @@ Skema sistem bergantung pada relasi transaksional yang berpusat pada integritas 
 
 ---
 
-## Preview Antarmuka Sistem
+## Preview Antarmuka Sistem (Visual Documentation)
 
-Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
+Pratinjau visual modul operasional dan administratif pada **SIM-ASET v1.2.0**:
 
-### Dashboard
-![Preview Dashboard](docs/images/dashboardv3.png)
+### 1. Modul Utama & Dasbor Inventaris
+| Dashboard Eksekutif | Master Data Barang & Status Kepemilikan |
+| :---: | :---: |
+| ![Preview Dashboard](docs/images/dashboardv3.png) | ![Preview Master Barang](docs/images/itemsv3.png) |
 
-### Master Barang
-![Preview Master Barang](docs/images/itemsv3.png)
+---
 
-### Daftar Peminjam
-![Preview Daftar Peminjam](docs/images/borrowersv3.png)
+### 2. Transaksi Peminjaman & Buku Besar Mutasi Stok
+| Transaksi Peminjaman (Multi-Barang) | Kartu Stok / Ledger Mutasi Aset |
+| :---: | :---: |
+| ![Preview Daftar Peminjaman](docs/images/loansv3.png) | ![Preview Kartu Stok](docs/images/stock-movementsv3.png) |
 
-### Map Peminjam
-![Preview Map Peminjam](docs/images/mappopupv3.png)
+---
 
-### Daftar Peminjaman
-![Preview Daftar Peminjaman](docs/images/loansv3.png)
+### 3. Geospasial Instansi & Pelaporan Resmi
+| Direktori Peminjam Instansi | Peta Lokasi Interaktif Leaflet |
+| :---: | :---: |
+| ![Preview Daftar Peminjam](docs/images/borrowersv3.png) | ![Preview Map Peminjam](docs/images/mappopupv3.png) |
 
-### Form Peminjaman
-![Preview Form Peminjaman](docs/images/loan-createv3.png)
+| Formulir Peminjaman & Scanner Barcode | Laporan Rekapitulasi & Ekspor Dokumen |
+| :---: | :---: |
+| ![Preview Form Peminjaman](docs/images/loan-createv3.png) | ![Preview Laporan](docs/images/reportsv3.png) |
 
-### Kartu Stok / Mutasi
-![Preview Kartu Stok](docs/images/stock-movementsv3.png)
-
-### Laporan
-![Preview Laporan](docs/images/reportsv3.png)
+---
 
 ---
 
@@ -127,6 +161,21 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
 ---
 
 ## Catatan Rilis & Pembaruan (Changelog)
+
+### [1.2.0] - 2026-10-22
+*   **Fitur Baru (Enterprise Administration & Security)**:
+    *   **Dynamic RBAC & Role Management**: Pembuatan, pengeditan, dan penghapusan peran kustom dengan isolasi imunitas pada peran default sistem.
+    *   **User-Specific Direct Permissions**: Pengaturan izin khusus per akun pengguna tanpa merombak peran bawaan.
+    *   **SKU Code Format Setting**: Pengaturan format kode SKU dengan blok anatomi visual, pilihan pemisah (`-`, `/`, `.`), counter padding, serta utilitas *Bulk Legacy Synchronization*.
+    *   **Visual Before-After Audit Comparison**: Modal inspeksi log history yang menampilkan perbandingan visual nilai lama vs nilai baru data yang diubah.
+*   **Peningkatan Antarmuka & UX**:
+    *   **Peta Interaktif Leaflet di Modal Instansi**: Menghapus input manual Lat/Long dengan integrasi peta Leaflet 280px, pencarian alamat otomatis Nominatim, dan draggable marker.
+    *   **Status Kepemilikan Barang Bertema**: Kartu kepemilikan aset (*Milik Sendiri*, *Milik Vendor*, *Instansi Lain*) dengan styling warna lembut saat aktif, efek hover dinamis, dan teks hitam bersih saat tidak dipilih.
+    *   **Input SKU Dinamis pada Modal Edit**: Field SKU terkunci permanen untuk aset internal, namun otomatis terbuka untuk aset vendor/instansi dengan validasi duplikasi real-time via AJAX dan dialog SweetAlert2 *"kode ini sudah digunakan"*.
+    *   **Icon-Assisted Form Labels**: Penambahan ikon FontAwesome pada seluruh keterangan form modal untuk mempermudah pemahaman kognitif pengguna awam.
+    *   **Dedicated Dropdown TomSelect**: Standarisasi seluruh filter pencarian dan pilihan pengguna menggunakan plugin `dropdown_input` terpisah guna mencegah teks pencarian bertumpuk dengan placeholder.
+*   **Pengujian & Verifikasi**:
+    *   107 automated tests (666 assertions) lulus 100% pada suite PHPUnit/Pest.
 
 ### [1.1.0] - 2026-10-12
 * **Fitur Baru (Super Admin)**:
@@ -176,6 +225,6 @@ Koleksi pratinjau visual dari modul operasional di dalam aplikasi:
 
 4. **Eksekusi Layanan Web Server**:
    ```bash
-   php artisan serve
+   php artisan serve --port=5000
    ```
-   *(Pekerja layanan mendengarkan koneksi pada *port* standar HTTP lokal `http://127.0.0.1:8000`).*
+   *(Pekerja layanan mendengarkan koneksi pada *port* standar HTTP lokal `http://localhost:5000`).*
