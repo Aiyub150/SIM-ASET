@@ -3,6 +3,60 @@
 @section('title', 'Master Data Barang — SIM-ASET')
 @section('page-title', 'Master Data Barang')
 
+@push('styles')
+<style>
+    /* Modern Ownership Selector Cards */
+    .ownership-card {
+        cursor: pointer;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem;
+        transition: all 0.2s ease-in-out;
+        background-color: #ffffff;
+        position: relative;
+    }
+    .ownership-card:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .ownership-card.active-internal {
+        border-color: #2563eb !important;
+        background-color: #eff6ff !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .ownership-card.active-vendor {
+        border-color: #7c3aed !important;
+        background-color: #f5f3ff !important;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    }
+    .ownership-card.active-external {
+        border-color: #d97706 !important;
+        background-color: #fffbeb !important;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    }
+
+    /* Live Image Preview Styles */
+    .preview-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        background-color: #f8fafc;
+        transition: border-color 0.2s;
+    }
+    .preview-box:hover {
+        border-color: #94a3b8;
+    }
+    .preview-box img {
+        max-height: 140px;
+        max-width: 100%;
+        border-radius: 6px;
+        object-fit: contain;
+    }
+</style>
+@endpush
+
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -258,29 +312,35 @@
                         <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked>
+                                <label class="ownership-card active-internal d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-internal">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked style="accent-color: #2563eb;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Milik Sendiri</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">SKU Otomatis</div>
+                                        <div class="fw-bold text-primary small d-flex align-items-center gap-1">
+                                            <i class="fa-solid fa-building-columns"></i> Milik Sendiri
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">SKU Otomatis Sistem</div>
                                     </div>
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-vendor">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #7c3aed;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Milik Vendor</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">SKU/Barcode Asli</div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-create-vendor">
+                                            <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">SKU/Barcode Asli</div>
                                     </div>
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-external">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #d97706;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Instansi Lain</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">SKU Titipan</div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-create-external">
+                                            <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">SKU Titipan Asli</div>
                                     </div>
                                 </label>
                             </div>
@@ -330,12 +390,25 @@
                         <input type="text" name="name" class="form-control" placeholder="Contoh: Kursi Susun Chitose" required>
                     </div>
 
-                    {{-- FOTO BARANG --}}
+                    {{-- FOTO BARANG DENGAN LIVE PREVIEW --}}
                     <div class="mt-3">
                         <label class="form-label fw-semibold">Foto Barang</label>
-                        <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/webp">
-                        <div class="form-text text-muted" style="font-size:0.75rem;">
-                            Format: JPG, PNG, WEBP (maks 2MB). Foto ini otomatis tersimpan ke bukti fisik mutasi stok awal.
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto">
+                                <div class="preview-box" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; padding: 2px;">
+                                    <img id="create_image_preview" src="" alt="Pratinjau" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                                    <div id="create_image_placeholder" class="text-muted text-center" style="font-size: 0.65rem; line-height: 1.2;">
+                                        <i class="fa-solid fa-camera fa-lg d-block mb-1 text-secondary"></i>
+                                        Pratinjau
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="file" name="image" id="create_item_image_input" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <div class="form-text text-muted" style="font-size:0.75rem;">
+                                    Format: JPG, PNG, WEBP (maks 2MB). Foto ini otomatis tersimpan ke bukti fisik mutasi stok awal.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -381,29 +454,35 @@
                         <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-internal">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #2563eb;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Milik Sendiri</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">Aset Internal</div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-internal">
+                                            <i class="fa-solid fa-building-columns"></i> Milik Sendiri
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Aset Internal</div>
                                     </div>
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-vendor">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #7c3aed;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Milik Vendor</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">Sewa / Pihak Ketiga</div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-vendor">
+                                            <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Sewa / Pihak Ke-3</div>
                                     </div>
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
-                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-external">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #d97706;">
                                     <div>
-                                        <div class="fw-semibold text-dark small">Instansi Lain</div>
-                                        <div class="text-muted" style="font-size:0.7rem;">Titipan Pemerintah</div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-external">
+                                            <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Titipan Pemerintah</div>
                                     </div>
                                 </label>
                             </div>
@@ -443,16 +522,25 @@
                         <input type="text" name="name" id="edit_item_name" class="form-control" required>
                     </div>
 
-                    {{-- FOTO BARANG --}}
+                    {{-- FOTO BARANG DENGAN LIVE PREVIEW --}}
                     <div class="mt-3">
                         <label class="form-label fw-semibold">Foto Barang</label>
-                        <div class="d-flex align-items-center gap-3 mb-2" id="edit_current_image_container" style="display: none;">
-                            <img id="edit_current_image_preview" src="" alt="Foto Saat Ini" style="width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div class="text-muted small">Pilih file baru di bawah ini untuk mengganti gambar saat ini.</div>
-                        </div>
-                        <input type="file" name="image" id="edit_item_image" class="form-control" accept="image/jpeg,image/png,image/webp">
-                        <div class="form-text text-muted" style="font-size:0.75rem;">
-                            Format: JPG, PNG, WEBP (maks 2MB).
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto">
+                                <div class="preview-box" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; padding: 2px;">
+                                    <img id="edit_image_preview" src="" alt="Foto Barang" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                                    <div id="edit_image_placeholder" class="text-muted text-center" style="font-size: 0.65rem; line-height: 1.2;">
+                                        <i class="fa-solid fa-image fa-lg d-block mb-1 text-secondary"></i>
+                                        Belum Ada
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="file" name="image" id="edit_item_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <div class="form-text text-muted" style="font-size:0.75rem;">
+                                    Format: JPG, PNG, WEBP (maks 2MB). Pilih file baru untuk mengganti gambar.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -579,7 +667,69 @@
         const createOwnerLabel     = document.getElementById('create_owner_label');
         const createOwnerInput     = document.getElementById('create_owner_name');
 
+        // Interaktivitas Visual Card Selector untuk Status Kepemilikan (Create)
+        function refreshOwnershipCardClasses(prefix) {
+            const radios = document.querySelectorAll(`.${prefix}-ownership-radio`);
+            radios.forEach(radio => {
+                const label = document.getElementById(`label-${prefix}-${radio.value}`);
+                const textElem = document.getElementById(`text-${prefix}-${radio.value}`);
+                if (!label) return;
+
+                label.classList.remove('active-internal', 'active-vendor', 'active-external');
+                if (textElem) {
+                    textElem.classList.remove('text-primary', 'text-purple', 'text-warning');
+                    textElem.classList.add('text-dark');
+                }
+
+                if (radio.checked) {
+                    label.classList.add(`active-${radio.value}`);
+                    if (textElem) {
+                        textElem.classList.remove('text-dark');
+                        if (radio.value === 'internal') textElem.classList.add('text-primary');
+                        if (radio.value === 'vendor') textElem.classList.add('text-purple');
+                        if (radio.value === 'external') textElem.classList.add('text-warning');
+                    }
+                }
+            });
+        }
+
+        // Live Image Preview Universal Handler
+        function setupLivePreview(fileInputId, imgPreviewId, placeholderId) {
+            const input = document.getElementById(fileInputId);
+            const preview = document.getElementById(imgPreviewId);
+            const placeholder = document.getElementById(placeholderId);
+
+            if (!input || !preview) return;
+
+            input.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    if (preview.getAttribute('data-original-src')) {
+                        preview.src = preview.getAttribute('data-original-src');
+                        preview.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    } else {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                        if (placeholder) placeholder.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        setupLivePreview('create_item_image_input', 'create_image_preview', 'create_image_placeholder');
+        setupLivePreview('edit_item_image', 'edit_image_preview', 'edit_image_placeholder');
+
         function updateCreateSku() {
+            refreshOwnershipCardClasses('create');
             const selectedRadio = document.querySelector('input[name="ownership_status"].create-ownership-radio:checked');
             const status = selectedRadio ? selectedRadio.value : 'internal';
 
@@ -664,6 +814,7 @@
             const editImgPreview   = document.getElementById('edit_current_image_preview');
 
             function syncEditOwnershipUI(status) {
+                refreshOwnershipCardClasses('edit');
                 if (status === 'internal') {
                     editOwnerGroup.style.display = 'none';
                     editOwnerInput.required = false;
@@ -712,13 +863,21 @@
                 syncEditOwnershipUI(ownership);
 
                 // Set preview foto
-                document.getElementById('edit_item_image').value = '';
+                const editImgInput = document.getElementById('edit_item_image');
+                const editPreview = document.getElementById('edit_image_preview');
+                const editPlaceholder = document.getElementById('edit_image_placeholder');
+                editImgInput.value = '';
+
                 if (itemImage && itemImage.trim() !== '') {
-                    editImgPreview.src = itemImage;
-                    editImgContainer.style.display = 'flex';
+                    editPreview.src = itemImage;
+                    editPreview.setAttribute('data-original-src', itemImage);
+                    editPreview.style.display = 'block';
+                    if (editPlaceholder) editPlaceholder.style.display = 'none';
                 } else {
-                    editImgPreview.src = '';
-                    editImgContainer.style.display = 'none';
+                    editPreview.src = '';
+                    editPreview.removeAttribute('data-original-src');
+                    editPreview.style.display = 'none';
+                    if (editPlaceholder) editPlaceholder.style.display = 'block';
                 }
             });
         }

@@ -45,7 +45,10 @@ class StockMovementController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('stocks.index', compact('movements', 'search', 'type'));
+        $items         = Item::with('category')->orderBy('name', 'asc')->get();
+        $suggestedCode = $this->generateReferenceCode();
+
+        return view('stocks.index', compact('movements', 'search', 'type', 'items', 'suggestedCode'));
     }
 
     /**

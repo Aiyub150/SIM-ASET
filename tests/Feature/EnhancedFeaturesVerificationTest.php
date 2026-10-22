@@ -90,6 +90,24 @@ class EnhancedFeaturesVerificationTest extends TestCase
         ]);
         $this->assertEquals('active', $activeLoan->computed_status);
 
+        // KASUS KRITIS: Data lama berstatus 'completed' di DB tapi ada barang yang belum dikembalikan fisik
+        $unreturnedLoan = Loan::create([
+            'loan_code' => 'PINJ-TEST-UNRETURNED',
+            'borrower_id' => $this->borrower->id,
+            'user_id' => $this->superAdmin->id,
+            'borrow_date' => $today->copy()->subDays(2),
+            'due_date' => $today->copy()->addDays(3),
+            'status' => 'completed',
+        ]);
+        \App\Models\LoanItem::create([
+            'loan_id' => $unreturnedLoan->id,
+            'item_id' => $this->item->id,
+            'qty' => 5,
+            'returned_qty' => 0, // Belum ada yang kembali
+        ]);
+        // Status harus menolak completed dan jatuh ke 'active'
+        $this->assertEquals('active', $unreturnedLoan->fresh()->computed_status);
+
         // 2. Status Terlambat (belum selesai, sudah melewati jatuh tempo)
         $overdueLoan = Loan::create([
             'loan_code' => 'PINJ-TEST-002',

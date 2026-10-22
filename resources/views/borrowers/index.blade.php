@@ -11,12 +11,12 @@
         <p class="text-muted mb-0" style="font-size:.82rem;">Daftar instansi atau pihak yang dapat meminjam aset</p>
     </div>
     @can('borrowers.create')
-    <a href="{{ route('borrowers.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createBorrowerModal">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Tambah Instansi
-    </a>
+    </button>
     @endcan
 </div>
 
@@ -65,7 +65,16 @@
                         </td>
                         @can('borrowers.edit')
                         <td class="text-center pe-4">
-                            <a href="{{ route('borrowers.edit', $borrower->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-borrower"
+                                    data-id="{{ $borrower->id }}"
+                                    data-name="{{ $borrower->institution_name }}"
+                                    data-pic="{{ $borrower->pic_name }}"
+                                    data-contact="{{ $borrower->contact_number }}"
+                                    data-address="{{ $borrower->address }}"
+                                    data-lat="{{ $borrower->latitude }}"
+                                    data-lng="{{ $borrower->longitude }}">
+                                Edit
+                            </button>
                         </td>
                         @endcan
                     </tr>
@@ -103,6 +112,115 @@
     </div>
   </div>
 </div>
+
+{{-- MODAL TAMBAH INSTANSI BARU (POPUP MODAL) --}}
+@can('borrowers.create')
+<div class="modal fade" id="createBorrowerModal" tabindex="-1" aria-labelledby="createBorrowerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <h5 class="modal-title fw-bold text-dark" id="createBorrowerModalLabel">Tambah Instansi Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('borrowers.store') }}" method="POST" id="form-create-borrower">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nama Instansi / Organisasi <span class="text-danger">*</span></label>
+                        <input type="text" name="institution_name" class="form-control" placeholder="Contoh: Dinas Pendidikan Kabupaten..." required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nama Penanggung Jawab (PIC) <span class="text-danger">*</span></label>
+                            <input type="text" name="pic_name" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nomor Kontak (HP/Telp) <span class="text-danger">*</span></label>
+                            <input type="text" name="contact_number" class="form-control" placeholder="Contoh: 081234567890" required style="font-family:monospace;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Alamat Lengkap</label>
+                        <textarea name="address" rows="2" class="form-control" placeholder="Jalan, nomor gedung, kecamatan..."></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Latitude (Garis Lintang)</label>
+                            <input type="text" name="latitude" class="form-control" placeholder="-0.9123456">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Longitude (Garis Bujur)</label>
+                            <input type="text" name="longitude" class="form-control" placeholder="116.8123456">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Simpan Instansi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endcan
+
+{{-- MODAL EDIT INSTANSI (POPUP MODAL) --}}
+@can('borrowers.edit')
+<div class="modal fade" id="editBorrowerModal" tabindex="-1" aria-labelledby="editBorrowerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <h5 class="modal-title fw-bold text-dark" id="editBorrowerModalLabel">Edit Data Instansi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="form-edit-borrower">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nama Instansi / Organisasi <span class="text-danger">*</span></label>
+                        <input type="text" name="institution_name" id="edit_borrower_name" class="form-control" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nama Penanggung Jawab (PIC) <span class="text-danger">*</span></label>
+                            <input type="text" name="pic_name" id="edit_borrower_pic" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nomor Kontak (HP/Telp) <span class="text-danger">*</span></label>
+                            <input type="text" name="contact_number" id="edit_borrower_contact" class="form-control" required style="font-family:monospace;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Alamat Lengkap</label>
+                        <textarea name="address" id="edit_borrower_address" rows="2" class="form-control"></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Latitude</label>
+                            <input type="text" name="latitude" id="edit_borrower_lat" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Longitude</label>
+                            <input type="text" name="longitude" id="edit_borrower_lng" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endcan
 
 @endsection
 
@@ -151,5 +269,29 @@
         }, { once: true });
     }
 
+    // Handler Modal Edit Instansi Popup
+    document.querySelectorAll('.btn-edit-borrower').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+            const pic = this.getAttribute('data-pic');
+            const contact = this.getAttribute('data-contact');
+            const address = this.getAttribute('data-address');
+            const lat = this.getAttribute('data-lat');
+            const lng = this.getAttribute('data-lng');
+
+            const form = document.getElementById('form-edit-borrower');
+            form.action = `/borrowers/${id}`;
+            document.getElementById('edit_borrower_name').value = name;
+            document.getElementById('edit_borrower_pic').value = pic;
+            document.getElementById('edit_borrower_contact').value = contact;
+            document.getElementById('edit_borrower_address').value = address || '';
+            document.getElementById('edit_borrower_lat').value = lat || '';
+            document.getElementById('edit_borrower_lng').value = lng || '';
+
+            const editModal = new bootstrap.Modal(document.getElementById('editBorrowerModal'));
+            editModal.show();
+        });
+    });
 </script>
 @endpush

@@ -122,8 +122,8 @@
                                         'return_url' => route('loans.return', $loan->id),
                                         'borrow_proof_url' => route('loans.borrow-proof', $loan->id),
                                         'return_proof_url' => route('loans.return-proof', $loan->id),
-                                        'is_all_returned' => $loan->loanItems->every(fn($li) => ($li->qty - $li->returned_qty) == 0),
-                                        'can_return' => auth()->user()->can('loans.return') && $loan->status !== 'completed',
+                                        'is_all_returned' => $loan->loanItems->count() > 0 && $loan->loanItems->every(fn($li) => ($li->qty - $li->returned_qty) == 0),
+                                        'can_return' => auth()->user()->can('loans.return') && !in_array($loan->computed_status, ['completed', 'completed_late']),
                                         'items' => $loan->loanItems->map(fn($li) => [
                                             'id' => $li->id,
                                             'sku' => $li->item->sku,
@@ -275,10 +275,18 @@
                                 </div>
                                 <form id="form_upload_borrow_proof" method="POST" enctype="multipart/form-data">
                                     @csrf
-                                    <div class="input-group input-group-sm">
-                                        <input type="file" name="borrow_proof_image" class="form-control" accept="image/jpeg,image/png,image/webp" required>
-                                        <button type="submit" class="btn btn-primary fw-semibold">Unggah</button>
+                                    <div class="row g-2 align-items-center mb-2">
+                                        <div class="col-auto">
+                                            <div style="width: 55px; height: 55px; border: 2px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
+                                                <img id="borrow_proof_live_preview" src="" alt="Live Bukti Pinjam" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                                                <i id="borrow_proof_live_icon" class="fa-solid fa-camera text-secondary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" name="borrow_proof_image" id="input_borrow_proof_file" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" required>
+                                        </div>
                                     </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-semibold">Unggah Bukti Serah Terima</button>
                                     <div class="form-text text-muted small text-start mt-1" style="font-size:0.72rem;">
                                         Unggah foto penyerahan barang / BAST fisik (maks 2MB).
                                     </div>
@@ -300,10 +308,18 @@
                                 </div>
                                 <form id="form_upload_return_proof" method="POST" enctype="multipart/form-data">
                                     @csrf
-                                    <div class="input-group input-group-sm">
-                                        <input type="file" name="return_proof_image" id="input_return_proof" class="form-control" accept="image/jpeg,image/png,image/webp" required>
-                                        <button type="submit" id="btn_submit_return_proof" class="btn btn-success fw-semibold">Unggah</button>
+                                    <div class="row g-2 align-items-center mb-2">
+                                        <div class="col-auto">
+                                            <div style="width: 55px; height: 55px; border: 2px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
+                                                <img id="return_proof_live_preview" src="" alt="Live Bukti Kembali" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                                                <i id="return_proof_live_icon" class="fa-solid fa-camera text-secondary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" name="return_proof_image" id="input_return_proof" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" required>
+                                        </div>
                                     </div>
+                                    <button type="submit" id="btn_submit_return_proof" class="btn btn-success btn-sm w-100 fw-semibold">Unggah Bukti Pengembalian</button>
                                     <div class="form-text text-muted small text-start mt-1" style="font-size:0.72rem;">
                                         Hanya dapat diunggah jika <strong>seluruh barang telah dikembalikan</strong>.
                                     </div>
@@ -320,6 +336,28 @@
                         <span class="badge bg-white text-primary">Operasional</span>
                     </div>
                     <div class="card-body p-3">
+                        {{-- PEMINDAI BARCODE / SKU PENGEMBALIAN CEPAT --}}
+                        <div class="p-2 mb-3 bg-light border rounded-3">
+                            <label class="form-label fw-semibold small mb-1 d-flex justify-content-between align-items-center">
+                                <span><i class="fa-solid fa-barcode text-primary me-1"></i> Scan Barcode / Input SKU Barang</span>
+                                <span class="badge bg-primary-subtle text-primary" style="font-size:0.68rem;">Scanner Otomatis</span>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white"><i class="fa-solid fa-qrcode text-muted"></i></span>
+                                <input type="text" id="modal_scan_barcode_input" class="form-control font-monospace" placeholder="Scan barcode barang atau ketik SKU lalu Enter...">
+                                <button type="button" class="btn btn-outline-primary" id="btn_toggle_modal_camera">
+                                    <i class="fa-solid fa-camera"></i> Kamera
+                                </button>
+                            </div>
+                            <div id="modal_camera_reader_box" class="mt-2 text-center" style="display: none;">
+                                <div id="modal_reader" style="width: 100%; max-width: 320px; margin: 0 auto; border-radius: 8px; overflow: hidden;"></div>
+                                <small class="text-muted d-block mt-1">Arahkan kamera ke QR Code/Barcode barang</small>
+                            </div>
+                            <div id="modal_scan_feedback" class="small mt-1 text-muted" style="font-size:0.75rem;">
+                                Siap memindai barcode. Setiap scan akan otomatis mengisi/menaikkan jumlah kembali item terkait.
+                            </div>
+                        </div>
+
                         <form id="form_modal_return" method="POST">
                             @csrf
                             <div id="modal_return_items_container">
@@ -345,6 +383,7 @@
 </div>
 
 @push('scripts')
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const loanStatusFilter = document.getElementById('loan_status_filter');
@@ -364,6 +403,34 @@
                 }
             });
         }
+
+        // Setup live preview bukti di modal loan detail
+        function setupMiniPreview(inputId, imgId, iconId) {
+            const input = document.getElementById(inputId);
+            const img = document.getElementById(imgId);
+            const icon = document.getElementById(iconId);
+            if (!input || !img) return;
+
+            input.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        img.src = e.target.result;
+                        img.style.display = 'block';
+                        if (icon) icon.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    img.src = '';
+                    img.style.display = 'none';
+                    if (icon) icon.style.display = 'block';
+                }
+            });
+        }
+
+        setupMiniPreview('input_borrow_proof_file', 'borrow_proof_live_preview', 'borrow_proof_live_icon');
+        setupMiniPreview('input_return_proof', 'return_proof_live_preview', 'return_proof_live_icon');
 
         // --- HANDLER MODAL DETAIL PEMINJAMAN (POPUP) ---
         const loanDetailModal = document.getElementById('loanDetailModal');
@@ -407,9 +474,18 @@
                 loanData.items.forEach(item => {
                     const tr = document.createElement('tr');
                     const isLunas = item.remaining_qty === 0;
+                    const itemImageHtml = item.image 
+                        ? `<img src="${item.image}" alt="${item.name}" class="rounded border me-2" style="width:34px; height:34px; object-fit:cover; vertical-align:middle;">` 
+                        : `<span class="badge bg-light text-secondary border me-2" style="font-size:0.65rem; width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;">No Pic</span>`;
+
                     tr.innerHTML = `
                         <td class="ps-3"><span style="font-family:monospace; color:#2563eb; font-weight:600;">${item.sku}</span></td>
-                        <td class="fw-semibold text-dark">${item.name}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${itemImageHtml}
+                                <span class="fw-semibold text-dark">${item.name}</span>
+                            </div>
+                        </td>
                         <td class="text-center">${item.qty}</td>
                         <td class="text-center text-muted">${item.returned_qty}</td>
                         <td class="text-center fw-bold ${isLunas ? 'text-success' : 'text-danger'}">${item.remaining_qty}</td>
@@ -457,7 +533,7 @@
                 // Validasi Pencegatan SweetAlert2 untuk Bukti Pengembalian
                 const formUploadReturnProof = document.getElementById('form_upload_return_proof');
                 formUploadReturnProof.onsubmit = function (e) {
-                    if (!loanData.is_all_returned || loanData.status !== 'completed') {
+                    if (!loanData.is_all_returned || (loanData.computed_status !== 'completed' && loanData.computed_status !== 'completed_late')) {
                         e.preventDefault();
                         Swal.fire({
                             icon: 'warning',
@@ -480,12 +556,23 @@
                     returnContainer.innerHTML = '';
                     pendingItems.forEach((pi, idx) => {
                         const row = document.createElement('div');
-                        row.className = 'row g-2 align-items-center mb-2';
+                        row.className = 'row g-2 align-items-center mb-2 item-return-row';
+                        row.setAttribute('data-sku', (pi.sku || '').toUpperCase());
+
+                        const itemThumb = pi.image 
+                            ? `<img src="${pi.image}" alt="${pi.name}" class="rounded border me-2" style="width:36px; height:36px; object-fit:cover;">` 
+                            : `<span class="badge bg-light text-secondary border me-2" style="width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; font-size:0.65rem;">No Pic</span>`;
+
                         row.innerHTML = `
-                            <div class="col-md-7">
+                            <div class="col-md-7 d-flex align-items-center">
                                 <input type="hidden" name="items[${idx}][loan_item_id]" value="${pi.id}">
-                                <div class="fw-semibold text-dark small">${pi.name} (${pi.sku})</div>
-                                <div class="text-muted" style="font-size:0.75rem;">Sisa yang harus kembali: <strong>${pi.remaining_qty}</strong> unit</div>
+                                ${itemThumb}
+                                <div>
+                                    <div class="fw-semibold text-dark small">${pi.name}</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">
+                                        SKU: <span class="font-monospace text-primary fw-semibold">${pi.sku}</span> | Sisa: <strong>${pi.remaining_qty}</strong> unit
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="input-group input-group-sm">
@@ -497,6 +584,37 @@
                         `;
                         returnContainer.appendChild(row);
                     });
+
+                    // Scanner USB / Keyboard barcode handler di dalam modal
+                    const scanInput = document.getElementById('modal_scan_barcode_input');
+                    const scanFeedback = document.getElementById('modal_scan_feedback');
+                    if (scanInput) {
+                        scanInput.value = '';
+                        scanInput.onkeydown = function (e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const code = this.value.trim().toUpperCase();
+                                if (!code) return;
+
+                                const matchedRow = returnContainer.querySelector(`.item-return-row[data-sku="${code}"]`);
+                                if (matchedRow) {
+                                    const inp = matchedRow.querySelector('.modal-return-qty-input');
+                                    const maxVal = parseInt(inp.getAttribute('data-max'), 10);
+                                    let currentVal = parseInt(inp.value, 10) || 0;
+
+                                    if (currentVal < maxVal) {
+                                        inp.value = currentVal + 1;
+                                        scanFeedback.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> Berhasil scan [${code}]: Jumlah kembali dinaikkan menjadi ${inp.value}.</span>`;
+                                    } else {
+                                        scanFeedback.innerHTML = `<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> SKU [${code}] sudah mencapai batas maksimal sisa pinjaman (${maxVal}).</span>`;
+                                    }
+                                } else {
+                                    scanFeedback.innerHTML = `<span class="text-danger fw-bold"><i class="fa-solid fa-xmark"></i> SKU [${code}] tidak ditemukan dalam daftar barang pinjaman ini.</span>`;
+                                }
+                                this.value = '';
+                            }
+                        };
+                    }
 
                     // Tombol isi semua per row
                     returnContainer.querySelectorAll('.btn-fill-max').forEach(b => {
@@ -534,6 +652,71 @@
                 } else {
                     returnSection.style.display = 'none';
                 }
+            });
+
+            // Handler Kamera Barcode Scanner di dalam Modal
+            let modalHtml5QrCode = null;
+            const btnToggleCamera = document.getElementById('btn_toggle_modal_camera');
+            const cameraBox = document.getElementById('modal_camera_reader_box');
+            const scanFeedback = document.getElementById('modal_scan_feedback');
+
+            if (btnToggleCamera) {
+                btnToggleCamera.addEventListener('click', function () {
+                    if (cameraBox.style.display === 'none') {
+                        cameraBox.style.display = 'block';
+                        btnToggleCamera.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Kamera';
+                        btnToggleCamera.className = 'btn btn-danger';
+
+                        if (typeof Html5Qrcode !== 'undefined') {
+                            modalHtml5QrCode = new Html5Qrcode("modal_reader");
+                            modalHtml5QrCode.start(
+                                { facingMode: "environment" },
+                                { fps: 10, qrbox: { width: 220, height: 220 } },
+                                (decodedText) => {
+                                    const code = decodedText.trim().toUpperCase();
+                                    const matchedRow = document.querySelector(`.item-return-row[data-sku="${code}"]`);
+                                    if (matchedRow) {
+                                        const inp = matchedRow.querySelector('.modal-return-qty-input');
+                                        const maxVal = parseInt(inp.getAttribute('data-max'), 10);
+                                        let currentVal = parseInt(inp.value, 10) || 0;
+
+                                        if (currentVal < maxVal) {
+                                            inp.value = currentVal + 1;
+                                            scanFeedback.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> [Kamera] Berhasil scan ${code}: Qty dinaikkan jadi ${inp.value}.</span>`;
+                                        } else {
+                                            scanFeedback.innerHTML = `<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> [Kamera] SKU ${code} sudah mencapai max.</span>`;
+                                        }
+                                    } else {
+                                        scanFeedback.innerHTML = `<span class="text-danger fw-bold"><i class="fa-solid fa-xmark"></i> [Kamera] SKU ${code} tidak ada di pinjaman ini.</span>`;
+                                    }
+                                },
+                                (errorMessage) => {
+                                    // Mengabaikan frame tanpa barcode
+                                }
+                            ).catch(err => {
+                                scanFeedback.innerHTML = `<span class="text-danger">Gagal membuka kamera: ${err}</span>`;
+                            });
+                        }
+                    } else {
+                        stopModalCamera();
+                    }
+                });
+            }
+
+            function stopModalCamera() {
+                if (modalHtml5QrCode) {
+                    modalHtml5QrCode.stop().then(() => {
+                        modalHtml5QrCode.clear();
+                        modalHtml5QrCode = null;
+                    }).catch(() => {});
+                }
+                cameraBox.style.display = 'none';
+                btnToggleCamera.innerHTML = '<i class="fa-solid fa-camera"></i> Kamera';
+                btnToggleCamera.className = 'btn btn-outline-primary';
+            }
+
+            loanDetailModal.addEventListener('hidden.bs.modal', function () {
+                stopModalCamera();
             });
         }
     });

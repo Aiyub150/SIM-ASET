@@ -11,12 +11,12 @@
         <p class="text-muted mb-0" style="font-size:.82rem;">Riwayat seluruh pergerakan fisik inventaris aset daerah</p>
     </div>
     @can('stocks.adjust')
-    <a href="{{ route('stocks.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createStockMovementModal">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Input Mutasi Baru
-    </a>
+    </button>
     @endcan
 </div>
 
@@ -145,6 +145,129 @@
     </div>
     @endif
 </div>
+
+{{-- MODAL TAMBAH MUTASI STOK BARU (POPUP MODAL TANPA REDIRECT) --}}
+@can('stocks.adjust')
+<div class="modal fade" id="createStockMovementModal" tabindex="-1" aria-labelledby="createStockMovementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark mb-0" id="createStockMovementModalLabel">Input Mutasi Stok Permanen</h5>
+                    <p class="text-muted small mb-0">Catat penambahan atau pengurangan saldo fisik aset barang</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('stocks.store') }}" method="POST" enctype="multipart/form-data" id="form-create-stock-movement">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning py-2.5 px-3 d-flex align-items-start gap-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;">
+                        <i class="fa-solid fa-triangle-exclamation text-warning mt-1 flex-shrink-0"></i>
+                        <div>
+                            <strong>Peringatan Audit:</strong> Data mutasi fisik yang tersimpan <strong>tidak dapat diedit atau dihapus</strong> untuk menjamin integritas pembukuan buku besar aset.
+                        </div>
+                    </div>
+
+                    {{-- REFERENSI BAST --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span>Nomor Referensi (BAST)</span>
+                            <span class="badge" style="background:#eff6ff; color:#2563eb; font-size:.7rem; font-weight:500;">
+                                Auto-generate
+                            </span>
+                        </label>
+                        <input type="text" name="reference_code" id="modal_reference_code" class="form-control"
+                               value="{{ $suggestedCode ?? '' }}" readonly
+                               style="font-family:monospace; background:#f8fafc; color:#1e293b; font-weight:600;">
+                    </div>
+
+                    {{-- PILIH BARANG DENGAN PREVIEW THUMBNAIL --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih Barang Inventaris <span class="text-danger">*</span></label>
+                        <select name="item_id" id="modal_stock_item_id" class="form-select" required>
+                            <option value="">— Pilih atau cari barang… —</option>
+                            @if(isset($items))
+                                @foreach($items as $it)
+                                    <option value="{{ $it->id }}"
+                                            data-name="{{ $it->name }}"
+                                            data-sku="{{ $it->sku }}"
+                                            data-category="{{ $it->category->name ?? 'Tanpa Kategori' }}"
+                                            data-image="{{ $it->image ? asset('storage/' . $it->image) : '' }}"
+                                            data-available="{{ $it->available_qty }}"
+                                            data-total="{{ $it->total_qty }}">
+                                        [{{ $it->sku }}] {{ $it->name }} — Fisik: {{ $it->total_qty }}, Tersedia: {{ $it->available_qty }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+
+                        {{-- KARTU PREVIEW BARANG TERPILIH --}}
+                        <div id="selected_item_card" class="mt-2.5 p-2.5 border rounded-3 bg-light d-flex align-items-center gap-3" style="display: none;">
+                            <img id="selected_item_image" src="" alt="Thumbnail" class="rounded border" style="width: 50px; height: 50px; object-fit: cover; background: #fff;">
+                            <div>
+                                <div class="fw-bold text-dark small" id="selected_item_name">-</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">
+                                    SKU: <span class="font-monospace fw-semibold text-primary" id="selected_item_sku">-</span> | 
+                                    Kategori: <span id="selected_item_category">-</span> | 
+                                    Stok Fisik: <strong id="selected_item_total">0</strong> (Tersedia: <strong id="selected_item_available" class="text-success">0</strong>)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-7">
+                            <label class="form-label fw-semibold">Tipe Mutasi <span class="text-danger">*</span></label>
+                            <select name="type" id="modal_stock_mutation_type" class="form-select" required>
+                                <option value="">— Pilih Tipe Mutasi —</option>
+                                <option value="in">➕ Barang Masuk / Pengadaan</option>
+                                <option value="out">➖ Barang Keluar / Hibah</option>
+                                <option value="broken">🔴 Barang Rusak Total</option>
+                                <option value="lost">⚫ Barang Hilang</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Jumlah (Qty) <span class="text-danger">*</span></label>
+                            <input type="number" name="qty" id="modal_stock_qty" class="form-control" min="1" step="1" required placeholder="Minimal 1">
+                        </div>
+                    </div>
+
+                    {{-- LIVE PREVIEW UNTUK FOTO BUKTI / DOKUMEN MUTASI --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Foto Bukti Fisik / BAST <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto">
+                                <div style="width: 75px; height: 75px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f8fafc; padding: 2px;">
+                                    <img id="stock_proof_preview" src="" alt="Bukti" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                                    <div id="stock_proof_placeholder" class="text-muted text-center" style="font-size: 0.65rem; line-height: 1.2;">
+                                        <i class="fa-solid fa-file-image fa-lg d-block mb-1 text-secondary"></i>
+                                        Pratinjau
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="file" name="image" id="modal_stock_image_input" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <div class="form-text text-muted" style="font-size: 0.75rem;">
+                                    Jika memilih barang masuk, sistem otomatis menggunakan foto barang apabila tidak ada foto bukti baru yang diunggah.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label fw-semibold">Catatan Mutasi <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <textarea name="notes" rows="2" class="form-control" placeholder="Keterangan penyerahan, hibah, berita acara, dll..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Simpan Mutasi Permanen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endcan
 
 {{-- Modal Detail Mutasi Stok --}}
 <div class="modal fade" id="modalDetailMovement" tabindex="-1" aria-labelledby="modalDetailMovementLabel" aria-hidden="true">
@@ -353,6 +476,104 @@
                 });
             });
         }
+        // --- Interaktivitas Modal Input Mutasi Stok ---
+        const modalStockItemSelect = document.getElementById('modal_stock_item_id');
+        const selectedItemCard     = document.getElementById('selected_item_card');
+        const selectedItemImage    = document.getElementById('selected_item_image');
+        const selectedItemName     = document.getElementById('selected_item_name');
+        const selectedItemSku      = document.getElementById('selected_item_sku');
+        const selectedItemCategory = document.getElementById('selected_item_category');
+        const selectedItemTotal    = document.getElementById('selected_item_total');
+        const selectedItemAvail    = document.getElementById('selected_item_available');
+
+        if (modalStockItemSelect) {
+            modalStockItemSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                if (opt && opt.value) {
+                    const name = opt.getAttribute('data-name');
+                    const sku = opt.getAttribute('data-sku');
+                    const cat = opt.getAttribute('data-category');
+                    const img = opt.getAttribute('data-image');
+                    const tot = opt.getAttribute('data-total');
+                    const avl = opt.getAttribute('data-available');
+
+                    selectedItemName.textContent = name;
+                    selectedItemSku.textContent = sku;
+                    selectedItemCategory.textContent = cat;
+                    selectedItemTotal.textContent = tot;
+                    selectedItemAvail.textContent = avl;
+
+                    if (img && img.trim() !== '') {
+                        selectedItemImage.src = img;
+                        selectedItemImage.style.display = 'block';
+                    } else {
+                        selectedItemImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="%2394a3b8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>';
+                    }
+                    selectedItemCard.style.display = 'flex';
+                } else {
+                    selectedItemCard.style.display = 'none';
+                }
+            });
+        }
+
+        // Live image preview untuk upload bukti mutasi
+        const modalStockImgInput = document.getElementById('modal_stock_image_input');
+        const stockProofPreview  = document.getElementById('stock_proof_preview');
+        const stockProofHolder   = document.getElementById('stock_proof_placeholder');
+        if (modalStockImgInput && stockProofPreview) {
+            modalStockImgInput.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        stockProofPreview.src = e.target.result;
+                        stockProofPreview.style.display = 'block';
+                        if (stockProofHolder) stockProofHolder.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    stockProofPreview.src = '';
+                    stockProofPreview.style.display = 'none';
+                    if (stockProofHolder) stockProofHolder.style.display = 'block';
+                }
+            });
+        }
+
+        // SweetAlert2 konfirmasi submit modal mutasi
+        const formCreateStock = document.getElementById('form-create-stock-movement');
+        if (formCreateStock) {
+            formCreateStock.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                const qtyInput = document.getElementById('modal_stock_qty');
+                const qtyVal = parseInt(qtyInput.value, 10);
+                if (isNaN(qtyVal) || qtyVal < 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    qtyInput.focus();
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Simpan Mutasi Stok?',
+                    text: 'Apakah Anda yakin ingin memproses transaksi mutasi stok permanen ini?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Proses Mutasi',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#2563eb'
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
         const stockTypeFilter = document.getElementById('stock_type_filter');
         if (stockTypeFilter && typeof TomSelect !== 'undefined') {
             let typeInit = false;

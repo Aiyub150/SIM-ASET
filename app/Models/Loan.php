@@ -40,13 +40,18 @@ class Loan extends Model
         $today = now()->startOfDay();
         $dueDate = $this->due_date ? $this->due_date->copy()->startOfDay() : null;
 
-        // Cek apakah sudah berstatus completed atau semua item sudah kembali
-        $isCompleted = ($this->status === 'completed');
-        if (!$isCompleted && $this->relationLoaded('loanItems')) {
-            $isCompleted = $this->loanItems->count() > 0 && $this->loanItems->every(fn($item) => $item->remaining_qty == 0);
-        }
+        // Muat relasi loanItems jika belum dimuat untuk memastikan audit fisik akurat
+        $items = $this->relationLoaded('loanItems') ? $this->loanItems : $this->loanItems()->get();
+        
+        $hasItems = $items->count() > 0;
+        // Hitung total sisa barang yang belum kembali
+        $remainingCount = $items->sum(function ($item) {
+            return max(0, (int)$item->qty - (int)$item->returned_qty);
+        });
 
-        if ($isCompleted) {
+        $isPhysicallyCompleted = $hasItems ? ($remainingCount === 0) : ($this->status === 'completed');
+
+        if ($isPhysicallyCompleted) {
             $returnDate = $this->return_date ? $this->return_date->copy()->startOfDay() : null;
             if ($dueDate && $returnDate && $returnDate->gt($dueDate)) {
                 return 'completed_late'; // Selesai Terlambat
@@ -54,7 +59,7 @@ class Loan extends Model
             return 'completed'; // Selesai
         }
 
-        // Jika belum selesai:
+        // Jika barang belum kembali lunas:
         if ($dueDate && $today->gt($dueDate)) {
             return 'overdue'; // Terlambat
         }
