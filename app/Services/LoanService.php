@@ -54,13 +54,14 @@ class LoanService
 
             // 2. Insert Data ke Tabel loans (Header)
             $loan = Loan::create([
-                'loan_code'   => $loanCode,
-                'borrower_id' => $data['borrower_id'],
-                'user_id'     => $userId,
-                'borrow_date' => $data['borrow_date'],
-                'due_date'    => $data['due_date'],
-                'status'      => 'active', // Langsung aktif saat dipinjam
-                'notes'       => $data['notes'] ?? null,
+                'loan_code'          => $loanCode,
+                'borrower_id'        => $data['borrower_id'],
+                'user_id'            => $userId,
+                'borrow_date'        => $data['borrow_date'],
+                'due_date'           => $data['due_date'],
+                'status'             => 'active', // Langsung aktif saat dipinjam
+                'notes'              => $data['notes'] ?? null,
+                'borrow_proof_image' => $data['borrow_proof_image'] ?? null,
             ]);
 
             // 3. Proses setiap barang yang dipinjam
@@ -83,7 +84,7 @@ class LoanService
                 $item->available_qty -= $itemData['qty'];
                 $item->save();
 
-                // 5.b. Catat Mutasi Stok Keluar (P0 Fix)
+                // 5.b. Catat Mutasi Stok Keluar (P0 Fix) - terhubung dengan bukti foto awal jika ada
                 \App\Models\StockMovement::create([
                     'reference_code' => $loan->loan_code,
                     'item_id'        => $item->id,
@@ -92,7 +93,8 @@ class LoanService
                     'qty'            => $itemData['qty'],
                     'balance_before' => $balanceBefore,
                     'balance_after'  => $item->available_qty,
-                    'notes'          => 'Peminjaman barang',
+                    'notes'          => 'Peminjaman barang: ' . ($data['notes'] ?? '-'),
+                    'image'          => $data['borrow_proof_image'] ?? null,
                 ]);
 
                 // 6. Insert Data ke Tabel loan_items (Detail)
@@ -175,6 +177,7 @@ class LoanService
                     'balance_before' => $balanceBefore,
                     'balance_after'  => $item->available_qty,
                     'notes'          => 'Pengembalian barang pinjaman',
+                    'image'          => $data['return_proof_image'] ?? null,
                 ]);
             }
 
@@ -186,6 +189,9 @@ class LoanService
                 // Jika semua barang sudah kembali, tutup transaksi
                 $loan->status = 'completed';
                 $loan->return_date = now(); // Catat tanggal pengembalian lunas
+                if (!empty($data['return_proof_image'])) {
+                    $loan->return_proof_image = $data['return_proof_image'];
+                }
                 $loan->save();
             }
 

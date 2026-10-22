@@ -51,8 +51,9 @@ class ItemController extends Controller
             ->withQueryString();
 
         $categories = Category::orderBy('name')->get();
+        $categoriesWithSku = $this->categoriesWithNextSku();
 
-        return view('items.index', compact('items', 'categories', 'search', 'categoryId', 'ownershipStatus'));
+        return view('items.index', compact('items', 'categories', 'categoriesWithSku', 'search', 'categoryId', 'ownershipStatus'));
     }
 
     public function lookupBySku(Request $request)
@@ -192,6 +193,7 @@ class ItemController extends Controller
             ]);
 
             // Jika ada stok awal, catat sebagai stock movement tipe 'in'
+            // Sekaligus salin gambar barang baru ke bukti fisik stok awal agar efisien dan transparan
             if ($totalQty > 0) {
                 $this->stockService->adjustStock([
                     'item_id'        => $item->id,
@@ -199,6 +201,7 @@ class ItemController extends Controller
                     'qty'            => $totalQty,
                     'reference_code' => 'INIT/' . $sku,
                     'notes'          => 'Stok awal saat data barang dibuat.',
+                    'image'          => $imagePath,
                 ], Auth::id());
             }
 

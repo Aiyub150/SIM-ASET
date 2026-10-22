@@ -119,8 +119,14 @@ class ReportController extends Controller
             echo "<table><thead><tr><th>No</th><th>Kode Peminjaman</th><th>Peminjam</th><th>Tgl Pinjam</th><th>Jatuh Tempo</th><th>Status</th><th>Daftar Barang & Qty</th></tr></thead><tbody>";
             $no = 1;
             foreach ($loans as $l) {
+                $statusText = match($l->computed_status) {
+                    'completed' => 'Selesai',
+                    'completed_late' => 'Selesai Terlambat',
+                    'overdue' => 'Terlambat',
+                    default => 'Aktif',
+                };
                 $itemsStr = htmlspecialchars($l->loanItems->map(fn($li) => ($li->item->name ?? 'Barang') . ' (' . $li->qty . ')')->join(', '));
-                echo "<tr><td align='center'>{$no}</td><td>{$l->loan_code}</td><td>" . htmlspecialchars($l->borrower->name ?? '-') . "</td><td>{$l->borrow_date}</td><td>{$l->due_date}</td><td>{$l->status}</td><td>{$itemsStr}</td></tr>";
+                echo "<tr><td align='center'>{$no}</td><td>{$l->loan_code}</td><td>" . htmlspecialchars($l->borrower->institution_name ?? $l->borrower->name ?? '-') . "</td><td>{$l->borrow_date}</td><td>{$l->due_date}</td><td>{$statusText}</td><td>{$itemsStr}</td></tr>";
                 $no++;
             }
             if ($loans->isEmpty()) {
@@ -186,14 +192,20 @@ class ReportController extends Controller
             fputcsv($handle, ['No', 'Kode Peminjaman', 'Peminjam', 'Tanggal Pinjam', 'Jatuh Tempo', 'Status', 'Daftar Barang & Qty']);
             $no = 1;
             foreach ($loans as $l) {
+                $statusText = match($l->computed_status) {
+                    'completed' => 'Selesai',
+                    'completed_late' => 'Selesai Terlambat',
+                    'overdue' => 'Terlambat',
+                    default => 'Aktif',
+                };
                 $itemsStr = $l->loanItems->map(fn($li) => ($li->item->name ?? 'Barang') . ' (' . $li->qty . ')')->join(', ');
                 fputcsv($handle, [
                     $no++,
                     $l->loan_code,
-                    $l->borrower->name ?? '-',
+                    $l->borrower->institution_name ?? $l->borrower->name ?? '-',
                     $l->borrow_date,
                     $l->due_date,
-                    $l->status,
+                    $statusText,
                     $itemsStr
                 ]);
             }

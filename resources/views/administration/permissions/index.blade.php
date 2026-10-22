@@ -8,6 +8,8 @@
     .matrix-wrapper {
         position: relative;
         overflow-x: auto;
+        max-height: 72vh;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         border-radius: 12px;
         border: 1px solid #cbd5e1;
@@ -31,8 +33,12 @@
         border-bottom: none;
     }
     .matrix-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
         border-bottom: 2px solid #cbd5e1;
         background-color: #f8fafc;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .matrix-sticky-col {
         position: sticky;
@@ -43,8 +49,11 @@
         box-shadow: 2px 0 5px rgba(0,0,0,0.03);
     }
     .matrix-table thead th.matrix-sticky-col {
+        position: sticky;
+        top: 0;
+        left: 0;
         background-color: #f8fafc;
-        z-index: 6;
+        z-index: 15;
         border-right: 2px solid #cbd5e1 !important;
     }
     .matrix-sticky-col-header,

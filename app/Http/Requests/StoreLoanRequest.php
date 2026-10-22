@@ -26,6 +26,7 @@ class StoreLoanRequest extends FormRequest
             'borrow_date'     => ['required', 'date'],
             'due_date'        => ['required', 'date', 'after_or_equal:borrow_date'],
             'notes'           => ['nullable', 'string', 'max:1000'],
+            'borrow_proof_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             
             // Validasi Array Items
             'items'           => ['required', 'array', 'min:1'],

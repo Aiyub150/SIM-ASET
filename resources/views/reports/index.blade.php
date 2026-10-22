@@ -108,12 +108,15 @@
                             <td style="font-size:.82rem; color:#475569;">{{ \Illuminate\Support\Str::limit($loan->borrower->address ?? '—', 35) }}</td>
                             <td style="font-size:.85rem;">{{ $loan->due_date->format('d/m/Y') }}</td>
                             <td class="text-center pe-4">
-                                @if($loan->status === 'completed')
+                                @php $compStatus = $loan->computed_status; @endphp
+                                @if($compStatus === 'completed')
                                     <span class="badge bg-success">Selesai</span>
-                                @elseif($loan->status === 'active')
-                                    <span class="badge" style="background:#fef3c7; color:#92400e;">Aktif</span>
+                                @elseif($compStatus === 'completed_late')
+                                    <span class="badge bg-warning text-dark">Selesai Terlambat</span>
+                                @elseif($compStatus === 'overdue')
+                                    <span class="badge bg-danger">Terlambat</span>
                                 @else
-                                    <span class="badge bg-secondary">{{ strtoupper($loan->status) }}</span>
+                                    <span class="badge" style="background:#fef3c7; color:#92400e;">Aktif</span>
                                 @endif
                             </td>
                         </tr>

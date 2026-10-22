@@ -40,7 +40,15 @@
                     <td>{{ $loan->borrower->institution_name ?? $loan->user->name }}</td>
                     <td>{{ $loan->borrower->contact_number ?? '-' }}</td>
                     <td>{{ $loan->borrower->address ?? '-' }}</td>
-                    <td class="text-center">{{ strtoupper($loan->status) }}</td>
+                    <td class="text-center">
+                        @php $statusText = match($loan->computed_status) {
+                            'completed' => 'SELESAI',
+                            'completed_late' => 'SELESAI TERLAMBAT',
+                            'overdue' => 'TERLAMBAT',
+                            default => 'AKTIF',
+                        }; @endphp
+                        {{ $statusText }}
+                    </td>
                 </tr>
             @empty
                 <tr><td colspan="7" class="text-center">Tidak ada transaksi tercatat.</td></tr>

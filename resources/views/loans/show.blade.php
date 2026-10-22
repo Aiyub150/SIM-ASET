@@ -123,6 +123,69 @@
     </div>
 </div>
 
+{{-- BUKTI DOKUMENTASI FISIK (AWAL & PENGEMBALIAN) --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Bukti Serah Terima Awal</span>
+                @if($loan->borrow_proof_image)
+                    <span class="badge bg-success">Terlampir</span>
+                @else
+                    <span class="badge bg-secondary">Belum Ada</span>
+                @endif
+            </div>
+            <div class="card-body p-3 text-center">
+                @if($loan->borrow_proof_image)
+                    <div class="mb-3">
+                        <img src="{{ asset('storage/' . $loan->borrow_proof_image) }}" alt="Bukti Pinjam" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain;">
+                    </div>
+                @endif
+                <form action="{{ route('loans.borrow-proof', $loan->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="input-group input-group-sm">
+                        <input type="file" name="borrow_proof_image" class="form-control" accept="image/jpeg,image/png,image/webp" required>
+                        <button type="submit" class="btn btn-primary fw-semibold">Unggah</button>
+                    </div>
+                    <div class="form-text text-muted small text-start mt-1" style="font-size:0.75rem;">
+                        Unggah foto penyerahan barang / BAST fisik (maks 2MB).
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Bukti Pengembalian Lengkap</span>
+                @if($loan->return_proof_image)
+                    <span class="badge bg-success">Terlampir</span>
+                @else
+                    <span class="badge bg-secondary">Belum Ada</span>
+                @endif
+            </div>
+            <div class="card-body p-3 text-center">
+                @if($loan->return_proof_image)
+                    <div class="mb-3">
+                        <img src="{{ asset('storage/' . $loan->return_proof_image) }}" alt="Bukti Kembali" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain;">
+                    </div>
+                @endif
+                <form id="page_form_upload_return_proof" action="{{ route('loans.return-proof', $loan->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="input-group input-group-sm">
+                        <input type="file" name="return_proof_image" class="form-control" accept="image/jpeg,image/png,image/webp" required>
+                        <button type="submit" class="btn btn-success fw-semibold">Unggah</button>
+                    </div>
+                    <div class="form-text text-muted small text-start mt-1" style="font-size:0.75rem;">
+                        Hanya dapat diunggah jika <strong>seluruh barang telah dikembalikan</strong>.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Form Pengembalian --}}
 @if($loan->status !== 'completed' && $pendingItems->count() > 0 && auth()->user()->can('loans.return'))
 <div class="card mb-4" style="border-color:#2563eb;">
@@ -167,6 +230,7 @@
     <div class="card-body p-4">
         <form action="{{ route('loans.return', $loan->id) }}" 
               method="POST"
+              enctype="multipart/form-data"
               data-confirm="Apakah Anda yakin ingin memproses pengembalian barang peminjaman ini?"
               data-confirm-title="Konfirmasi Pengembalian Barang?">
             @csrf
@@ -194,6 +258,12 @@
                     </div>
                     <div class="col-md-2"></div>
                 </div>
+            </div>
+
+            <div class="mb-3 pt-2">
+                <label class="form-label fw-semibold">Unggah Bukti Pengembalian Fisik <span class="text-muted">(opsional)</span></label>
+                <input type="file" name="return_proof_image" id="page_return_proof_input" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp">
+                <div class="form-text text-muted" style="font-size:0.75rem;">Hanya dapat disimpan jika pengembalian ini melunasi seluruh sisa barang.</div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-2">
@@ -255,6 +325,24 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Validasi Upload Bukti Pengembalian di Halaman Detail
+        const pageFormUploadReturnProof = document.getElementById('page_form_upload_return_proof');
+        if (pageFormUploadReturnProof) {
+            pageFormUploadReturnProof.addEventListener('submit', function (e) {
+                const isCompleted = @json($loan->status === 'completed');
+                const remainingCount = @json($loan->loanItems->sum(fn($li) => $li->qty - $li->returned_qty));
+                if (!isCompleted || remainingCount > 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'semua barang harus dikembalikan jika ingin meng-upload gambar pengembalian, silahkan periksa kembali',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return false;
+                }
+            });
+        }
         const container = document.getElementById('return-items-container');
         const template  = document.getElementById('return-template')?.querySelector('.item-row');
         const btnAdd    = document.getElementById('btn-add-return');

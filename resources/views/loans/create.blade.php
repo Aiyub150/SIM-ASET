@@ -150,7 +150,7 @@
     }
 </style>
 
-<form action="{{ route('loans.store') }}" method="POST" id="loan-form">
+<form action="{{ route('loans.store') }}" method="POST" id="loan-form" enctype="multipart/form-data">
     @csrf
 
     <div class="row g-4">
@@ -222,6 +222,13 @@
                                class="form-control @error('due_date') is-invalid @enderror"
                                value="{{ old('due_date') }}" required>
                         @error('due_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bukti Serah Terima Awal <span class="text-muted">(opsional)</span></label>
+                        <input type="file" name="borrow_proof_image" class="form-control @error('borrow_proof_image') is-invalid @enderror" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted" style="font-size:0.75rem;">Format JPG/PNG/WEBP maks 2MB (foto fisik/dokumen serah terima).</div>
+                        @error('borrow_proof_image') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="mb-1">
@@ -535,6 +542,30 @@
                     icon: 'warning',
                     title: 'Barang Belum Dipilih',
                     text: 'Pastikan seluruh baris peminjaman telah memilih barang.',
+                    confirmButtonColor: '#2563eb'
+                });
+                return false;
+            }
+
+            // Validasi jumlah barang minimal 1
+            let hasZeroQty = false;
+            const qtyInputs = form.querySelectorAll('input[name$="[qty]"]');
+            qtyInputs.forEach(input => {
+                const val = parseInt(input.value, 10);
+                if (isNaN(val) || val < 1) {
+                    hasZeroQty = true;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            if (hasZeroQty) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perhatian',
+                    text: 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
                     confirmButtonColor: '#2563eb'
                 });
                 return false;

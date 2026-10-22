@@ -11,12 +11,12 @@
         <p class="text-muted mb-0" style="font-size:.82rem;">Daftar seluruh inventaris aset yang terdaftar</p>
     </div>
     @can('items.create')
-    <a href="{{ route('items.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createItemModal">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Tambah Barang
-    </a>
+    </button>
     @endcan
 </div>
 
@@ -171,19 +171,21 @@
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-1">
                                 <button type="button" 
-                                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+                                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 btn-edit-item"
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#quickUploadModal"
+                                        data-bs-target="#editItemModal"
                                         data-item-id="{{ $item->id }}"
                                         data-item-name="{{ $item->name }}"
                                         data-item-sku="{{ $item->sku }}"
+                                        data-item-category-id="{{ $item->category_id }}"
+                                        data-item-ownership="{{ $item->ownership_status }}"
+                                        data-item-owner-name="{{ $item->owner_name }}"
                                         data-item-image="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
-                                        title="{{ $item->image ? 'Ganti Foto Barang' : 'Upload Foto Barang' }}">
+                                        title="Edit Data Barang">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                                     </svg>
-                                    {{ $item->image ? 'Ganti Foto' : 'Upload Foto' }}
+                                    Edit
                                 </button>
                                 <a href="{{ route('items.label', ['item' => $item->id, 'type' => '2d']) }}" 
                                    target="_blank" 
@@ -239,41 +241,240 @@
     </div>
 </div>
 
-{{-- MODAL UPLOAD / GANTI FOTO CEPAT --}}
-<div class="modal fade" id="quickUploadModal" tabindex="-1" aria-labelledby="quickUploadModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="quickUploadModalLabel">Upload / Ganti Foto Barang</h5>
+{{-- MODAL TAMBAH BARANG BARU (POPUP CREATE) --}}
+@can('items.create')
+<div class="modal fade" id="createItemModal" tabindex="-1" aria-labelledby="createItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <h5 class="modal-title fw-bold text-dark" id="createItemModalLabel">Tambah Barang Inventaris Baru</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="quickUploadForm" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('items.store') }}" method="POST" enctype="multipart/form-data" id="form-create-item">
                 @csrf
-                <div class="modal-body">
+                <div class="modal-body p-4">
+                    {{-- STATUS KEPEMILIKAN ASET --}}
                     <div class="mb-3">
-                        <label class="form-label text-muted small mb-1">Barang</label>
-                        <div class="fw-bold fs-6 text-dark" id="modal-item-name">-</div>
-                        <div class="text-primary small font-monospace" id="modal-item-sku">-</div>
+                        <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked>
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Milik Sendiri</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">SKU Otomatis</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio">
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Milik Vendor</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">SKU/Barcode Asli</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio">
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Instansi Lain</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">SKU Titipan</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-center mb-3" id="modal-preview-container" style="display:none;">
-                        <img id="modal-item-preview" src="" alt="Pratinjau Foto" style="max-height: 140px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain;">
+
+                    {{-- NAMA PEMILIK / VENDOR (KONDISIONAL) --}}
+                    <div class="mb-3" id="create_owner_field_group" style="display: none;">
+                        <label class="form-label fw-semibold" id="create_owner_label">Nama Pemilik / Vendor <span class="text-danger">*</span></label>
+                        <input type="text" name="owner_name" id="create_owner_name" class="form-control" placeholder="Contoh: PT Vendor Nusantara / Dinas Kesehatan">
                     </div>
-                    <div class="mb-3">
-                        <label for="quick_item_image" class="form-label fw-semibold">Pilih File Foto Baru</label>
-                        <input type="file" name="image" id="quick_item_image" class="form-control" accept="image/jpeg,image/png,image/webp" required>
+
+                    <div class="row g-3">
+                        {{-- KATEGORI --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                            <select name="category_id" id="create_category_id" class="form-select" required>
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                @foreach($categoriesWithSku as $cat)
+                                    <option value="{{ $cat->id }}" 
+                                            data-prefix="{{ $cat->sku_prefix }}" 
+                                            data-next="{{ str_pad($cat->next_sku_number, 3, '0', STR_PAD_LEFT) }}">
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- KODE BARANG (SKU) --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Kode Barang (SKU)</span>
+                                <span id="create_sku_badge" class="badge" style="background:#eff6ff; color:#2563eb; font-size:.7rem; font-weight:500;">
+                                    Auto-generate
+                                </span>
+                            </label>
+                            <input type="text" name="sku" id="create_sku_preview" class="form-control" placeholder="Pilih kategori terlebih dahulu" readonly style="font-family:monospace; background:#f8fafc; color:#64748b;">
+                            <div class="form-text text-muted" id="create_sku_helper" style="font-size:0.75rem;">
+                                SKU otomatis. Contoh: <code>PREFIX-001</code>.
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- NAMA BARANG --}}
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Nama Barang <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: Kursi Susun Chitose" required>
+                    </div>
+
+                    {{-- FOTO BARANG --}}
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Foto Barang</label>
+                        <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/webp">
                         <div class="form-text text-muted" style="font-size:0.75rem;">
-                            Format yang didukung: JPG, PNG, WEBP. Maksimal 2MB.
+                            Format: JPG, PNG, WEBP (maks 2MB). Foto ini otomatis tersimpan ke bukti fisik mutasi stok awal.
+                        </div>
+                    </div>
+
+                    {{-- JUMLAH BARANG (TOTAL FISIK AWAL) --}}
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">
+                            Jumlah Barang <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" name="total_qty" id="create_total_qty" class="form-control" value="1" min="1" step="1" placeholder="Contoh: 10" required>
+                        <div class="form-text text-muted" style="font-size:0.75rem;">
+                            Jumlah fisik barang yang didaftarkan (minimal 1 unit).
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Simpan Foto</button>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" id="btn-submit-create-item" class="btn btn-primary btn-sm px-4 fw-bold">Simpan Barang</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endcan
+
+{{-- MODAL EDIT DATA BARANG (POPUP EDIT - TANPA TOTAL FISIK DEMI INTEGRITAS AUDIT) --}}
+@if(auth()->user()?->hasAnyRole(['Super Admin', 'Admin']) || auth()->user()?->can('items.edit'))
+<div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0" style="border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark mb-0" id="editItemModalLabel">Edit Data Barang</h5>
+                    <span class="badge bg-white text-primary border font-monospace mt-1" id="edit_modal_sku_badge">-</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" id="form-edit-item">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    {{-- STATUS KEPEMILIKAN ASET --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio">
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Milik Sendiri</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">Aset Internal</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio">
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Milik Vendor</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">Sewa / Pihak Ketiga</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="card p-2 border cursor-pointer h-100 d-flex flex-row align-items-center gap-2" style="border-radius:8px;">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio">
+                                    <div>
+                                        <div class="fw-semibold text-dark small">Instansi Lain</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">Titipan Pemerintah</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- NAMA PEMILIK / VENDOR (KONDISIONAL) --}}
+                    <div class="mb-3" id="edit_owner_field_group" style="display: none;">
+                        <label class="form-label fw-semibold" id="edit_owner_label">Nama Pemilik / Vendor <span class="text-danger">*</span></label>
+                        <input type="text" name="owner_name" id="edit_owner_name" class="form-control" placeholder="Contoh: PT Vendor Nusantara">
+                    </div>
+
+                    <div class="row g-3">
+                        {{-- KATEGORI --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                            <select name="category_id" id="edit_category_id" class="form-select" required>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- KODE BARANG (SKU - READONLY DI FORM EDIT) --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Kode Barang (SKU)</label>
+                            <input type="text" id="edit_sku_preview" class="form-control" readonly style="font-family:monospace; background:#f8fafc; color:#64748b;">
+                            <div class="form-text text-muted" style="font-size:0.75rem;">
+                                Kode SKU terkunci permanen untuk konsistensi transaksi dan audit.
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- NAMA BARANG --}}
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Nama Barang <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="edit_item_name" class="form-control" required>
+                    </div>
+
+                    {{-- FOTO BARANG --}}
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Foto Barang</label>
+                        <div class="d-flex align-items-center gap-3 mb-2" id="edit_current_image_container" style="display: none;">
+                            <img id="edit_current_image_preview" src="" alt="Foto Saat Ini" style="width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div class="text-muted small">Pilih file baru di bawah ini untuk mengganti gambar saat ini.</div>
+                        </div>
+                        <input type="file" name="image" id="edit_item_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted" style="font-size:0.75rem;">
+                            Format: JPG, PNG, WEBP (maks 2MB).
+                        </div>
+                    </div>
+
+                    {{-- KETERANGAN TRANSPARANSI STOK FISIK --}}
+                    <div class="alert alert-info py-2 px-3 mt-3 d-flex align-items-center gap-2 mb-0" style="font-size: 0.8rem; border-radius: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="flex-shrink-0" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                        </svg>
+                        <div>
+                            <strong>Integritas Audit:</strong> Jumlah stok fisik tidak dapat diubah dari form ini. Segala penambahan atau pengurangan saldo fisik wajib melalui menu <a href="{{ route('stocks.create') }}" class="text-decoration-none fw-bold">Kartu Stok</a>.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -369,35 +570,155 @@
             });
         }
 
-        // Handler Modal Upload / Ganti Foto Cepat
-        const quickModal = document.getElementById('quickUploadModal');
-        if (quickModal) {
-            quickModal.addEventListener('show.bs.modal', function (event) {
+        // --- LOGIKA MODAL TAMBAH BARANG (CREATE) ---
+        const createCategorySelect = document.getElementById('create_category_id');
+        const createSkuPreview     = document.getElementById('create_sku_preview');
+        const createSkuBadge       = document.getElementById('create_sku_badge');
+        const createSkuHelper      = document.getElementById('create_sku_helper');
+        const createOwnerGroup     = document.getElementById('create_owner_field_group');
+        const createOwnerLabel     = document.getElementById('create_owner_label');
+        const createOwnerInput     = document.getElementById('create_owner_name');
+
+        function updateCreateSku() {
+            const selectedRadio = document.querySelector('input[name="ownership_status"].create-ownership-radio:checked');
+            const status = selectedRadio ? selectedRadio.value : 'internal';
+
+            if (status === 'internal') {
+                createOwnerGroup.style.display = 'none';
+                createOwnerInput.required = false;
+
+                createSkuPreview.readOnly = true;
+                createSkuPreview.style.background = '#f8fafc';
+                createSkuBadge.textContent = 'Auto-generate';
+                createSkuBadge.className = 'badge bg-primary-subtle text-primary';
+
+                const opt = createCategorySelect.options[createCategorySelect.selectedIndex];
+                if (opt && opt.value) {
+                    const prefix = opt.getAttribute('data-prefix');
+                    const nextNum = opt.getAttribute('data-next');
+                    createSkuPreview.value = prefix + '-' + nextNum;
+                    createSkuHelper.innerHTML = 'SKU otomatis: <code>' + prefix + '-' + nextNum + '</code>';
+                } else {
+                    createSkuPreview.value = '';
+                    createSkuHelper.textContent = 'Pilih kategori untuk melihat pratinjau SKU.';
+                }
+            } else if (status === 'vendor') {
+                createOwnerGroup.style.display = 'block';
+                createOwnerLabel.innerHTML = 'Nama Vendor / Perusahaan Pemilik <span class="text-danger">*</span>';
+                createOwnerInput.placeholder = 'Contoh: PT Vendor Nusantara / CV Rental Jaya';
+                createOwnerInput.required = true;
+
+                createSkuPreview.readOnly = false;
+                createSkuPreview.style.background = '#ffffff';
+                createSkuBadge.textContent = 'SKU / Barcode Asli Vendor';
+                createSkuBadge.className = 'badge bg-purple-subtle text-purple';
+                createSkuHelper.innerHTML = '<span class="text-dark fw-semibold">Wajib input SKU/Barcode asli:</span> Barang sewa tidak menggunakan SKU otomatis.';
+            } else if (status === 'external') {
+                createOwnerGroup.style.display = 'block';
+                createOwnerLabel.innerHTML = 'Nama Instansi Pemilik Aset <span class="text-danger">*</span>';
+                createOwnerInput.placeholder = 'Contoh: Dinas Kesehatan / Bappeda';
+                createOwnerInput.required = true;
+
+                createSkuPreview.readOnly = false;
+                createSkuPreview.style.background = '#ffffff';
+                createSkuBadge.textContent = 'SKU / Kode Registrasi Instansi';
+                createSkuBadge.className = 'badge bg-warning-subtle text-warning';
+                createSkuHelper.innerHTML = '<span class="text-dark fw-semibold">Wajib input Kode Registrasi:</span> Barang titipan instansi menggunakan kode aset resminya.';
+            }
+        }
+
+        document.querySelectorAll('.create-ownership-radio').forEach(r => r.addEventListener('change', updateCreateSku));
+        createCategorySelect?.addEventListener('change', updateCreateSku);
+
+        // Pencegatan SweetAlert2 untuk form create (total_qty minimal 1)
+        const formCreateItem = document.getElementById('form-create-item');
+        const inputCreateQty = document.getElementById('create_total_qty');
+        if (formCreateItem && inputCreateQty) {
+            formCreateItem.addEventListener('submit', function (e) {
+                const qtyVal = parseInt(inputCreateQty.value, 10);
+                if (isNaN(qtyVal) || qtyVal < 1) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    inputCreateQty.focus();
+                }
+            });
+        }
+
+        // --- LOGIKA MODAL EDIT BARANG ---
+        const editModal = document.getElementById('editItemModal');
+        if (editModal) {
+            const formEdit       = document.getElementById('form-edit-item');
+            const editName       = document.getElementById('edit_item_name');
+            const editSkuPreview = document.getElementById('edit_sku_preview');
+            const editSkuBadge   = document.getElementById('edit_modal_sku_badge');
+            const editCategory   = document.getElementById('edit_category_id');
+            const editOwnerGroup = document.getElementById('edit_owner_field_group');
+            const editOwnerLabel = document.getElementById('edit_owner_label');
+            const editOwnerInput = document.getElementById('edit_owner_name');
+            const editImgContainer = document.getElementById('edit_current_image_container');
+            const editImgPreview   = document.getElementById('edit_current_image_preview');
+
+            function syncEditOwnershipUI(status) {
+                if (status === 'internal') {
+                    editOwnerGroup.style.display = 'none';
+                    editOwnerInput.required = false;
+                } else if (status === 'vendor') {
+                    editOwnerGroup.style.display = 'block';
+                    editOwnerLabel.innerHTML = 'Nama Vendor / Perusahaan Pemilik <span class="text-danger">*</span>';
+                    editOwnerInput.placeholder = 'Contoh: PT Vendor Nusantara / CV Rental Jaya';
+                    editOwnerInput.required = true;
+                } else if (status === 'external') {
+                    editOwnerGroup.style.display = 'block';
+                    editOwnerLabel.innerHTML = 'Nama Instansi Pemilik Aset <span class="text-danger">*</span>';
+                    editOwnerInput.placeholder = 'Contoh: Dinas Kesehatan / Bappeda';
+                    editOwnerInput.required = true;
+                }
+            }
+
+            document.querySelectorAll('.edit-ownership-radio').forEach(r => {
+                r.addEventListener('change', function () {
+                    syncEditOwnershipUI(this.value);
+                });
+            });
+
+            editModal.addEventListener('show.bs.modal', function (event) {
                 const btn = event.relatedTarget;
                 if (!btn) return;
 
-                const itemId = btn.getAttribute('data-item-id');
-                const itemName = btn.getAttribute('data-item-name');
-                const itemSku = btn.getAttribute('data-item-sku');
-                const itemImage = btn.getAttribute('data-item-image');
+                const itemId     = btn.getAttribute('data-item-id');
+                const itemName   = btn.getAttribute('data-item-name');
+                const itemSku    = btn.getAttribute('data-item-sku');
+                const categoryId = btn.getAttribute('data-item-category-id');
+                const ownership  = btn.getAttribute('data-item-ownership') || 'internal';
+                const ownerName  = btn.getAttribute('data-item-owner-name') || '';
+                const itemImage  = btn.getAttribute('data-item-image') || '';
 
-                const form = document.getElementById('quickUploadForm');
-                form.action = `/items/${itemId}/quick-image`;
+                formEdit.action = `/items/${itemId}`;
+                editName.value = itemName;
+                editSkuPreview.value = itemSku;
+                editSkuBadge.textContent = 'SKU: ' + itemSku;
+                editCategory.value = categoryId;
+                editOwnerInput.value = ownerName;
 
-                document.getElementById('modal-item-name').textContent = itemName;
-                document.getElementById('modal-item-sku').textContent = itemSku;
+                // Set radio ownership
+                document.querySelectorAll('.edit-ownership-radio').forEach(r => {
+                    r.checked = (r.value === ownership);
+                });
+                syncEditOwnershipUI(ownership);
 
-                const previewContainer = document.getElementById('modal-preview-container');
-                const previewImg = document.getElementById('modal-item-preview');
-                const fileInput = document.getElementById('quick_item_image');
-                fileInput.value = '';
-
+                // Set preview foto
+                document.getElementById('edit_item_image').value = '';
                 if (itemImage && itemImage.trim() !== '') {
-                    previewImg.src = itemImage;
-                    previewContainer.style.display = 'block';
+                    editImgPreview.src = itemImage;
+                    editImgContainer.style.display = 'flex';
                 } else {
-                    previewImg.src = '';
-                    previewContainer.style.display = 'none';
+                    editImgPreview.src = '';
+                    editImgContainer.style.display = 'none';
                 }
             });
         }

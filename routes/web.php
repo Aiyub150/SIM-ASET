@@ -44,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{loan}',         [LoanController::class, 'show'])->name('show');
         Route::get('/{loan}/print',   [LoanController::class, 'printPdf'])->middleware('throttle:20,1')->name('print');
         Route::post('/{loan}/return', [LoanController::class, 'returnItems'])->middleware(['role_or_permission:Super Admin|Admin|Staff Logistik|loans.return', 'throttle:30,1'])->name('return');
+        Route::post('/{loan}/borrow-proof', [LoanController::class, 'uploadBorrowProof'])->middleware('throttle:30,1')->name('borrow-proof');
+        Route::post('/{loan}/return-proof', [LoanController::class, 'uploadReturnProof'])->middleware('throttle:30,1')->name('return-proof');
     });
 
     Route::get('/items/lookup', [ItemController::class, 'lookupBySku'])->middleware('throttle:60,1')->name('items.lookup');

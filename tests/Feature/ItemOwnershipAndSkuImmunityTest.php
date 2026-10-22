@@ -282,8 +282,8 @@ class ItemOwnershipAndSkuImmunityTest extends TestCase
         $response = $this->actingAs($this->superAdmin)->get(route('items.index'));
         $response->assertOk();
         $response->assertSee('imagePreviewModal');
-        $response->assertSee('quickUploadModal');
-        $response->assertSee('Upload Foto');
+        $response->assertSee('editItemModal');
+        $response->assertSee('createItemModal');
         $response->assertDontSee('items.destroy');
     }
 }

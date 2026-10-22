@@ -91,7 +91,13 @@ class LoanController extends Controller
     public function store(StoreLoanRequest $request): RedirectResponse
     {
         try {
-            $loan = $this->loanService->createLoan($request->validated(), Auth::id());
+            $data = $request->validated();
+
+            if ($request->hasFile('borrow_proof_image')) {
+                $data['borrow_proof_image'] = $request->file('borrow_proof_image')->store('images/loans/proofs', 'public');
+            }
+
+            $loan = $this->loanService->createLoan($data, Auth::id());
 
             \App\Services\ActivityLogger::log(
                 'LOAN_CREATE',
@@ -143,7 +149,7 @@ class LoanController extends Controller
                 : "Pengembalian parsial berhasil dicatat pada transaksi {$loan->loan_code}.";
 
             return redirect()
-                ->route('loans.show', $loan->id)
+                ->route('loans.index')
                 ->with('success', $message);
 
         } catch (Exception $e) {
@@ -196,5 +202,79 @@ class LoanController extends Controller
         });
 
         return view('loans.show', compact('loan', 'pendingItems'));
+    }
+
+    /**
+     * Upload Bukti Peminjaman Awal Susulan
+     */
+    public function uploadBorrowProof(\Illuminate\Http\Request $request, Loan $loan): RedirectResponse
+    {
+        $request->validate([
+            'borrow_proof_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'borrow_proof_image.required' => 'Pilih file bukti peminjaman terlebih dahulu.',
+            'borrow_proof_image.image'    => 'File yang dipilih harus berupa gambar.',
+            'borrow_proof_image.mimes'    => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'borrow_proof_image.max'      => 'Ukuran foto maksimal 2MB.',
+        ]);
+
+        $path = $request->file('borrow_proof_image')->store('images/loans/proofs', 'public');
+        $loan->update(['borrow_proof_image' => $path]);
+
+        // Hubungkan juga ke stock movements out terkait jika belum punya gambar
+        \App\Models\StockMovement::where('reference_code', $loan->loan_code)
+            ->where('type', 'out')
+            ->whereNull('image')
+            ->update(['image' => $path]);
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Peminjaman',
+            "Mengunggah bukti foto awal peminjaman untuk transaksi {$loan->loan_code}",
+            ['loan_id' => $loan->id, 'loan_code' => $loan->loan_code, 'image' => $path],
+            $request
+        );
+
+        return redirect()->route('loans.index')->with('success', "Bukti foto peminjaman untuk {$loan->loan_code} berhasil diunggah.");
+    }
+
+    /**
+     * Upload Bukti Pengembalian Susulan (HANYA JIKA SELURUH BARANG SUDAH SELESAI DIKEMBALIKAN)
+     */
+    public function uploadReturnProof(\Illuminate\Http\Request $request, Loan $loan): RedirectResponse
+    {
+        // Validasi Kritis: semua barang harus sudah dikembalikan
+        $hasPending = $loan->loanItems()->whereColumn('returned_qty', '<', 'qty')->exists();
+        if ($hasPending || $loan->status !== 'completed') {
+            return redirect()->route('loans.index')->with('error', 'semua barang harus dikembalikan jika ingin meng-upload gambar pengembalian, silahkan periksa kembali');
+        }
+
+        $request->validate([
+            'return_proof_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'return_proof_image.required' => 'Pilih file bukti pengembalian terlebih dahulu.',
+            'return_proof_image.image'    => 'File yang dipilih harus berupa gambar.',
+            'return_proof_image.mimes'    => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'return_proof_image.max'      => 'Ukuran foto maksimal 2MB.',
+        ]);
+
+        $path = $request->file('return_proof_image')->store('images/loans/proofs', 'public');
+        $loan->update(['return_proof_image' => $path]);
+
+        // Hubungkan juga ke stock movements in terkait jika belum punya gambar
+        \App\Models\StockMovement::where('reference_code', $loan->loan_code)
+            ->where('type', 'in')
+            ->whereNull('image')
+            ->update(['image' => $path]);
+
+        \App\Services\ActivityLogger::log(
+            'UPDATE',
+            'Peminjaman',
+            "Mengunggah bukti foto pengembalian lengkap untuk transaksi {$loan->loan_code}",
+            ['loan_id' => $loan->id, 'loan_code' => $loan->loan_code, 'image' => $path],
+            $request
+        );
+
+        return redirect()->route('loans.index')->with('success', "Bukti foto pengembalian untuk {$loan->loan_code} berhasil diunggah.");
     }
 }
