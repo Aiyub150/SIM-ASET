@@ -574,6 +574,41 @@
             });
         }
 
+        // TomSelect untuk Input Mutasi Stok
+        const modalStockItem = document.getElementById('modal_stock_item_id');
+        if (modalStockItem && typeof TomSelect !== 'undefined') {
+            new TomSelect(modalStockItem, {
+                create: false,
+                plugins: ['dropdown_input'],
+                placeholder: 'Cari barang berdasarkan nama atau kode SKU...',
+                render: {
+                    option: function(data, escape) {
+                        const img = data.image ? `<img src="${escape(data.image)}" class="rounded border me-2" style="width: 32px; height: 32px; object-fit: cover;">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center me-2 text-muted" style="width: 32px; height: 32px; font-size: 0.7rem;"><i class="fa-solid fa-box"></i></div>`;
+                        return `<div class="d-flex align-items-center py-1">
+                            ${img}
+                            <div>
+                                <div class="fw-semibold text-dark small">${escape(data.name || data.text)}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">
+                                    SKU: <span class="font-monospace text-primary">${escape(data.sku || '')}</span> | Tersedia: <strong class="text-success">${escape(data.available || 0)}</strong>
+                                </div>
+                            </div>
+                        </div>`;
+                    },
+                    item: function(data, escape) {
+                        return `<div><span class="font-monospace fw-bold text-primary">[${escape(data.sku || '')}]</span> ${escape(data.name || data.text)}</div>`;
+                    }
+                }
+            });
+        }
+
+        const modalStockType = document.getElementById('modal_stock_mutation_type');
+        if (modalStockType && typeof TomSelect !== 'undefined') {
+            new TomSelect(modalStockType, {
+                create: false,
+                placeholder: '— Pilih Tipe Mutasi —'
+            });
+        }
+
         const stockTypeFilter = document.getElementById('stock_type_filter');
         if (stockTypeFilter && typeof TomSelect !== 'undefined') {
             let typeInit = false;

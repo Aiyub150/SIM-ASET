@@ -19,12 +19,12 @@
         </p>
     </div>
     @can('loans.create')
-    <a href="{{ route('loans.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createLoanModal">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         Buat Peminjaman
-    </a>
+    </button>
     @endcan
 </div>
 
@@ -382,6 +382,147 @@
     </div>
 </div>
 
+@can('loans.create')
+{{-- Modal Tambah Peminjaman Baru (Zero-Redirect) --}}
+<div class="modal fade" id="createLoanModal" tabindex="-1" aria-labelledby="createLoanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow border-0">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="fa-solid fa-hand-holding-box text-primary fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="createLoanModalLabel">Buat Transaksi Peminjaman Baru</h5>
+                        <p class="text-muted small mb-0">Catat serah terima peminjaman aset inventaris kepada instansi/peminjam</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('loans.store') }}" method="POST" id="form-create-loan" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body p-4">
+                    {{-- SCANNER SKU / BARCODE KOTAK INSTAN --}}
+                    <div class="card border border-primary border-opacity-25 bg-light mb-4">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-2">
+                                <div>
+                                    <span class="fw-bold text-primary small d-flex align-items-center gap-1.5">
+                                        <i class="fa-solid fa-qrcode fs-6"></i> Scan Barcode Kotak (QR Code) / Ketik SKU
+                                    </span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Arahkan scanner USB/kamera atau ketik SKU barang untuk menambahkannya langsung ke daftar</small>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btn-toggle-create-camera">
+                                    <i class="fa-solid fa-camera me-1"></i> Buka Kamera Scanner
+                                </button>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white"><i class="fa-solid fa-barcode text-muted"></i></span>
+                                <input type="text" id="modal-sku-scan-input" class="form-control font-monospace" placeholder="Contoh: ELEC-001 (lalu tekan Enter)..." autocomplete="off">
+                            </div>
+                            <div id="modal-sku-scan-feedback" class="small mt-1 text-muted" style="font-size: 0.72rem;">
+                                Menunggu input keyboard/scanner…
+                            </div>
+                            <div id="modal-camera-preview-wrapper" class="mt-2 text-center" style="display: none;">
+                                <div id="modal-create-camera-reader" class="rounded border" style="width: 100%; max-width: 320px; margin: 0 auto; min-height: 200px; background: #0f172a;"></div>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Arahkan kamera ke QR Code/Barcode barang</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        {{-- KOLOM KIRI: INFORMASI PEMINJAMAN --}}
+                        <div class="col-lg-5">
+                            <div class="card h-100 border">
+                                <div class="card-header bg-white py-2.5 px-3 fw-bold small text-dark border-bottom">
+                                    <i class="fa-solid fa-circle-info text-primary me-1"></i> Data Instansi & Jadwal
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small">Instansi Peminjam <span class="text-danger">*</span></label>
+                                        <select name="borrower_id" id="modal_loan_borrower_id" class="form-select" required>
+                                            <option value="">— Cari atau pilih instansi… —</option>
+                                            @if(isset($borrowers))
+                                                @foreach($borrowers as $b)
+                                                    <option value="{{ $b->id }}"
+                                                            data-inst="{{ $b->institution_name }}"
+                                                            data-pic="{{ $b->pic_name }}"
+                                                            data-phone="{{ $b->phone ?? '-' }}"
+                                                            data-email="{{ $b->email ?? '-' }}">
+                                                        {{ $b->institution_name }} (PIC: {{ $b->pic_name }})
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label fw-semibold small">Tanggal Pinjam <span class="text-danger">*</span></label>
+                                            <input type="date" name="borrow_date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}" required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label fw-semibold small">Batas Kembali <span class="text-danger">*</span></label>
+                                            <input type="date" name="due_date" class="form-control form-control-sm" value="{{ date('Y-m-d', strtotime('+7 days')) }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small">Bukti Serah Terima Awal <span class="text-muted fw-normal">(Opsional)</span></label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div style="width: 50px; height: 50px; border: 1.5px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
+                                                <img id="create_borrow_proof_preview" src="" alt="Bukti" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                                                <i class="fa-solid fa-file-image text-secondary" id="create_borrow_proof_icon"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" name="borrow_proof_image" id="create_borrow_proof_input" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp">
+                                                <div class="text-muted" style="font-size: 0.7rem;">Format JPG/PNG/WEBP maks 2MB</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-1">
+                                        <label class="form-label fw-semibold small">Catatan Peminjaman <span class="text-muted fw-normal">(Opsional)</span></label>
+                                        <textarea name="notes" rows="2" class="form-control form-control-sm" placeholder="Contoh: Keperluan dinas rapat koordinasi wilayah..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- KOLOM KANAN: DAFTAR BARANG YANG DIPINJAM --}}
+                        <div class="col-lg-7">
+                            <div class="card h-100 border">
+                                <div class="card-header bg-white py-2.5 px-3 d-flex justify-content-between align-items-center border-bottom">
+                                    <span class="fw-bold small text-dark">
+                                        <i class="fa-solid fa-boxes-stacked text-primary me-1"></i> Rincian Barang yang Dipinjam
+                                    </span>
+                                    <button type="button" id="btn-modal-add-row" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.78rem;">
+                                        <i class="fa-solid fa-plus me-1"></i> Tambah Baris
+                                    </button>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div id="modal-loan-items-container" style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                                        {{-- Row item digenerate via JS --}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Proses & Simpan Transaksi Peminjaman</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endcan
+
+<script id="items-data" type="application/json">
+    {!! json_encode($items ?? []) !!}
+</script>
+
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
@@ -431,6 +572,335 @@
 
         setupMiniPreview('input_borrow_proof_file', 'borrow_proof_live_preview', 'borrow_proof_live_icon');
         setupMiniPreview('input_return_proof', 'return_proof_live_preview', 'return_proof_live_icon');
+        setupMiniPreview('create_borrow_proof_input', 'create_borrow_proof_preview', 'create_borrow_proof_icon');
+
+        // --- HANDLER MODAL CREATE PEMINJAMAN (POPUP ZERO-REDIRECT) ---
+        const createLoanModal = document.getElementById('createLoanModal');
+        const modalBorrowerSelect = document.getElementById('modal_loan_borrower_id');
+        let modalBorrowerTom = null;
+
+        if (modalBorrowerSelect && typeof TomSelect !== 'undefined') {
+            modalBorrowerTom = new TomSelect(modalBorrowerSelect, {
+                create: false,
+                plugins: ['dropdown_input'],
+                placeholder: '— Cari atau pilih instansi peminjam —',
+                render: {
+                    option: function(data, escape) {
+                        return `<div class="d-flex align-items-center py-1">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px; height: 32px; font-weight: bold; font-size: 0.8rem;">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark small">${escape(data.inst || data.text)}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">
+                                    PIC: <strong>${escape(data.pic || '-')}</strong> | Telp: ${escape(data.phone || '-')}
+                                </div>
+                            </div>
+                        </div>`;
+                    },
+                    item: function(data, escape) {
+                        return `<div><i class="fa-solid fa-building text-primary me-1"></i> <strong>${escape(data.inst || data.text)}</strong> <span class="text-muted small">(PIC: ${escape(data.pic || '-')})</span></div>`;
+                    }
+                }
+            });
+        }
+
+        // Kelola Baris Barang Dinamis di Modal Create Peminjaman
+        const itemsDataEl = document.getElementById('items-data');
+        const AVAILABLE_ITEMS = itemsDataEl ? JSON.parse(itemsDataEl.textContent || '[]') : [];
+        const itemsContainer = document.getElementById('modal-loan-items-container');
+        const btnAddRow = document.getElementById('btn-modal-add-row');
+        let modalRowIndex = 0;
+        let itemPickers = [];
+
+        function renderLoanRow(initialItemId = null, initialQty = 1) {
+            if (!itemsContainer) return;
+            const idx = modalRowIndex++;
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row g-2 align-items-center mb-2 pb-2 border-bottom modal-item-row';
+            rowDiv.dataset.idx = idx;
+
+            rowDiv.innerHTML = `
+                <div class="col-7">
+                    <label class="form-label small mb-1 fw-semibold">Pilih Barang</label>
+                    <select name="items[${idx}][item_id]" class="form-select form-select-sm modal-item-select" required>
+                        <option value="">— Cari atau pilih barang… —</option>
+                        ${AVAILABLE_ITEMS.map(it => `
+                            <option value="${it.id}"
+                                    data-name="${it.name}"
+                                    data-sku="${it.sku}"
+                                    data-available="${it.available_qty}"
+                                    data-category="${it.category ? it.category.name : 'Umum'}"
+                                    data-image="${it.image ? '/storage/' + it.image : ''}"
+                                    ${initialItemId == it.id ? 'selected' : ''}>
+                                [${it.sku}] ${it.name} (Sisa: ${it.available_qty})
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <label class="form-label small mb-1 fw-semibold">Jumlah (Qty)</label>
+                    <input type="number" name="items[${idx}][qty]" class="form-control form-control-sm modal-item-qty" value="${initialQty}" min="1" max="999" required>
+                    <div class="text-muted text-end small modal-qty-hint" style="font-size:0.68rem;">Maks: -</div>
+                </div>
+                <div class="col-2 text-end pt-3">
+                    <button type="button" class="btn btn-outline-danger btn-sm py-1 px-2 btn-remove-row" title="Hapus baris">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+
+            itemsContainer.appendChild(rowDiv);
+
+            const selectEl = rowDiv.querySelector('.modal-item-select');
+            const qtyInput = rowDiv.querySelector('.modal-item-qty');
+            const qtyHint  = rowDiv.querySelector('.modal-qty-hint');
+            const removeBtn = rowDiv.querySelector('.btn-remove-row');
+
+            let tom = null;
+            if (typeof TomSelect !== 'undefined') {
+                tom = new TomSelect(selectEl, {
+                    create: false,
+                    plugins: ['dropdown_input'],
+                    placeholder: '— Cari nama / SKU barang —',
+                    render: {
+                        option: function(data, escape) {
+                            const img = data.image ? `<img src="${escape(data.image)}" class="rounded border me-2" style="width: 28px; height: 28px; object-fit: cover;">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center me-2 text-muted" style="width: 28px; height: 28px; font-size: 0.65rem;"><i class="fa-solid fa-box"></i></div>`;
+                            return `<div class="d-flex align-items-center py-1">
+                                ${img}
+                                <div>
+                                    <div class="fw-semibold text-dark small">${escape(data.name || data.text)}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">
+                                        SKU: <span class="font-monospace text-primary">${escape(data.sku || '')}</span> | Tersedia: <strong class="text-success">${escape(data.available || 0)}</strong>
+                                    </div>
+                                </div>
+                            </div>`;
+                        },
+                        item: function(data, escape) {
+                            return `<div><span class="font-monospace fw-bold text-primary">[${escape(data.sku || '')}]</span> ${escape(data.name || data.text)}</div>`;
+                        }
+                    },
+                    onChange: function(val) {
+                        syncRowMax(val, qtyInput, qtyHint);
+                    }
+                });
+            } else {
+                selectEl.addEventListener('change', function() {
+                    syncRowMax(this.value, qtyInput, qtyHint);
+                });
+            }
+
+            if (initialItemId) {
+                syncRowMax(initialItemId, qtyInput, qtyHint);
+            }
+
+            removeBtn.addEventListener('click', function() {
+                if (itemsContainer.querySelectorAll('.modal-item-row').length <= 1) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Minimal harus ada 1 barang dalam transaksi peminjaman.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+                if (tom) tom.destroy();
+                rowDiv.remove();
+            });
+
+            itemPickers.push({ idx, row: rowDiv, tom, selectEl, qtyInput });
+        }
+
+        function syncRowMax(itemId, qtyInput, qtyHint) {
+            const item = AVAILABLE_ITEMS.find(it => String(it.id) === String(itemId));
+            if (item) {
+                qtyInput.max = item.available_qty;
+                qtyHint.textContent = `Maks: ${item.available_qty}`;
+                if (parseInt(qtyInput.value, 10) > item.available_qty) {
+                    qtyInput.value = item.available_qty;
+                }
+            } else {
+                qtyHint.textContent = 'Maks: -';
+            }
+        }
+
+        if (btnAddRow) {
+            btnAddRow.addEventListener('click', function() {
+                renderLoanRow();
+            });
+        }
+
+        if (createLoanModal) {
+            createLoanModal.addEventListener('shown.bs.modal', function() {
+                if (itemsContainer && itemsContainer.children.length === 0) {
+                    renderLoanRow();
+                }
+            });
+        }
+
+        // Scanner Barcode / SKU di Modal Tambah Peminjaman
+        const modalSkuInput = document.getElementById('modal-sku-scan-input');
+        const modalSkuFeedback = document.getElementById('modal-sku-scan-feedback');
+        const btnToggleCreateCamera = document.getElementById('btn-toggle-create-camera');
+        const createCameraBox = document.getElementById('modal-camera-preview-wrapper');
+        let createHtml5QrCode = null;
+
+        function handleScannedSku(scannedSku) {
+            const clean = scannedSku.trim().toUpperCase();
+            if (!clean) return;
+
+            const foundItem = AVAILABLE_ITEMS.find(it => it.sku && it.sku.toUpperCase() === clean);
+            if (!foundItem) {
+                modalSkuFeedback.innerHTML = `<span class="text-danger fw-semibold"><i class="fa-solid fa-circle-xmark"></i> Barang dengan SKU "${scannedSku}" tidak ditemukan atau stok kosong.</span>`;
+                return;
+            }
+
+            // Cek apakah barang sudah ada di salah satu baris
+            let existingRow = null;
+            itemPickers.forEach(picker => {
+                const currentVal = picker.tom ? picker.tom.getValue() : picker.selectEl.value;
+                if (String(currentVal) === String(foundItem.id)) {
+                    existingRow = picker;
+                }
+            });
+
+            if (existingRow) {
+                const curQty = parseInt(existingRow.qtyInput.value || '1', 10);
+                if (curQty < foundItem.available_qty) {
+                    existingRow.qtyInput.value = curQty + 1;
+                    modalSkuFeedback.innerHTML = `<span class="text-success fw-semibold"><i class="fa-solid fa-circle-check"></i> Menambahkan qty untuk [${foundItem.sku}] ${foundItem.name} (Total: ${curQty + 1}).</span>`;
+                } else {
+                    modalSkuFeedback.innerHTML = `<span class="text-warning fw-semibold"><i class="fa-solid fa-triangle-exclamation"></i> Qty untuk [${foundItem.sku}] ${foundItem.name} telah mencapai batas stok (${foundItem.available_qty}).</span>`;
+                }
+            } else {
+                // Cari baris kosong atau tambah baris baru
+                let emptyPicker = itemPickers.find(p => {
+                    const v = p.tom ? p.tom.getValue() : p.selectEl.value;
+                    return !v;
+                });
+                if (emptyPicker) {
+                    if (emptyPicker.tom) {
+                        emptyPicker.tom.setValue(foundItem.id);
+                    } else {
+                        emptyPicker.selectEl.value = foundItem.id;
+                    }
+                    syncRowMax(foundItem.id, emptyPicker.qtyInput, emptyPicker.row.querySelector('.modal-qty-hint'));
+                } else {
+                    renderLoanRow(foundItem.id, 1);
+                }
+                modalSkuFeedback.innerHTML = `<span class="text-success fw-semibold"><i class="fa-solid fa-circle-check"></i> [${foundItem.sku}] ${foundItem.name} berhasil ditambahkan ke daftar!</span>`;
+            }
+        }
+
+        if (modalSkuInput) {
+            modalSkuInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleScannedSku(this.value);
+                    this.value = '';
+                }
+            });
+        }
+
+        if (btnToggleCreateCamera && createCameraBox) {
+            btnToggleCreateCamera.addEventListener('click', function() {
+                if (createCameraBox.style.display === 'none') {
+                    createCameraBox.style.display = 'block';
+                    btnToggleCreateCamera.innerHTML = '<i class="fa-solid fa-video-slash me-1"></i> Tutup Kamera';
+                    btnToggleCreateCamera.className = 'btn btn-danger btn-sm';
+
+                    createHtml5QrCode = new Html5Qrcode("modal-create-camera-reader");
+                    createHtml5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 220, height: 220 } },
+                        (decodedText) => {
+                            handleScannedSku(decodedText);
+                        },
+                        () => {}
+                    ).catch(err => {
+                        createCameraBox.style.display = 'none';
+                        btnToggleCreateCamera.innerHTML = '<i class="fa-solid fa-camera me-1"></i> Buka Kamera Scanner';
+                        btnToggleCreateCamera.className = 'btn btn-outline-primary btn-sm';
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Kamera Tidak Tersedia',
+                            text: 'Gagal mengakses modul kamera. Gunakan keyboard scanner SKU.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                    });
+                } else {
+                    stopCreateCamera();
+                }
+            });
+
+            function stopCreateCamera() {
+                if (createHtml5QrCode) {
+                    createHtml5QrCode.stop().then(() => {
+                        createHtml5QrCode.clear();
+                        createHtml5QrCode = null;
+                    }).catch(() => {});
+                }
+                createCameraBox.style.display = 'none';
+                btnToggleCreateCamera.innerHTML = '<i class="fa-solid fa-camera me-1"></i> Buka Kamera Scanner';
+                btnToggleCreateCamera.className = 'btn btn-outline-primary btn-sm';
+            }
+
+            if (createLoanModal) {
+                createLoanModal.addEventListener('hidden.bs.modal', function() {
+                    stopCreateCamera();
+                });
+            }
+        }
+
+        // Validasi Submit Form Create Peminjaman dengan SweetAlert2
+        const formCreateLoan = document.getElementById('form-create-loan');
+        if (formCreateLoan) {
+            formCreateLoan.addEventListener('submit', function(e) {
+                const rows = itemsContainer ? itemsContainer.querySelectorAll('.modal-item-row') : [];
+                if (rows.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'Silahkan tambahkan minimal satu barang untuk dipinjam.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+
+                let hasEmptyItem = false;
+                let hasInvalidQty = false;
+
+                rows.forEach(r => {
+                    const sel = r.querySelector('.modal-item-select');
+                    const qty = r.querySelector('.modal-item-qty');
+                    if (!sel || !sel.value) hasEmptyItem = true;
+                    if (!qty || parseInt(qty.value, 10) < 1) hasInvalidQty = true;
+                });
+
+                if (hasEmptyItem) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'Terdapat baris barang yang belum dipilih. Silahkan tentukan barang inventaris atau hapus baris kosong.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+
+                if (hasInvalidQty) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'jumlah barang minimal 1 silahkan cek kembali pada jumlah barang',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+            });
+        }
 
         // --- HANDLER MODAL DETAIL PEMINJAMAN (POPUP) ---
         const loanDetailModal = document.getElementById('loanDetailModal');

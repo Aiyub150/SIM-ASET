@@ -50,7 +50,7 @@ class ItemController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
         $categoriesWithSku = $this->categoriesWithNextSku();
 
         return view('items.index', compact('items', 'categories', 'categoriesWithSku', 'search', 'categoryId', 'ownershipStatus'));
@@ -319,7 +319,7 @@ class ItemController extends Controller
     // ── Helper: daftar kategori beserta prefix & nomor SKU berikutnya ──
     private function categoriesWithNextSku()
     {
-        return Category::orderBy('name')->get()->map(function (Category $cat) {
+        return Category::where('is_active', true)->orderBy('name')->get()->map(function (Category $cat) {
             $prefix = $cat->sku_prefix ?: strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $cat->name), 0, 4));
             $last   = Item::where('category_id', $cat->id)
                           ->where('sku', 'like', $prefix . '-%')

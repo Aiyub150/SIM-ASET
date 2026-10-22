@@ -82,7 +82,10 @@ class LoanController extends Controller
 
         $loans = $query->paginate(15)->withQueryString();
 
-        return view('loans.index', compact('loans', 'search', 'status'));
+        $borrowers = Borrower::orderBy('institution_name', 'asc')->get();
+        $items     = Item::with('category')->where('available_qty', '>', 0)->orderBy('name', 'asc')->get();
+
+        return view('loans.index', compact('loans', 'search', 'status', 'borrowers', 'items'));
     }
 
     /**

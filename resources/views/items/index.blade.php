@@ -8,32 +8,37 @@
     /* Modern Ownership Selector Cards */
     .ownership-card {
         cursor: pointer;
-        border: 2px solid #e2e8f0;
+        border: 2px solid #0f172a; /* Warna hitam tegas saat unselected */
         border-radius: 10px;
-        padding: 0.75rem;
-        transition: all 0.2s ease-in-out;
+        padding: 0.85rem 0.75rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         background-color: #ffffff;
         position: relative;
+        color: #0f172a;
     }
     .ownership-card:hover {
-        border-color: #cbd5e1;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #000000;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     .ownership-card.active-internal {
         border-color: #2563eb !important;
         background-color: #eff6ff !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        color: #1e40af !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     }
     .ownership-card.active-vendor {
         border-color: #7c3aed !important;
         background-color: #f5f3ff !important;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+        color: #5b21b6 !important;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
     }
     .ownership-card.active-external {
         border-color: #d97706 !important;
         background-color: #fffbeb !important;
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        color: #92400e !important;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
     }
 
     /* Live Image Preview Styles */
@@ -312,10 +317,10 @@
                         <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <label class="ownership-card active-internal d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-internal">
-                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked style="accent-color: #2563eb;">
+                                <label class="ownership-card active-internal d-flex flex-row align-items-center gap-2 h-100" id="label-create-internal">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 create-ownership-radio" checked style="accent-color: #2563eb; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-primary small d-flex align-items-center gap-1">
+                                        <div class="fw-bold small d-flex align-items-center gap-1.5" id="text-create-internal">
                                             <i class="fa-solid fa-building-columns"></i> Milik Sendiri
                                         </div>
                                         <div class="text-muted" style="font-size:0.72rem;">SKU Otomatis Sistem</div>
@@ -323,10 +328,10 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-vendor">
-                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #7c3aed;">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2 h-100" id="label-create-vendor">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #7c3aed; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-create-vendor">
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5" id="text-create-vendor">
                                             <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
                                         </div>
                                         <div class="text-muted" style="font-size:0.72rem;">SKU/Barcode Asli</div>
@@ -334,10 +339,10 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-create-external">
-                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #d97706;">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2 h-100" id="label-create-external">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 create-ownership-radio" style="accent-color: #d97706; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-create-external">
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5" id="text-create-external">
                                             <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
                                         </div>
                                         <div class="text-muted" style="font-size:0.72rem;">SKU Titipan Asli</div>
@@ -454,10 +459,10 @@
                         <label class="form-label fw-semibold">Status Kepemilikan Aset <span class="text-danger">*</span></label>
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-internal">
-                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #2563eb;">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2 h-100" id="label-edit-internal">
+                                    <input type="radio" name="ownership_status" value="internal" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #2563eb; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-internal">
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5" id="text-edit-internal">
                                             <i class="fa-solid fa-building-columns"></i> Milik Sendiri
                                         </div>
                                         <div class="text-muted" style="font-size:0.72rem;">Aset Internal</div>
@@ -465,24 +470,24 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-vendor">
-                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #7c3aed;">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2 h-100" id="label-edit-vendor">
+                                    <input type="radio" name="ownership_status" value="vendor" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #7c3aed; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-vendor">
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5" id="text-edit-vendor">
                                             <i class="fa-solid fa-truck-ramp-box"></i> Milik Vendor
                                         </div>
-                                        <div class="text-muted" style="font-size:0.72rem;">Sewa / Pihak Ke-3</div>
+                                        <div class="text-muted" style="font-size:0.72rem;">SKU/Barcode Asli</div>
                                     </div>
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <label class="ownership-card d-flex flex-row align-items-center gap-2.5 h-100" id="label-edit-external">
-                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #d97706;">
+                                <label class="ownership-card d-flex flex-row align-items-center gap-2 h-100" id="label-edit-external">
+                                    <input type="radio" name="ownership_status" value="external" class="form-check-input mt-0 edit-ownership-radio" style="accent-color: #d97706; width: 1.15rem; height: 1.15rem;">
                                     <div>
-                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1" id="text-edit-external">
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5" id="text-edit-external">
                                             <i class="fa-solid fa-handshake-angle"></i> Instansi Lain
                                         </div>
-                                        <div class="text-muted" style="font-size:0.72rem;">Titipan Pemerintah</div>
+                                        <div class="text-muted" style="font-size:0.72rem;">SKU Titipan Asli</div>
                                     </div>
                                 </label>
                             </div>
@@ -667,6 +672,36 @@
         const createOwnerLabel     = document.getElementById('create_owner_label');
         const createOwnerInput     = document.getElementById('create_owner_name');
 
+        let createTomCat = null;
+        if (createCategorySelect && typeof TomSelect !== 'undefined') {
+            createTomCat = new TomSelect(createCategorySelect, {
+                create: false,
+                plugins: ['dropdown_input'],
+                placeholder: 'Cari atau pilih kategori...',
+                render: {
+                    option: function(data, escape) {
+                        return `<div class="d-flex justify-content-between align-items-center py-1">
+                            <span class="fw-semibold text-dark small">${escape(data.text)}</span>
+                            <span class="badge bg-light text-primary font-monospace border" style="font-size: 0.7rem;">${escape(data.prefix || 'SKU')}</span>
+                        </div>`;
+                    }
+                },
+                onChange: function(val) {
+                    updateCreateSku();
+                }
+            });
+        }
+
+        let editTomCat = null;
+        const editCategory = document.getElementById('edit_category_id');
+        if (editCategory && typeof TomSelect !== 'undefined') {
+            editTomCat = new TomSelect(editCategory, {
+                create: false,
+                plugins: ['dropdown_input'],
+                placeholder: 'Cari atau pilih kategori...'
+            });
+        }
+
         // Interaktivitas Visual Card Selector untuk Status Kepemilikan (Create)
         function refreshOwnershipCardClasses(prefix) {
             const radios = document.querySelectorAll(`.${prefix}-ownership-radio`);
@@ -685,9 +720,6 @@
                     label.classList.add(`active-${radio.value}`);
                     if (textElem) {
                         textElem.classList.remove('text-dark');
-                        if (radio.value === 'internal') textElem.classList.add('text-primary');
-                        if (radio.value === 'vendor') textElem.classList.add('text-purple');
-                        if (radio.value === 'external') textElem.classList.add('text-warning');
                     }
                 }
             });
@@ -742,7 +774,8 @@
                 createSkuBadge.textContent = 'Auto-generate';
                 createSkuBadge.className = 'badge bg-primary-subtle text-primary';
 
-                const opt = createCategorySelect.options[createCategorySelect.selectedIndex];
+                const selectedValue = createTomCat ? createTomCat.getValue() : createCategorySelect.value;
+                const opt = createCategorySelect.querySelector(`option[value="${selectedValue}"]`);
                 if (opt && opt.value) {
                     const prefix = opt.getAttribute('data-prefix');
                     const nextNum = opt.getAttribute('data-next');
@@ -853,7 +886,11 @@
                 editName.value = itemName;
                 editSkuPreview.value = itemSku;
                 editSkuBadge.textContent = 'SKU: ' + itemSku;
-                editCategory.value = categoryId;
+                if (editTomCat) {
+                    editTomCat.setValue(categoryId);
+                } else {
+                    editCategory.value = categoryId;
+                }
                 editOwnerInput.value = ownerName;
 
                 // Set radio ownership

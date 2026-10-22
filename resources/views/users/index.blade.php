@@ -398,6 +398,17 @@
                 }
             });
         }
+        // TomSelect untuk Pilihan Role di Modal Tambah & Edit Pengguna
+        ['create_user_role', 'edit_user_role'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && typeof TomSelect !== 'undefined') {
+                new TomSelect(el, {
+                    create: false,
+                    placeholder: '— Pilih Peran Pengguna —'
+                });
+            }
+        });
+
         // --- Modal Edit Pengguna & Live Avatar Preview ---
         function setupAvatarPreview(fileInputId, previewImgId, placeholderId) {
             const input = document.getElementById(fileInputId);

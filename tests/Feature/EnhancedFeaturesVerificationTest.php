@@ -324,4 +324,28 @@ class EnhancedFeaturesVerificationTest extends TestCase
         $response->assertSee('Terlambat');
         $response->assertSee('Selesai Terlambat');
     }
+
+    /**
+     * Uji 8: Kategori non-aktif tidak muncul di pilihan form pembuatan barang baru
+     */
+    public function test_inactive_categories_are_excluded_from_item_creation_selection(): void
+    {
+        $activeCategory = \App\Models\Category::create([
+            'name' => 'Kategori Aktif ' . uniqid(),
+            'sku_prefix' => 'AKT',
+            'is_active' => true,
+        ]);
+
+        $inactiveCategory = \App\Models\Category::create([
+            'name' => 'Kategori Nonaktif ' . uniqid(),
+            'sku_prefix' => 'NON',
+            'is_active' => false,
+        ]);
+
+        $response = $this->actingAs($this->superAdmin)->get(route('items.index'));
+
+        $response->assertOk();
+        $response->assertSee($activeCategory->name);
+        $response->assertDontSee($inactiveCategory->name);
+    }
 }
